@@ -35,6 +35,12 @@ Cần Node.js bản LTS · https://nodejs.org
 
 Editor mở tại `http://localhost:5173/__editor`. Server đọc và ghi thẳng vào `Public/`, ảnh upload rơi vào `Public/assets/`.
 
+### Chế độ sửa trông khác trang thật
+
+Trong khung xem của editor, Webflow và jQuery bị tắt tạm và mọi animation bị ép về trạng thái hiện đầy đủ. Chủ ý là vậy: nếu để animation chạy, lúc bấm Lưu sẽ đóng băng trang ở giữa hiệu ứng (chữ mờ, khối lệch). Muốn xem bản có hiệu ứng thật, bấm nút **▶️ Xem có hiệu ứng** trên thanh công cụ.
+
+Các thẻ `<script>` bị tắt vẫn nằm nguyên trong file, chỉ đổi `type` tạm thời, nên lưu bao nhiêu lần cũng không mất.
+
 ### Backup hoạt động thế nào
 
 Mỗi lần bấm Save, editor copy file cũ sang `tools/backups/` với tên dạng:
