@@ -1,0 +1,33 @@
+# ─────────────────────────────────────────────
+# Chỉ commit thư mục Public/ (giao diện tĩnh).
+# Mọi thứ dưới đây là đồ chạy cục bộ, không deploy.
+# ─────────────────────────────────────────────
+
+# Editor + backup chạy trên máy
+tools/
+
+# Nếu muốn version cả editor, xoá dòng "tools/" ở trên
+# rồi bỏ comment 3 dòng dưới đây:
+# tools/backups/
+# tools/node_modules/
+# tools/*.log
+
+# Bản lưu cũ của editor (phòng khi lọt vào Public/)
+*.orig-bak
+*.bak
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# Hệ điều hành
+.DS_Store
+._*
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.swp
