@@ -1,0 +1,1740 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Site Content Editor</title>
+<style>
+  :root{
+    --blue:#0740C1; --blue-600:#0a4fd8; --blue-050:#eef3ff;
+    --ink:#0f172a; --muted:#64748b; --line:#e6eaf1; --bg:#f4f6fb; --card:#ffffff;
+    --amber:#b45309; --amber-bg:#fef3c7; --green:#047857; --green-bg:#dcfce7;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;color:var(--ink);background:var(--bg)}
+  button{font-family:inherit;cursor:pointer}
+  /* ---------- top bar ---------- */
+  .topbar{height:56px;display:flex;align-items:center;gap:14px;padding:0 16px;background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
+  .brand{display:flex;align-items:center;gap:9px;font-weight:700;font-size:15px;color:var(--blue)}
+  .brand .dot{width:22px;height:22px;border-radius:6px;background:var(--blue);display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:13px}
+  .topbar .sep{width:1px;height:26px;background:var(--line)}
+  .search{flex:1;max-width:360px;position:relative}
+  .search input{width:100%;height:36px;border:1px solid var(--line);border-radius:9px;padding:0 12px 0 34px;font-size:13.5px;background:#fbfcfe}
+  .search svg{position:absolute;left:10px;top:9px;color:var(--muted)}
+  .spacer{flex:1}
+  .status{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--muted)}
+  .status .pill{width:9px;height:9px;border-radius:50%;background:#cbd5e1}
+  .status.dirty .pill{background:var(--amber)}
+  .status.saved .pill{background:var(--green)}
+  .btn{height:36px;border:1px solid var(--line);background:#fff;border-radius:9px;padding:0 14px;font-size:13.5px;font-weight:600;color:var(--ink);display:inline-flex;align-items:center;gap:7px}
+  .btn:hover{background:#f8fafc}
+  .btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}
+  .btn.primary:hover{background:var(--blue-600)}
+  .btn:disabled{opacity:.5;cursor:default}
+  /* ---------- layout ---------- */
+  .app{display:grid;grid-template-columns:212px minmax(340px,1fr) 8px var(--pw,40vw);height:calc(100vh - 56px)}
+  .app.no-preview{grid-template-columns:212px 1fr 0 0}
+  .col{overflow:auto;height:100%}
+  .left{border-right:1px solid var(--line);background:#fbfcfe;padding:12px 10px}
+  .mid{padding:14px 16px 70px;min-width:0}
+  .right{background:#fff;display:flex;flex-direction:column;min-width:0}
+  .app.no-preview .right,.app.no-preview .gutter{display:none}
+  /* draggable divider */
+  .gutter{background:var(--line);cursor:col-resize;position:relative}
+  .gutter::before{content:"";position:absolute;left:-5px;right:-5px;top:0;bottom:0;z-index:5}
+  .gutter::after{content:"⋮⋮";writing-mode:vertical-rl;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#9aa6b5;font-size:12px;letter-spacing:-2px}
+  .gutter:hover,.gutter.drag{background:var(--blue)}
+  body.resizing{cursor:col-resize;user-select:none}
+  body.resizing #preview{pointer-events:none}
+  .left h4{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:8px 8px 6px}
+  .pagelink{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:8px 10px;border-radius:8px;font-size:13.5px;color:#334155;cursor:pointer;margin-bottom:2px}
+  .pagelink:hover{background:#eef2f9}
+  .pagelink.active{background:var(--blue);color:#fff;font-weight:600}
+  .pagelink .cnt{font-size:11px;background:rgba(0,0,0,.08);padding:1px 7px;border-radius:20px;color:inherit}
+  .pagelink.active .cnt{background:rgba(255,255,255,.25)}
+  .pagelink .badge{font-size:10px;background:var(--amber-bg);color:var(--amber);border-radius:20px;padding:1px 6px}
+  .pagelink.active .badge{background:rgba(255,255,255,.25);color:#fff}
+  /* nhom trang gap/mo duoc trong cot trai */
+  .grouphead{display:flex;align-items:center;gap:6px;padding:7px 10px;margin:12px 0 4px;border-radius:8px;cursor:pointer;user-select:none;
+             font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+  .grouphead:hover{background:#eef2f9}
+  .grouphead .caret{font-size:9px;line-height:1;transition:transform .15s ease;display:inline-block}
+  .grouphead.open .caret{transform:rotate(90deg)}
+  .grouphead .gname{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .grouphead .cnt{font-size:11px;letter-spacing:0;background:rgba(0,0,0,.08);padding:1px 7px;border-radius:20px;color:inherit}
+  .grouphead .badge{font-size:10px;letter-spacing:0;background:var(--amber-bg);color:var(--amber);border-radius:20px;padding:1px 6px}
+  .groupbody{margin:0 0 4px 5px;padding-left:6px;border-left:1px solid var(--line)}
+  /* ---------- middle: fields ---------- */
+  .page-title{font-size:17px;font-weight:700;margin:0 0 2px}
+  .page-sub{font-size:12.5px;color:var(--muted);margin:0}
+  .mid-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px;position:sticky;top:0;z-index:3;background:linear-gradient(var(--bg),var(--bg) 70%,transparent);padding:2px 0 8px}
+  .mid-tools{display:flex;gap:7px;flex-shrink:0}
+  .btn.sm{height:30px;padding:0 11px;font-size:12px}
+  .section-group{margin-bottom:14px;border:1px solid var(--line);border-radius:12px;background:#fbfcfe;overflow:hidden}
+  .section-head{cursor:pointer;user-select:none;display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;letter-spacing:.02em;text-transform:uppercase;color:var(--blue);margin:0;padding:10px 12px;background:#fff;border-bottom:1px solid var(--line)}
+  .section-head:hover{background:#f6f9ff}
+  .section-head .chev{color:#94a3b8;transition:transform .15s;flex-shrink:0}
+  .section-group.collapsed .chev{transform:rotate(-90deg)}
+  .section-group.collapsed .section-head{border-bottom:0}
+  .section-head .n{font-size:11px;color:var(--muted);font-weight:600;margin-left:auto}
+  .fields-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:9px;align-items:start;padding:11px}
+  .section-group.collapsed .fields-grid{display:none}
+  .field{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:9px 10px;margin-bottom:0;transition:border-color .15s,box-shadow .15s}
+  .field.changed{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-050)}
+  .field.located{border-color:var(--blue);box-shadow:0 0 0 3px rgba(7,64,193,.25)}
+  .field.located textarea{font-weight:600;background:#fbfdff}
+  .field.located .field-type{background:var(--blue);color:#fff}
+  @keyframes seflash{0%{box-shadow:0 0 0 8px rgba(7,64,193,.40)}100%{box-shadow:0 0 0 3px rgba(7,64,193,.25)}}
+  .field.flash{animation:seflash .95s ease-out}
+  .field-top{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+  .field-type{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);background:#f1f5f9;padding:2px 7px;border-radius:5px}
+  .field-type.t-heading{color:#7c3aed;background:#f3e8ff}
+  .field-type.t-button{color:#b45309;background:#fef3c7}
+  .field-type.t-image{color:#0369a1;background:#e0f2fe}
+  .field-type.t-title{color:#be123c;background:#ffe4e6}
+  .field .shared{font-size:10.5px;color:var(--amber);background:var(--amber-bg);padding:2px 7px;border-radius:5px;font-weight:600}
+  .field .reset{margin-left:auto;border:none;background:none;color:var(--muted);font-size:12px;padding:3px 6px;border-radius:6px;visibility:hidden}
+  .field:hover .reset{visibility:visible}
+  .field .reset:hover{background:#f1f5f9;color:var(--ink)}
+  .field textarea{width:100%;border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-family:inherit;font-size:13.5px;line-height:1.5;color:var(--ink);resize:vertical;min-height:38px;background:#fff}
+  .field textarea:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-050)}
+  .rich-tools{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:6px;align-items:center}
+  .rich-tools .sw{width:20px;height:20px;border-radius:5px;border:1px solid rgba(0,0,0,.18);cursor:pointer;padding:0;transition:transform .1s}
+  .rich-tools .sw:hover{transform:scale(1.15)}
+  .rich-tools .sw-custom{width:20px;height:20px;border-radius:5px;border:1px dashed #94a3b8;display:inline-flex;align-items:center;justify-content:center;font-size:13px;color:#64748b;cursor:pointer;position:relative;overflow:hidden;line-height:1}
+  .rich-tools .sw-custom input{position:absolute;inset:0;opacity:0;cursor:pointer}
+  .rich-ed{width:100%;min-height:38px;border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-family:inherit;font-size:13.5px;line-height:1.5;color:var(--ink);background:#fff;outline:none}
+  .rich-ed:focus{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-050)}
+  .rich-hint{font-size:11px;color:#94a3b8;margin-top:5px}
+  .rich-ed:empty:before{content:attr(data-ph);color:#cbd5e1;pointer-events:none}
+  .field.is-empty{border-color:#fbbf24;background:#fffdf5}
+  .field.is-empty .empty-tag{font-size:10.5px;font-weight:600;color:#b45309;background:#fef3c7;border-radius:5px;padding:2px 7px}
+  .field .apply-all{display:none;align-items:center;gap:7px;margin-top:8px;font-size:12.5px;color:#475569}
+  .field.changed.is-shared .apply-all{display:flex}
+  .field .apply-all input{width:15px;height:15px;accent-color:var(--blue)}
+  /* image field */
+  .imgrow{display:flex;gap:12px;align-items:center}
+  .imgthumb{width:88px;height:64px;border:1px solid var(--line);border-radius:8px;background:#f8fafc center/contain no-repeat;flex-shrink:0}
+  .imgmeta{min-width:0;flex:1}
+  .imgmeta .fn{font-size:12px;color:var(--muted);word-break:break-all;margin-bottom:8px}
+  .imgmeta .pending{font-size:11.5px;color:var(--green);font-weight:600}
+  /* ---------- preview ---------- */
+  .preview-bar{height:42px;display:flex;align-items:center;gap:10px;padding:0 14px;border-bottom:1px solid var(--line);font-size:12.5px;color:var(--muted);flex-shrink:0}
+  .preview-bar .live{display:inline-flex;align-items:center;gap:6px;color:var(--green);font-weight:600}
+  .preview-bar .live .d{width:8px;height:8px;border-radius:50%;background:var(--green)}
+  .preview-bar .pv-hint{margin-left:auto;font-size:11px;color:#9aa6b5}
+  .preview-stage{flex:1;overflow:hidden;position:relative;background:#fff}
+  #preview{border:0;background:#fff;transform-origin:top left;position:absolute;top:0;left:0}
+  .empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center;color:var(--muted);padding:30px}
+  .empty h3{color:var(--ink);margin:14px 0 6px}
+  .empty .big{width:66px;height:66px;border-radius:16px;background:var(--blue-050);display:flex;align-items:center;justify-content:center}
+  /* toast */
+  #toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:11px 18px;border-radius:10px;font-size:13.5px;opacity:0;pointer-events:none;transition:.25s;z-index:50;box-shadow:0 10px 30px rgba(0,0,0,.2)}
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  #toast.err{background:#b91c1c}
+  .hidden{display:none!important}
+  .loadwrap{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(244,246,251,.85);z-index:40;flex-direction:column;gap:14px}
+  .spin{width:34px;height:34px;border:3px solid var(--blue-050);border-top-color:var(--blue);border-radius:50%;animation:sp .8s linear infinite}
+  @keyframes sp{to{transform:rotate(360deg)}}
+</style>
+<style>.btn.active{background:#0740C1;color:#fff;border-color:#0740C1;}</style>
+<style>
+  /* ---------- tree map (middle panel) ---------- */
+  .tree{padding-bottom:40px}
+  .tsection{margin-bottom:8px;border:1px solid var(--line);border-radius:10px;background:#fff;overflow:hidden}
+  .tsection>.thead{display:flex;align-items:center;gap:8px;padding:10px 12px;cursor:pointer;user-select:none;font-size:13px;font-weight:700;color:var(--blue);background:#fff}
+  .tsection>.thead:hover{background:#f6f9ff}
+  .tsection>.thead .chev{transition:transform .15s;color:#94a3b8;flex-shrink:0}
+  .tsection:not(.open)>.thead .chev{transform:rotate(-90deg)}
+  .tsection>.thead .n{margin-left:auto;font-size:11px;color:var(--muted);font-weight:600}
+  .tsection>.tinner{display:none;padding:6px 8px 8px}
+  .tsection.open>.tinner{display:block}
+  .tblock{border:1px dashed #d5deec;border-radius:9px;margin:6px 0;background:#fbfcfe}
+  .tblock>.bhead{display:flex;align-items:center;gap:5px;padding:6px 8px}
+  .tblock>.bhead .blabel{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11.5px;color:#475569;font-weight:600}
+  .tblock .bbtn{border:1px solid var(--line);background:#fff;border-radius:6px;width:27px;height:27px;display:inline-flex;align-items:center;justify-content:center;color:#64748b;padding:0;font-size:13px;line-height:1}
+  .tblock .bbtn:hover{background:#eef2f9;color:var(--blue);border-color:#c7d6ef}
+  .tblock .bbtn.danger:hover{background:#fee2e2;color:#b91c1c;border-color:#fecaca}
+  .tblock>.bchildren{padding:0 6px 6px}
+  /* --- thao tac cap khu vuc --- */
+  .tsection>.thead .sops{display:flex;gap:4px;margin-left:8px}
+  .tsection>.thead .bbtn{border:1px solid var(--line);background:#fff;border-radius:6px;width:25px;height:25px;display:inline-flex;align-items:center;justify-content:center;color:#64748b;padding:0;font-size:12px;line-height:1;font-weight:400}
+  .tsection>.thead .bbtn:hover{background:#eef2f9;color:var(--blue);border-color:#c7d6ef}
+  .tsection>.thead .bbtn.danger:hover{background:#fee2e2;color:#b91c1c;border-color:#fecaca}
+  /* --- keo tha --- */
+  .bbtn.drag-h{cursor:grab;letter-spacing:-2px}
+  .bbtn.drag-h:active{cursor:grabbing}
+  .tblock.dragging,.tsection.dragging{opacity:.4}
+  .tblock.dz-before,.tsection.dz-before{box-shadow:0 -3px 0 -1px var(--blue)}
+  .tblock.dz-after,.tsection.dz-after{box-shadow:0 3px 0 -1px var(--blue)}
+  /* --- bang bo cuc trang --- */
+  .layout-box{border:1px solid #c7d6ef;background:#f6f9ff;border-radius:10px;margin-bottom:8px;overflow:hidden}
+  .layout-box .lhead{padding:8px 12px;font-size:12px;font-weight:700;color:var(--blue)}
+  .layout-row{display:flex;align-items:center;gap:5px;padding:5px 8px 5px 10px;border-top:1px solid #dbe6f7;background:#fff}
+  .layout-row .lnum{width:20px;text-align:center;font-size:10.5px;color:#94a3b8;font-weight:700;flex-shrink:0}
+  .layout-row .lname{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;color:#334155;font-weight:600}
+  .layout-row .bbtn{border:1px solid var(--line);background:#fff;border-radius:6px;width:27px;height:27px;display:inline-flex;align-items:center;justify-content:center;color:#64748b;padding:0;font-size:13px;line-height:1;flex-shrink:0}
+  .layout-row .bbtn:hover{background:#eef2f9;color:var(--blue);border-color:#c7d6ef}
+  .layout-row .bbtn.danger:hover{background:#fee2e2;color:#b91c1c;border-color:#fecaca}
+  .layout-row.dragging{opacity:.4}
+  .layout-row.dz-before{box-shadow:inset 0 3px 0 -1px var(--blue)}
+  .layout-row.dz-after{box-shadow:inset 0 -3px 0 -1px var(--blue)}
+  /* --- bang khoi dang an --- */
+  .hidden-box{border:1px solid #fde68a;background:#fffbeb;border-radius:10px;margin-bottom:8px;overflow:hidden}
+  .hidden-box .hhead{padding:8px 12px;font-size:12px;font-weight:700;color:#92400e}
+  .hidden-box .hrow{display:flex;align-items:center;gap:5px;padding:5px 8px 5px 12px;border-top:1px solid #fde68a}
+  .hidden-box .hlab{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11.5px;color:#92400e;font-weight:600}
+  .hidden-box .bbtn{border:1px solid #fcd34d;background:#fff;border-radius:6px;width:27px;height:27px;display:inline-flex;align-items:center;justify-content:center;color:#92400e;padding:0;font-size:13px;line-height:1}
+  .hidden-box .bbtn:hover{background:#fef3c7}
+  .hidden-box .bbtn.danger:hover{background:#fee2e2;color:#b91c1c;border-color:#fecaca}
+  .tnode{border-top:1px solid #eef1f6}
+  .tnode:first-child{border-top:0}
+  .trow{display:flex;align-items:center;gap:8px;padding:7px 8px;cursor:pointer;border-radius:7px}
+  .trow:hover{background:#f1f5f9}
+  .tnode.open>.trow{background:#eef3ff}
+  .trow .tt{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--muted);background:#f1f5f9;padding:2px 6px;border-radius:5px;flex-shrink:0}
+  .trow .tt.t-heading{color:#7c3aed;background:#f3e8ff}
+  .trow .tt.t-button{color:#b45309;background:#fef3c7}
+  .trow .tt.t-image{color:#0369a1;background:#e0f2fe}
+  .trow .tt.t-title{color:#be123c;background:#ffe4e6}
+  .trow .tprev{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;color:#334155}
+  .trow .dot{width:7px;height:7px;border-radius:50%;background:var(--blue);flex-shrink:0;visibility:hidden}
+  .tnode.changed .trow .dot{visibility:visible}
+  .tbody{display:none;padding:8px 8px 10px}
+  .tnode.open>.tbody{display:block}
+  .tbody .field{border:0;padding:0;background:transparent;box-shadow:none!important}
+  @keyframes tflash{0%{box-shadow:0 0 0 6px rgba(7,64,193,.35)}100%{box-shadow:0 0 0 0 rgba(7,64,193,0)}}
+  .tnode.flash>.trow{animation:tflash .95s ease-out;border-radius:7px}
+</style>
+<style>
+  /* ================= CHE DO MAU (color editor drawer) ================= */
+  body.ce-open .app{margin-right:344px}
+  .ce-drawer{position:fixed;top:56px;right:0;bottom:0;width:344px;background:#fff;border-left:1px solid var(--line);
+    box-shadow:-14px 0 34px rgba(15,23,42,.10);z-index:40;display:flex;flex-direction:column;
+    transform:translateX(105%);transition:transform .22s ease}
+  .ce-drawer.open{transform:none}
+  .ce-head{display:flex;align-items:flex-start;gap:10px;padding:13px 16px 11px;border-bottom:1px solid var(--line)}
+  .ce-title{font-weight:700;font-size:14.5px}
+  .ce-el{font-size:11.5px;color:var(--muted);margin-top:3px;word-break:break-all;line-height:1.35}
+  .ce-x{margin-left:auto;border:0;background:#f1f5f9;width:28px;height:28px;border-radius:8px;color:#475569;font-size:13px;flex:none}
+  .ce-x:hover{background:#e2e8f0}
+  .ce-crumbs{display:flex;flex-wrap:wrap;gap:4px;align-items:center;padding:8px 16px;border-bottom:1px solid var(--line);background:#fbfcfe}
+  .ce-crumb{font-size:11px;border:1px solid var(--line);background:#fff;border-radius:20px;padding:3px 9px;color:#475569;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .ce-crumb:hover{border-color:#0052CD;color:#0052CD}
+  .ce-crumb.cur{background:#0052CD;border-color:#0052CD;color:#fff;font-weight:600}
+  .ce-arrow{color:#cbd5e1;font-size:10px}
+  .ce-tabs{display:flex;gap:6px;padding:11px 16px 0}
+  .ce-tab{flex:1;height:32px;border:1px solid var(--line);background:#fff;border-radius:8px;font-size:12.5px;font-weight:600;color:#475569}
+  .ce-tab.active{background:#F0F4FC;border-color:#0052CD;color:#0052CD}
+  .ce-body{flex:1;overflow:auto;padding:12px 16px 18px}
+  .ce-row{margin-bottom:15px}
+  .ce-lab{display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;color:#334155;margin-bottom:7px}
+  .ce-cur{width:16px;height:16px;border-radius:5px;border:1px solid #cbd5e1;flex:none;
+    background-image:linear-gradient(45deg,#e2e8f0 25%,transparent 25%,transparent 75%,#e2e8f0 75%),linear-gradient(45deg,#e2e8f0 25%,transparent 25%,transparent 75%,#e2e8f0 75%);
+    background-size:8px 8px;background-position:0 0,4px 4px}
+  .ce-cur i{display:block;width:100%;height:100%;border-radius:4px}
+  .ce-val{font-weight:400;color:#94a3b8;font-size:11px}
+  .ce-sws{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+  .ce-sw{width:24px;height:24px;border-radius:7px;border:1px solid rgba(15,23,42,.15);padding:0;transition:transform .1s}
+  .ce-sw:hover{transform:scale(1.14)}
+  .ce-pick{width:24px;height:24px;border-radius:7px;border:1px dashed #94a3b8;display:inline-flex;align-items:center;justify-content:center;font-size:13px;color:#475569;cursor:pointer;position:relative;overflow:hidden}
+  .ce-pick input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+  .ce-clear{height:24px;border:1px solid var(--line);background:#fff;border-radius:7px;font-size:11px;padding:0 8px;color:#475569}
+  .ce-clear:hover{border-color:#0052CD;color:#0052CD}
+  .ce-scope{border:1px solid #cfe0ff;background:#F0F4FC;border-radius:10px;padding:10px;margin-bottom:15px}
+  .ce-scope .t{font-size:11.5px;color:#334155;margin-bottom:8px;line-height:1.4}
+  .ce-scope .t b{color:#0052CD}
+  .ce-scopebtns{display:flex;flex-direction:column;gap:5px}
+  .ce-sc{text-align:left;border:1px solid var(--line);background:#fff;border-radius:8px;padding:7px 9px;font-size:12px;color:#334155;line-height:1.35}
+  .ce-sc:hover:not(:disabled){border-color:#94b6ee}
+  .ce-sc.on{border-color:#0052CD;color:#0052CD;font-weight:600;box-shadow:0 0 0 1px #0052CD inset}
+  .ce-sc:disabled{opacity:.45;cursor:default}
+  .ce-foot{border-top:1px solid var(--line);padding:10px 16px;display:flex;align-items:center;gap:10px}
+  .ce-hint{font-size:10.5px;color:var(--muted);line-height:1.35}
+  .ce-empty{font-size:12.5px;color:var(--muted);line-height:1.6;padding:14px 2px}
+  .ce-empty b{color:#334155}
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="brand"><span class="dot">✎</span> Site Editor</div>
+    <div class="sep"></div>
+    <div class="search">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      <input id="search" type="text" placeholder="Tìm chữ trong trang..." autocomplete="off">
+    </div>
+    <div class="spacer"></div>
+    <div id="status" class="status"><span class="pill"></span><span class="txt">Chưa mở website</span></div>
+    <button id="previewToggle" class="btn" title="Ẩn / hiện khung xem trước">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
+      Xem trước
+    </button>
+    <button id="colorBtn" class="btn" title="Bật chế độ đổi màu — bấm vào nút / CTA / khối bất kỳ trong khung xem trước">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="13.5" cy="6.5" r="1.5"/><circle cx="17.5" cy="10.5" r="1.5"/><circle cx="8.5" cy="7.5" r="1.5"/><circle cx="6.5" cy="12.5" r="1.5"/><path d="M12 2a10 10 0 1 0 0 20c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1a1.49 1.49 0 0 1 1.09-2.5H16a6 6 0 0 0 6-6c0-5.52-4.48-10-10-10z"/></svg>
+      <span class="lbl">Đổi màu</span>
+    </button>
+    <button id="blogBtn" class="btn" title="Mở dashboard quản lý bài viết blog / SEO">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h11a2 2 0 0 1 2 2v14H6a2 2 0 0 1-2-2z"/><path d="M8 8h6M8 12h6M8 16h4"/><path d="M17 8h1a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2"/></svg>
+      Blog SEO
+    </button>
+    <button id="hideRepairBtn" class="btn" title="Ẩn / hiện các mục Sửa chữa trên toàn site" style="display:none"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><line x1="3" y1="3" x2="21" y2="21"/></svg><span class="lbl">Ẩn Sửa chữa</span></button><button id="saveBtn" class="btn primary" disabled>
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>
+      Lưu tất cả
+    </button>
+  </div>
+
+  <div class="app">
+    <div class="col left" id="left"></div>
+    <div class="col mid" id="mid">
+      <div class="empty">
+        <div class="big"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#0740C1" stroke-width="1.7"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg></div>
+        <h3>Đang tải nội dung website…</h3>
+        <p>Công cụ sẽ tự quét toàn bộ chữ và ảnh của các trang.</p>
+      </div>
+    </div>
+    <div class="gutter" id="gutter" title="Kéo để thay đổi độ rộng khung xem trước"></div>
+    <div class="col right">
+      <div class="preview-bar"><span class="live"><span class="d"></span>Xem trước trực tiếp</span><span id="previewName"></span><span class="pv-hint">bản desktop thu nhỏ · bấm vào để tìm ô sửa</span></div>
+      <div class="preview-stage" id="pstage"><iframe id="preview" title="preview"></iframe></div>
+    </div>
+  </div>
+
+  <div id="ceDrawer" class="ce-drawer">
+    <div class="ce-head">
+      <div style="min-width:0">
+        <div class="ce-title">Đổi màu</div>
+        <div class="ce-el" id="ceElName">Chưa chọn phần tử nào</div>
+      </div>
+      <button class="ce-x" id="ceClose" title="Đóng">✕</button>
+    </div>
+    <div class="ce-crumbs" id="ceCrumbs"></div>
+    <div class="ce-tabs">
+      <button class="ce-tab active" data-tab="base">Bình thường</button>
+      <button class="ce-tab" data-tab="hover">Khi rê chuột</button>
+    </div>
+    <div class="ce-body" id="ceBody"></div>
+    <div class="ce-foot">
+      <button class="btn sm" id="ceReset">Hoàn tác màu</button>
+      <span class="ce-hint">Đổi xong nhớ bấm <b>Lưu tất cả</b> để ghi vào file</span>
+    </div>
+  </div>
+
+  <div id="toast"></div>
+  <div id="loader" class="loadwrap"><div class="spin"></div><div id="loadmsg" style="color:#475569;font-size:13.5px">Đang kết nối…</div></div>
+
+<script>
+"use strict";
+/* ============================================================
+   Site Content Editor  — works with any static-site folder
+   ============================================================ */
+const state = { pages: [], active: null, sharedIndex: new Map() };
+const collapsedSections = new Set();
+const $ = s => document.querySelector(s);
+
+/* -------- section label detection (class-name heuristics) -------- */
+const SECTION_MAP = [
+  [/nav|menu/, 'Thanh điều hướng'], [/hero|banner|masthead/, 'Hero (đầu trang)'],
+  [/partner|client|logo-?strip|brand/, 'Đối tác / Logo'], [/solution/, 'Giải pháp'],
+  [/feature/, 'Tính năng'], [/benefit/, 'Lợi ích'], [/statistic|counter|stat\b/, 'Số liệu'],
+  [/pricing|plan|price/, 'Bảng giá'], [/testimonial|review|feedback/, 'Đánh giá'],
+  [/work|process|step|how/, 'Cách hoạt động'], [/faq|question/, 'Câu hỏi thường gặp'],
+  [/income|financial|saving|analytic|dashboard|product-?screen/, 'Minh hoạ sản phẩm'],
+  [/addition|extra|more/, 'Nội dung bổ sung'], [/app|download|get-app|store/, 'Tải ứng dụng'],
+  [/cta|call-?to|subscribe|newsletter/, 'Kêu gọi hành động (CTA)'],
+  [/blog|post|article|news/, 'Blog / Bài viết'], [/footer/, 'Chân trang'],
+  [/header|topbar/, 'Đầu trang'],
+];
+function sectionOf(el){
+  let n = el, depth = 0;
+  while(n && n.nodeType === 1 && depth < 40){
+    const cls = (n.getAttribute && (n.getAttribute('class')||'')) + ' ' + (n.id||'');
+    for(const [re,label] of SECTION_MAP){ if(re.test(cls.toLowerCase())) return label; }
+    if(/^(section|footer|header|nav|main)$/i.test(n.tagName)) {
+      const cls2 = (n.getAttribute('class')||'').toLowerCase();
+      for(const [re,label] of SECTION_MAP){ if(re.test(cls2)) return label; }
+    }
+    n = n.parentElement; depth++;
+  }
+  return 'Nội dung';
+}
+
+/* -------- classify a text element -------- */
+const HEADING_TAGS = new Set(['H1','H2','H3','H4','H5','H6']);
+function textType(el){
+  if(!el) return 'text';
+  const t = el.tagName;
+  if(HEADING_TAGS.has(t)) return 'heading';
+  const cls = (el.getAttribute('class')||'').toLowerCase();
+  if(t==='A' || t==='BUTTON' || /button|btn|cta/.test(cls)) return 'button';
+  return 'text';
+}
+const TYPE_LABEL = { heading:'Tiêu đề', text:'Đoạn chữ', button:'Nút bấm', image:'Hình ảnh', title:'Tiêu đề trang', placeholder:'Ô nhập' };
+
+const SKIP_TAGS = new Set(['SCRIPT','STYLE','NOSCRIPT','SVG','TEMPLATE','CODE','PATH','G']);
+const INLINE_TAGS = new Set(['SPAN','B','STRONG','I','EM','U','A','BR','SMALL','SUP','SUB','MARK','FONT','WBR','ABBR']);
+function isVisibleText(s){ return s && s.replace(/[\s ​]+/g,'').length > 0; }
+
+/* -------- walk a document, produce editable items bound to live nodes -------- */
+let uidSeq = 0;
+// Deterministic walk shared by extraction AND preview tagging so indices line up 1:1
+function collectTargets(doc){
+  const texts=[], imgs=[], phs=[];
+  let title=null;
+  const t=doc.querySelector('title'); if(t && isVisibleText(t.textContent)) title=t;
+  const body=doc.body;
+  if(body){
+    (function walk(el){
+      if(!el || SKIP_TAGS.has(el.tagName)) return;
+      const childEls = Array.from(el.children).filter(c=>!SKIP_TAGS.has(c.tagName));
+      const directText = Array.from(el.childNodes).filter(n=>n.nodeType===3 && isVisibleText(n.nodeValue));
+      const isSlot = el.hasAttribute && el.hasAttribute('data-se-slot');   // an emptied-but-kept field
+      if(childEls.length===0){
+        if(directText.length>0 || isSlot) texts.push({mode:'plain', node:el});
+      } else if(childEls.every(c=>INLINE_TAGS.has(c.tagName)) && (isVisibleText(el.textContent) || isSlot)){
+        const hasRich = childEls.some(c=>c.tagName!=='BR');   // spans/links -> rich; only <br> -> plain multiline
+        texts.push({mode: hasRich?'rich':'plain', node:el});
+      } else { for(const tn of directText) texts.push({mode:'textnode', node:tn}); for(const c of childEls) walk(c); }
+    })(body);
+    body.querySelectorAll('img').forEach(img=>{ const s=img.getAttribute('src')||''; if(s && !s.startsWith('data:')) imgs.push(img); });
+    body.querySelectorAll('input[placeholder],textarea[placeholder]').forEach(inp=>{ if(isVisibleText(inp.getAttribute('placeholder'))) phs.push(inp); });
+  }
+  return { title, texts, imgs, phs };
+}
+function extract(page){
+  const items=[], T=collectTargets(page.doc);
+  if(T.title){ const it=mkItem(page,'title',T.title,null,'Đầu trang',T.title.textContent.trim(),'element'); it.cat='title'; it.seid='title'; items.push(it); }
+  T.texts.forEach((t,i)=>{
+    const isTN = t.mode==='textnode';
+    const el = isTN ? t.node.parentElement : t.node;
+    const type = isTN ? 'text' : textType(t.node);
+    const it = mkItem(page, type, el, (isTN?t.node:null), sectionOf(el), '', t.mode);
+    it.cat='text'; it.seid='t'+i;
+    it.original = it.value = getText(it);
+    items.push(it);
+  });
+  T.imgs.forEach((img,i)=>{ const it=mkImage(page,img,img.getAttribute('src')); it.cat='img'; it.seid='g'+i; items.push(it); });
+  T.phs.forEach((inp,i)=>{ const it=mkItem(page,'placeholder',inp,null,sectionOf(inp),(inp.getAttribute('placeholder')||'').trim(),'placeholder'); it.cat='ph'; it.seid='p'+i; items.push(it); });
+  return items;
+}
+function mkItem(page,type,el,textNode,section,value,mode){
+  return { uid:'f'+(uidSeq++), kind:'text', type, el, textNode, mode:mode||'element',
+           section, original:value, value, changed:false, page };
+}
+function mkImage(page,img,src){
+  return { uid:'f'+(uidSeq++), kind:'image', type:'image', el:img, section:sectionOf(img),
+           original:src, value:src, changed:false, pendingFile:null, pendingURL:null, page };
+}
+function getText(it){
+  if(it.type==='title') return it.el.textContent;
+  if(it.type==='placeholder') return it.el.getAttribute('placeholder')||'';
+  if(it.mode==='textnode') return it.textNode.nodeValue;
+  if(it.mode==='rich') return it.el.innerHTML;
+  return plainGet(it.el);
+}
+function setText(it,val){
+  if(it.type==='title'){ it.el.textContent = val; return; }
+  if(it.type==='placeholder'){ it.el.setAttribute('placeholder', val); return; }
+  if(it.mode==='textnode'){ it.textNode.nodeValue = val; return; }
+  if(it.mode==='rich'){ it.el.innerHTML = sanitizeRich(val); return; }
+  plainSet(it.el, val);
+}
+function plainGet(el){
+  let s='';
+  el.childNodes.forEach(n=>{ if(n.nodeType===3) s+=n.nodeValue; else if(n.nodeType===1 && n.tagName==='BR') s+='\n'; });
+  return s.replace(/​/g,'');
+}
+function plainSet(el,val){
+  if(/\n/.test(val)) el.innerHTML = val.split('\n').map(esc).join('<br>');
+  else el.textContent = val;
+}
+// When a field is emptied, keep a marker so it stays an editable slot after save/reload.
+function markSlot(it){
+  if(it.kind!=='text' || it.type==='title' || it.type==='placeholder' || it.mode==='textnode' || !it.el) return;
+  const empty = !((it.el.textContent||'').replace(/[\s​]/g,'').length);
+  if(empty) it.el.setAttribute('data-se-slot',''); else it.el.removeAttribute('data-se-slot');
+}
+// keep only safe inline tags + class / color / href so edits preserve colours and links
+function sanitizeRich(html){
+  const box=document.createElement('div'); box.innerHTML=html;
+  const ALLOW=new Set(['SPAN','BR','B','STRONG','I','EM','U','A','MARK','SUP','SUB','SMALL','FONT']);
+  box.querySelectorAll('font').forEach(f=>{ const s=document.createElement('span'); const c=f.getAttribute('color')||(f.style&&f.style.color); if(c) s.style.color=c; s.innerHTML=f.innerHTML; f.replaceWith(s); });
+  (function clean(node){
+    Array.from(node.childNodes).forEach(n=>{
+      if(n.nodeType===1){
+        if(!ALLOW.has(n.tagName)){ while(n.firstChild) node.insertBefore(n.firstChild,n); node.removeChild(n); return; }
+        const keepClass=n.getAttribute('class'), keepColor=n.style&&n.style.color, keepHref=n.tagName==='A'?n.getAttribute('href'):null;
+        Array.from(n.attributes).forEach(a=>n.removeAttribute(a.name));
+        if(keepClass) n.setAttribute('class',keepClass);
+        if(keepColor) n.style.color=keepColor;
+        if(keepHref) n.setAttribute('href',keepHref);
+        clean(n);
+      } else if(n.nodeType===8){ node.removeChild(n); }
+    });
+  })(box);
+  return box.innerHTML.replace(/(?:\s*<br\s*\/?>)+\s*$/i,'');   // drop trailing line-break artifacts
+}
+
+/* -------- shared-text index (same text on >=2 pages) -------- */
+function buildSharedIndex(){
+  const map = new Map();
+  for(const p of state.pages) for(const it of p.items){
+    if(it.kind!=='text') continue;
+    const key = it.original.trim(); if(key.length<2) continue;
+    if(!map.has(key)) map.set(key,[]);
+    map.get(key).push(it);
+  }
+  for(const [k,arr] of map){
+    const pageSet = new Set(arr.map(i=>i.page.name));
+    if(pageSet.size>=2) for(const it of arr){ it.shared=true; it.sharedCount=pageSet.size; }
+  }
+  state.sharedIndex = map;
+}
+
+/* ============================ loading ============================ */
+async function boot(){
+  try{
+    const r = await fetch('/__api/list');
+    if(!r.ok) throw new Error('no-server');
+    const data = await r.json();
+    if(!data.files || !data.files.length){ loadMsg('Không tìm thấy file .html nào trong thư mục.'); return; }
+    setLoad('Đang tải '+data.files.length+' trang…');
+    for(const f of data.files){
+      const html = await (await fetch('/'+f.split('/').map(encodeURIComponent).join('/'))).text();
+      const doc = new DOMParser().parseFromString(html, 'text/html');
+      const page = { name:f, doc, items:[], dirty:false };
+      page.items = extract(page);
+      state.pages.push(page);
+    }
+    buildSharedIndex();
+    $('#loader').classList.add('hidden');
+    renderSidebar();
+    if(state.pages.length) selectPage(state.pages[0]);
+    setStatus('saved','Sẵn sàng — mọi thay đổi sẽ lưu vào file'); _scUpdateBtn();
+  }catch(e){
+    $('#loader').classList.remove('hidden');
+    loadMsg('Chưa chạy qua server. Hãy mở bằng file start (start.bat / start.command) để công cụ có thể lưu vào file.');
+  }
+}
+function setLoad(m){ $('#loadmsg').textContent = m; }
+function loadMsg(m){ $('#loader').innerHTML = '<div class="empty" style="max-width:460px"><div class="big">⚠️</div><h3>'+m+'</h3></div>'; }
+
+/* ============================ rendering ============================ */
+/* ---------- nhom trang tu dong theo tien to ten file ----------
+   Quy uoc dat ten cua site clone:  <ho>__<ten-trang>.html
+     home__home.html, home__home-v2.html      -> nhom "home"
+     about-us__about-us-2.html                -> nhom "about-us"
+     blog.html + blog__<slug>.html            -> nhom "blog" (blog.html la trang tong)
+   Ho nao chi co 1 trang thi khong lap nhom, day len muc "Trang chinh".
+   Tuong thich nguoc: qranty-blog-<slug>.html cung gom vao ho "qranty-blog". */
+const GROUP_LABEL = {
+  'home':'Trang chủ', 'index':'Trang chủ',
+  'services':'Tính năng', 'service':'Tính năng',
+  'about-us':'Về Wistorix', 'about':'Về Wistorix',
+  'pricing':'Bảng giá',
+  'contact-us':'Liên hệ', 'contact':'Liên hệ',
+  'blog':'Blog', 'qranty-blog':'Blog', 'news':'Tin tức',
+  'worker':'Đội ngũ', 'team':'Đội ngũ',
+  'template':'Trang mẫu (template)', 'utility':'Trang tiện ích',
+  'legal':'Pháp lý', 'case-study':'Case study', 'project':'Dự án', 'portfolio':'Portfolio'
+};
+// Thu tu hien thi giong thanh menu (navigator) cua website Wistorix.
+// Key khong co trong danh sach nay se xep sau, theo alphabet.
+const NAV_ORDER = ['home','index','services','about-us','pricing','contact-us','blog','worker','team','template'];
+// Nhan tieng Viet cho tung trang, lay dung chu trong menu site.
+const PAGE_LABEL = {
+  'index.html':'Trang chủ',
+  'services.html':'Tính năng (tổng)',
+  'services__ai-strategy.html':'AI Strategy',
+  'services__business-consulting.html':'Business Consulting',
+  'services__data-insights.html':'Data Insights',
+  'about-us__about-us.html':'Về Wistorix',
+  'about-us__about-us-2.html':'Câu chuyện sản phẩm',
+  'about-us__about-us-3.html':'Đội ngũ',
+  'pricing.html':'Bảng giá',
+  'contact-us__contact-us.html':'Liên hệ',
+  'contact-us__contact-us-2.html':'Hỗ trợ',
+  'contact-us__contact-us-3.html':'Đặt lịch demo',
+  'blog.html':'Blog (tổng)'
+};
+function pageLabelOf(name){ return PAGE_LABEL[String(name||'').split('/').pop()] || null; }
+function navRank(key){ const i = NAV_ORDER.indexOf(String(key||'').toLowerCase()); return i<0 ? 999 : i; }
+function groupKeyOf(name){
+  const base = String(name||'').split('/').pop().replace(/\.html?$/i,'');
+  const m = /^(.+?)__/.exec(base);                                  // ho__ten-trang
+  if(m) return m[1].toLowerCase();
+  const q = /^(qranty-blog)-.+$/i.exec(base);                       // tuong thich site Qranty
+  if(q) return q[1].toLowerCase();
+  return base.toLowerCase();                                        // file le -> tu lam khoa
+}
+function groupLabelOf(key, n){
+  const lbl = GROUP_LABEL[key] || key.replace(/[-_]/g,' ').replace(/\b\w/g, c=>c.toUpperCase());
+  return lbl + ' (' + n + ')';
+}
+// ten hien thi cua 1 trang khi nam trong nhom: bo tien to ho cho do lap chu
+function inGroupName(name, key){
+  const lbl = pageLabelOf(name); if(lbl) return lbl;          // uu tien nhan menu
+  const base = String(name||'').split('/').pop().replace(/\.html?$/i,'');
+  if(base.toLowerCase() === key) return 'Trang tổng';
+  const s = base.replace(new RegExp('^'+key.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'(__|-)','i'),'')
+                .replace(/[-_]+/g,' ').trim();
+  return s ? s.charAt(0).toUpperCase()+s.slice(1) : base;
+}
+// nhom nao dang mo — nho qua localStorage
+let openGroups = new Set();
+try{ openGroups = new Set(JSON.parse(localStorage.getItem('se-open-groups')||'[]')); }catch(e){}
+function saveOpenGroups(){ try{ localStorage.setItem('se-open-groups', JSON.stringify([...openGroups])); }catch(e){} }
+
+function pageRow(p, label){
+  const nText = p.items.filter(i=>i.kind==='text').length;
+  const nImg  = p.items.filter(i=>i.kind==='image').length;
+  const dirty = p.dirty ? '<span class="badge">•</span>' : '';
+  return '<div class="pagelink" data-page="'+p.name+'" title="'+p.name+'"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'
+       + (label || prettyName(p.name)) + '</span>' + dirty
+       + '<span class="cnt">'+(nText+nImg)+'</span></div>';
+}
+
+function buildGroups(){
+  const map = new Map();
+  for(const p of state.pages){
+    const k = groupKeyOf(p.name);
+    if(!map.has(k)) map.set(k, []);
+    map.get(k).push(p);
+  }
+  // Moi node: {type:'single',key,page} hoac {type:'group',key,pages}
+  const nodes = [];
+  for(const [k, arr] of map){
+    if(arr.length < 2){ nodes.push({ type:'single', key:k, page:arr[0] }); continue; }
+    // Thu tu trong nhom: trang tong -> trang chinh -> cac trang -2, -3... (giong menu)
+    const rankOf = p => {
+      const b = String(p.name).split('/').pop().replace(/\.html?$/i,'').toLowerCase();
+      if(b === k) return [0,0];                 // <ho>.html : trang tong
+      if(b === k+'__'+k) return [1,0];          // <ho>__<ho>.html : trang chinh cua nhom
+      const m = /-(\d+)$/.exec(b); return [2, m ? +m[1] : 9999];   // -2, -3, ...
+    };
+    arr.sort((a,b)=>{ const ra=rankOf(a), rb=rankOf(b); return ra[0]-rb[0] || ra[1]-rb[1] || a.name.localeCompare(b.name); });
+    nodes.push({ type:'group', key:k, pages:arr });
+  }
+  // Xep dung thu tu menu website (navigator); key ngoai menu xep sau theo alphabet.
+  nodes.sort((a,b)=> navRank(a.key)-navRank(b.key) || a.key.localeCompare(b.key));
+  return nodes;
+}
+function renderSidebar(){
+  const el = $('#left');
+  const nodes = buildGroups();
+  // dang sua trang nao thi bung nhom cua no ra cho thay
+  if(state.active){
+    const ak = groupKeyOf(state.active.name);
+    if(nodes.some(n=>n.type==='group' && n.key===ak)) openGroups.add(ak);
+  }
+  let html = '<h4>Trang Wistorix · theo menu website</h4>';
+  for(const n of nodes){
+    if(n.type==='single'){
+      html += pageRow(n.page, pageLabelOf(n.page.name) || prettyName(n.page.name));
+      continue;
+    }
+    const g = n;
+    const open = openGroups.has(g.key);
+    const gDirty = g.pages.some(p=>p.dirty) ? '<span class="badge">•</span>' : '';
+    html += '<div class="grouphead'+(open?' open':'')+'" data-gkey="'+esc(g.key)+'" title="Bấm để gập / mở nhóm">'
+          +   '<span class="caret">▶</span><span class="gname">'+esc(groupLabelOf(g.key, g.pages.length))+'</span>'
+          +   gDirty + '<span class="cnt">'+g.pages.length+'</span>'
+          + '</div>'
+          + '<div class="groupbody'+(open?'':' hidden')+'" data-gbody="'+esc(g.key)+'">';
+    for(const p of g.pages) html += pageRow(p, inGroupName(p.name, g.key));
+    html += '</div>';
+  }
+  el.innerHTML = html;
+  el.querySelectorAll('.pagelink').forEach(a=>a.onclick=()=>selectPage(state.pages.find(p=>p.name===a.dataset.page)));
+  el.querySelectorAll('.grouphead').forEach(gh=>gh.onclick=()=>{
+    const k = gh.dataset.gkey;
+    if(openGroups.has(k)) openGroups.delete(k); else openGroups.add(k);
+    saveOpenGroups();
+    gh.classList.toggle('open', openGroups.has(k));
+    const body = el.querySelector('[data-gbody="'+CSS.escape(k)+'"]');
+    if(body) body.classList.toggle('hidden', !openGroups.has(k));
+  });
+  markActive();
+}
+function prettyName(f){ return f.replace(/\.html?$/i,'').replace(/[-_]/g,' ').replace(/\bqranty\b/gi,'').trim() || f; }
+function markActive(){
+  document.querySelectorAll('.pagelink').forEach(a=>a.classList.toggle('active', state.active && a.dataset.page===state.active.name));
+}
+function selectPage(p){
+  state.active = p; markActive(); renderFields(); renderPreview();
+  $('#previewName').textContent = p.name;
+}
+
+/* ---------- tree state + block detection ---------- */
+const openSections = new Set();          // which sections are expanded (default: all collapsed)
+const blockReg = new Map(); let bidSeq = 0;   // bid -> live block element (rebuilt each render)
+const secReg   = new Map();                   // sid -> live section element
+const hidReg   = new Map();                   // hid -> comment node dang an
+let pendingOpenUid = null;               // a field node to auto-open on next render
+
+function classSig(el){ return (el && el.getAttribute && (el.getAttribute('class')||'').trim().replace(/\s+/g,' ')) || ''; }
+// nearest ancestor of `el` that is one of >=2 same-class siblings (a repeatable "card")
+function repeatedAncestor(el){
+  let n = el;
+  while(n && n.nodeType===1 && n.parentElement && n.tagName!=='BODY'){
+    const sig = classSig(n);
+    if(sig){
+      const sibs = n.parentElement.children;
+      for(let k=0;k<sibs.length;k++){ if(sibs[k]!==n && classSig(sibs[k])===sig){ return n; } }
+    }
+    n = n.parentElement;
+  }
+  return null;
+}
+function blockLabel(el, fallback){
+  const h = el.querySelector('h1,h2,h3,h4,h5,h6');
+  let t = (h && h.textContent ? h.textContent : '').trim();
+  if(!t) t = (fallback||'').trim();
+  if(!t){ const c=(el.getAttribute('class')||'').split(/\s+/)[0]||''; t=c.replace(/[-_]/g,' ').replace(/\bsingle\b/gi,'').trim(); }
+  t = t.replace(/\s+/g,' ').trim() || 'Khối';
+  return t.length>40 ? t.slice(0,40)+'…' : t;
+}
+/* ---------- an / hien bang comment HTML ----------
+   Khoi bi an duoc boc thanh  <!--QB-HIDE[nhan]...html...-->
+   Ky tu ket thuc comment duoc thay the de khong lam vo file, va doi nguoc lai
+   duoc 1-1 khi hien. Google khong doc noi dung trong comment -> khong hai SEO. */
+const HIDE_RE = /^QB-HIDE\[([^\]]*)\]([\s\S]*)$/;
+function hideEnc(x){ return String(x).replace(/§/g,'§S').replace(/--!>/g,'§B').replace(/-->/g,'§G'); }
+function hideDec(x){ return String(x).replace(/§B/g,'--!>').replace(/§G/g,'-->').replace(/§S/g,'§'); }
+function hideLabelSafe(t){
+  return (String(t||'Khoi').replace(/[\]\[\-\r\n]+/g,' ').replace(/\s+/g,' ').trim().slice(0,60)) || 'Khoi';
+}
+function hideEl(doc, el, label){
+  const cm = doc.createComment('QB-HIDE['+hideLabelSafe(label)+']'+hideEnc(el.outerHTML));
+  el.parentNode.replaceChild(cm, el);
+  return cm;
+}
+function listHidden(doc){
+  const out=[]; if(!doc || !doc.body) return out;
+  const w = doc.createTreeWalker(doc.body, 128 /* SHOW_COMMENT */);
+  let n; while((n = w.nextNode())){ const m = HIDE_RE.exec(n.nodeValue||''); if(m) out.push({node:n, label:m[1]}); }
+  return out;
+}
+function showHidden(doc, cm){
+  const m = HIDE_RE.exec(cm.nodeValue||''); if(!m || !cm.parentNode) return false;
+  const box = doc.createElement('div');
+  box.innerHTML = hideDec(m[2]);
+  const frag = doc.createDocumentFragment();
+  while(box.firstChild) frag.appendChild(box.firstChild);
+  cm.parentNode.replaceChild(frag, cm);
+  return true;
+}
+
+/* ---------- bo cuc that cua trang ----------
+   Cac khu vuc cap 1 la con truc tiep cua "khung trang" (vd .pages-wrapper).
+   Chung la anh em ruot nen keo tha doi cho luon an toan. */
+const LAYOUT_SKIP = new Set(['SCRIPT','STYLE','NOSCRIPT','LINK','TEMPLATE','META','BR']);
+function layoutKids(el){
+  return Array.from(el.children).filter(c => !LAYOUT_SKIP.has(c.tagName) && c.children.length);
+}
+function layoutHost(doc){
+  let host = doc && doc.body; if(!host) return null;
+  for(let g=0; g<6; g++){
+    const k = layoutKids(host);
+    if(k.length===1 && layoutKids(k[0]).length>1) host = k[0]; else break;
+  }
+  return host;
+}
+function pageSections(doc){
+  const host = layoutHost(doc);
+  return host ? layoutKids(host) : [];
+}
+function layoutName(el){
+  const zone = sectionOf(el);
+  const head = blockLabel(el, '');
+  if(head && head!=='Khối' && zone!==head) return zone + ' — ' + head;
+  return zone;
+}
+
+// group a section's items (doc order) into block nodes + loose field nodes
+function buildSectionNodes(arr){
+  const nodes=[]; let i=0;
+  while(i<arr.length){
+    const blk = repeatedAncestor(arr[i].el);
+    if(blk){
+      const group=[arr[i]]; let j=i+1;
+      while(j<arr.length && repeatedAncestor(arr[j].el)===blk){ group.push(arr[j]); j++; }
+      nodes.push({type:'block', el:blk, items:group}); i=j;
+    } else { nodes.push({type:'field', item:arr[i]}); i++; }
+  }
+  return nodes;
+}
+function fieldPreview(it){
+  if(it.kind==='image') return it.value.split('/').pop()||'(ảnh)';
+  const t = searchText(it).replace(/\s+/g,' ').trim();
+  return t || '(trống)';
+}
+function fieldNodeHTML(it){
+  const tl = TYPE_LABEL[it.type]||'Chữ';
+  const body = it.kind==='image' ? imageFieldHTML(it) : textFieldHTML(it);
+  const open = (pendingOpenUid===it.uid) ? ' open' : '';
+  return '<div class="tnode'+(it.changed?' changed':'')+open+'" data-uid="'+it.uid+'">'+
+    '<div class="trow" data-tfield><span class="dot"></span>'+
+    '<span class="tt t-'+it.type+'">'+tl+'</span>'+
+    '<span class="tprev">'+esc(fieldPreview(it))+'</span></div>'+
+    '<div class="tbody">'+body+'</div></div>';
+}
+
+function renderFields(filter){
+  const p = state.active, mid = $('#mid');
+  const groups = new Map();
+  for(const it of p.items){
+    if(filter){ const hay = (it.kind==='image'? it.value : searchText(it)).toLowerCase(); if(!hay.includes(filter)) continue; }
+    if(!groups.has(it.section)) groups.set(it.section, []);
+    groups.get(it.section).push(it);
+  }
+  let html = '<div class="mid-head"><div><h2 class="page-title">'+prettyName(p.name)+'</h2>'+
+    '<p class="page-sub">'+p.name+' — '+p.items.length+' mục • '+groups.size+' khu vực · bấm để mở/sửa</p></div>'+
+    '<div class="mid-tools"><button class="btn sm" id="expandAll">Mở tất cả</button>'+
+    '<button class="btn sm" id="collapseAll">Thu gọn</button></div></div>';
+  if(groups.size===0) html += '<div class="empty" style="height:auto;padding:40px">Không có mục nào khớp tìm kiếm.</div>';
+  html += '<div class="tree">';
+  blockReg.clear(); secReg.clear(); hidReg.clear();
+  // bang "Bo cuc trang": cac khu vuc that cua trang, keo tha / an / nhan ban / xoa
+  const secs = pageSections(p.doc);
+  if(secs.length>1){
+    let lrows = '';
+    secs.forEach((el,i)=>{
+      const sid = 's'+(bidSeq++); secReg.set(sid, el);
+      const nm = layoutName(el);
+      lrows += '<div class="layout-row" data-sid="'+sid+'" data-dragid="s:'+sid+'" data-lname="'+esc(nm)+'">'+
+        '<span class="bbtn drag-h" data-drag title="Kéo để đổi vị trí khu vực">⠿</span>'+
+        '<span class="lnum">'+(i+1)+'</span>'+
+        '<span class="lname">'+esc(nm)+'</span>'+
+        '<button class="bbtn" data-sop="dup" title="Nhân bản khu vực">⧉</button>'+
+        '<button class="bbtn" data-sop="up" title="Đưa lên trên">↑</button>'+
+        '<button class="bbtn" data-sop="down" title="Đưa xuống dưới">↓</button>'+
+        '<button class="bbtn" data-sop="hide" title="Ẩn khu vực (bật lại được)">👁</button>'+
+        '<button class="bbtn danger" data-sop="del" title="Xoá hẳn khu vực">🗑</button></div>';
+    });
+    html += '<div class="layout-box"><div class="lhead">Bố cục trang — '+secs.length+' khu vực · kéo ⠿ để đổi thứ tự</div>'+lrows+'</div>';
+  }
+  // bang liet ke cac khoi dang an (khong con trong cay vi da thanh comment)
+  const hidden = listHidden(p.doc);
+  if(hidden.length){
+    let hrows = '';
+    hidden.forEach((h,i)=>{ const hk='h'+i; hidReg.set(hk, h.node);
+      hrows += '<div class="hrow"><span class="hlab">🚫 '+esc(h.label)+'</span>'+
+        '<button class="bbtn" data-hop="show" data-hid="'+hk+'" title="Hiện lại đúng vị trí cũ">↩</button>'+
+        '<button class="bbtn danger" data-hop="drop" data-hid="'+hk+'" title="Xoá hẳn khỏi file">🗑</button></div>';
+    });
+    html += '<div class="hidden-box"><div class="hhead">Đang ẩn ('+hidden.length+') — không hiện trên web, vẫn nằm trong file</div>'+hrows+'</div>';
+  }
+  for(const [section, arr] of groups){
+    const open = (filter || openSections.has(section)) ? ' open' : '';
+    let inner='';
+    for(const nd of buildSectionNodes(arr)){
+      if(nd.type==='field'){ inner += fieldNodeHTML(nd.item); continue; }
+      const bid='b'+(bidSeq++); blockReg.set(bid, nd.el);
+      let kids=''; for(const it of nd.items) kids += fieldNodeHTML(it);
+      inner += '<div class="tblock" data-bid="'+bid+'" data-dragid="b:'+bid+'">'+
+        '<div class="bhead">'+
+        '<span class="bbtn drag-h" data-drag title="Kéo để đổi vị trí">⠿</span>'+
+        '<span class="blabel">▦ '+esc(blockLabel(nd.el, searchText(nd.items[0])))+'</span>'+
+        '<button class="bbtn" data-bop="dup" title="Nhân bản khối này">⧉</button>'+
+        '<button class="bbtn" data-bop="up" title="Chuyển lên / sang trái">↑</button>'+
+        '<button class="bbtn" data-bop="down" title="Chuyển xuống / sang phải">↓</button>'+
+        '<button class="bbtn" data-bop="hide" title="Ẩn khối này (giữ lại trong file, bật lại được)">👁</button>'+
+        '<button class="bbtn danger" data-bop="del" title="Xoá hẳn khối này">🗑</button>'+
+        '</div><div class="bchildren">'+kids+'</div></div>';
+    }
+    html += '<div class="tsection'+open+'" data-section="'+esc(section)+'">'+
+      '<div class="thead" data-tsec><svg class="chev" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="m6 9 6 6 6-6"/></svg>'+
+      esc(section)+'<span class="n">'+arr.length+' mục</span></div>'+
+      '<div class="tinner">'+inner+'</div></div>';
+  }
+  html += '</div>';
+  mid.innerHTML = html;
+  wireTree(mid);
+  const ea=$('#expandAll'), ca=$('#collapseAll');
+  if(ea) ea.onclick=()=>{ groups.forEach((_,s)=>openSections.add(s)); renderFields(filter); };
+  if(ca) ca.onclick=()=>{ openSections.clear(); renderFields(filter); };
+  pendingOpenUid = null;
+}
+
+function wireTree(root){
+  root.querySelectorAll('.thead[data-tsec]').forEach(h=>{
+    h.onclick=()=>{ const sec=h.closest('.tsection'), name=sec.dataset.section;
+      sec.classList.toggle('open');
+      if(sec.classList.contains('open')) openSections.add(name); else openSections.delete(name);
+    };
+  });
+  root.querySelectorAll('.tblock [data-bop]').forEach(b=>{
+    b.onclick=e=>{ e.stopPropagation(); const el=blockReg.get(b.closest('.tblock').dataset.bid); if(el) blockOp(b.dataset.bop, el); };
+  });
+  // nut thao tac trong bang "Bo cuc trang"
+  root.querySelectorAll('.layout-row [data-sop]').forEach(b=>{
+    b.onclick=e=>{ e.stopPropagation(); const row=b.closest('.layout-row'); const el=secReg.get(row.dataset.sid);
+      if(el) blockOp(b.dataset.sop, el, row.dataset.lname || 'khu vực này'); };
+  });
+  // bang "Dang an"
+  root.querySelectorAll('.hidden-box [data-hop]').forEach(b=>{
+    b.onclick=e=>{ e.stopPropagation();
+      const p=state.active, cm=hidReg.get(b.dataset.hid); if(!p||!cm) return;
+      if(b.dataset.hop==='show'){ if(!showHidden(p.doc, cm)) return; afterStructural('Đã hiện lại ✓'); }
+      else { if(!confirm('Xoá hẳn khối đang ẩn này khỏi file? Sau khi lưu sẽ không lấy lại được.')) return;
+             if(cm.parentNode) cm.parentNode.removeChild(cm); afterStructural('Đã xoá hẳn ✓'); }
+    };
+  });
+  wireDrag(root);
+  root.querySelectorAll('.tnode>.trow[data-tfield]').forEach(r=>{
+    r.onclick=()=>{ const node=r.closest('.tnode'); node.classList.toggle('open');
+      if(node.classList.contains('open')){ const inp=node.querySelector('textarea,.rich-ed'); if(inp) setTimeout(()=>inp.focus({preventScroll:true}),0); } };
+  });
+  wireFields(root);   // reuse existing per-field editing (textarea / rich / color / image / reset)
+}
+
+/* ---------- structural ops: nhan ban / an / xoa / doi thu tu ---------- */
+function afterStructural(msg){
+  const p = state.active; if(!p) return;
+  markDirty(p);
+  p.items = extract(p);          // quet lai trang sau khi doi cau truc
+  buildSharedIndex();
+  renderFields($('#search').value.trim().toLowerCase()||null);
+  renderPreview();
+  if(msg) toast(msg);
+}
+function blockOp(op, el, what){
+  const p = state.active; if(!p || !el || !el.parentNode) return;
+  const name = what || 'khối này';
+  if(op==='del' || op==='hide'){
+    // luoi an toan doc lap voi cay: khong bao gio cho mot thao tac nuot gan het trang
+    const docLen = (p.doc.body && p.doc.body.innerHTML.length) || 1;
+    if(el.outerHTML.length > docLen*0.6){
+      alert('Khối này chiếm gần như toàn bộ trang nên không thao tác được.\n\nHãy mở khu vực ra rồi ẩn/xoá từng khối nhỏ bên trong.');
+      return;
+    }
+  }
+  if(op==='del'){
+    if(!confirm('Xoá hẳn '+name+' khỏi trang?\n\nMuốn lấy lại được thì dùng nút 👁 Ẩn thay vì xoá.')) return;
+    el.remove();
+  }
+  else if(op==='hide'){ hideEl(p.doc, el, (what && what!=='khối này') ? what : blockLabel(el)); }
+  else if(op==='dup'){ const c=el.cloneNode(true); el.parentNode.insertBefore(c, el.nextSibling); }
+  else if(op==='up'){ const prev=el.previousElementSibling; if(!prev){ toast('Đã ở đầu nhóm'); return; } el.parentNode.insertBefore(el, prev); }
+  else if(op==='down'){ const next=el.nextElementSibling; if(!next){ toast('Đã ở cuối nhóm'); return; } el.parentNode.insertBefore(next, el); }
+  afterStructural(op==='dup'?'Đã nhân bản ✓':op==='del'?'Đã xoá ✓':op==='hide'?'Đã ẩn ✓ — bật lại ở bảng "Đang ẩn"':'Đã đổi thứ tự ✓');
+}
+
+/* ---------- keo tha doi vi tri (chi trong cung phan tu cha) ---------- */
+let dragSrc = null;
+function dragElOf(host){
+  const id = host && host.dataset ? host.dataset.dragid : '';
+  if(!id) return null;
+  return id.charAt(0)==='b' ? blockReg.get(id.slice(2)) : secReg.get(id.slice(2));
+}
+function clearDropMarks(root){ root.querySelectorAll('.dz-before,.dz-after').forEach(n=>n.classList.remove('dz-before','dz-after')); }
+function wireDrag(root){
+  root.querySelectorAll('[data-drag]').forEach(h=>{
+    h.setAttribute('draggable','true');
+    h.addEventListener('dragstart', e=>{
+      const host = h.closest('[data-dragid]'); const el = dragElOf(host);
+      if(!host || !el){ e.preventDefault(); return; }
+      dragSrc = {host, el};
+      host.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+      try{ e.dataTransfer.setData('text/plain', host.dataset.dragid); }catch(_){}
+      e.stopPropagation();
+    });
+    h.addEventListener('dragend', ()=>{
+      clearDropMarks(root);
+      if(dragSrc && dragSrc.host) dragSrc.host.classList.remove('dragging');
+      dragSrc = null;
+    });
+  });
+  root.querySelectorAll('[data-dragid]').forEach(host=>{
+    const okTarget = ()=>{
+      if(!dragSrc) return null;
+      const t = dragElOf(host);
+      if(!t || t===dragSrc.el) return null;
+      if(t.parentNode !== dragSrc.el.parentNode) return null;   // chi cho doi cho trong cung cha
+      return t;
+    };
+    host.addEventListener('dragover', e=>{
+      const t = okTarget(); if(!t) return;
+      e.preventDefault(); e.stopPropagation();
+      e.dataTransfer.dropEffect = 'move';
+      const r = host.getBoundingClientRect();
+      const after = (e.clientY - r.top) > r.height/2;
+      clearDropMarks(root);
+      host.classList.add(after ? 'dz-after' : 'dz-before');
+    });
+    host.addEventListener('drop', e=>{
+      const t = okTarget(); if(!t) return;
+      e.preventDefault(); e.stopPropagation();
+      const r = host.getBoundingClientRect();
+      const after = (e.clientY - r.top) > r.height/2;
+      const moved = dragSrc.el;
+      t.parentNode.insertBefore(moved, after ? t.nextSibling : t);
+      clearDropMarks(root);
+      if(dragSrc.host) dragSrc.host.classList.remove('dragging');
+      dragSrc = null;
+      afterStructural('Đã đổi vị trí ✓');
+    });
+  });
+}
+function esc(s){ return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function searchText(it){
+  if(it.type==='placeholder') return it.el.getAttribute('placeholder')||'';
+  if(it.mode==='textnode') return it.textNode.nodeValue||'';
+  return it.el.textContent||'';
+}
+function colorSwatchesHTML(){
+  const cols=[['#0f172a','Đậm'],['#1a72e8','Xanh'],['#2ba6db','Xanh nhạt'],['#e11d48','Đỏ'],['#059669','Lục'],['#64748b','Xám'],['#ffffff','Trắng']];
+  let s=''; for(const [c,t] of cols) s+='<button class="sw" data-color="'+c+'" title="Đổi màu: '+t+'" style="background:'+c+'"></button>';
+  s+='<label class="sw-custom" title="Màu khác">+<input type="color" data-act="customcolor"></label>';
+  return s;
+}
+function textFieldHTML(it){
+  const tl = TYPE_LABEL[it.type]||'Chữ';
+  const shared = it.shared ? '<span class="shared">Dùng chung '+it.sharedCount+' trang</span>' : '';
+  const isEmpty = it.type!=='placeholder' && it.type!=='title' && it.el && !((it.el.textContent||'').replace(/[\s​]/g,'').length);
+  const cls = 'field'+(it.changed?' changed':'')+(it.shared?' is-shared':'')+(isEmpty?' is-empty':'');
+  const emptyTag = isEmpty ? '<span class="empty-tag">trống</span>' : '';
+  let body;
+  if(it.mode==='rich'){
+    body = '<div class="rich-tools">'+colorSwatchesHTML()+'</div>'+
+           '<div class="rich-ed" contenteditable="true" data-act="richedit" spellcheck="false" data-ph="(trống — gõ để thêm chữ)">'+it.value+'</div>'+
+           '<div class="rich-hint">Sửa cả câu ở đây · Enter để xuống dòng · bôi đen chữ rồi bấm màu để đổi màu</div>';
+  } else {
+    const txt = getText(it);
+    const rows = Math.min(8, Math.max(1, Math.ceil((txt.length||1)/46) + (txt.match(/\n/g)||[]).length));
+    body = '<textarea rows="'+rows+'" data-act="edit" placeholder="(trống — gõ để thêm lại chữ)">'+esc(txt)+'</textarea>';
+  }
+  return '<div class="'+cls+'" data-uid="'+it.uid+'">'+
+    '<div class="field-top"><span class="field-type t-'+it.type+'">'+tl+'</span>'+shared+emptyTag+
+    '<button class="reset" data-act="reset">Hoàn tác</button></div>'+ body +
+    (it.shared?'<label class="apply-all"><input type="checkbox" data-act="applyall" checked> Áp dụng cho tất cả '+it.sharedCount+' trang có chữ này</label>':'')+
+    '</div>';
+}
+function imageFieldHTML(it){
+  const fn = it.value.split('/').pop();
+  const raw = it.pendingURL || it.value;
+  const thumb = /^(https?:|data:|blob:)/i.test(raw) ? raw : '/'+raw.split('/').map(encodeURIComponent).join('/');
+  const pend = it.pendingFile ? '<div class="pending">✓ Ảnh mới đã chọn — sẽ lưu khi bấm “Lưu tất cả”</div>' : '';
+  return '<div class="field'+(it.changed?' changed':'')+'" data-uid="'+it.uid+'">'+
+    '<div class="field-top"><span class="field-type t-image">Hình ảnh</span>'+
+    '<button class="reset" data-act="reset">Hoàn tác</button></div>'+
+    '<div class="imgrow"><div class="imgthumb" style="background-image:url(\''+thumb.replace(/'/g,"%27")+'\')"></div>'+
+    '<div class="imgmeta"><div class="fn">'+esc(fn)+'</div>'+
+    '<button class="btn" data-act="pickimg"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15l-5-5L5 21"/><circle cx="9" cy="9" r="2"/><path d="M3 3h18v18H3z"/></svg> Đổi ảnh</button>'+pend+'</div></div></div>';
+}
+
+function wireFields(root){
+  root.querySelectorAll('.section-head[data-toggle]').forEach(h=>{
+    h.onclick=()=>{ const s=h.dataset.toggle, g=h.closest('.section-group');
+      g.classList.toggle('collapsed');
+      if(g.classList.contains('collapsed')) collapsedSections.add(s); else collapsedSections.delete(s);
+    };
+  });
+  root.querySelectorAll('.field').forEach(f=>{
+    const it = findItem(f.dataset.uid); if(!it) return;
+    const ta = f.querySelector('textarea');
+    if(ta){
+      ta.addEventListener('input', ()=>{
+        setText(it, ta.value); it.value = getText(it);
+        it.changed = (it.value !== it.original);
+        markSlot(it);
+        f.classList.toggle('changed', it.changed);
+        f.classList.toggle('is-empty', !ta.value.replace(/[\s​]/g,'').length);
+        markDirty(it.page); livePreview(it);
+      });
+    }
+    const ed = f.querySelector('.rich-ed');
+    if(ed){
+      ed.addEventListener('input', ()=>syncRich(it, ed, f));
+      ed.addEventListener('keydown', e=>{ if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); document.execCommand('insertLineBreak'); } });
+      f.querySelectorAll('.sw[data-color]').forEach(b=>b.addEventListener('mousedown', e=>{ e.preventDefault(); applyColor(it, ed, f, b.dataset.color); }));
+      const cc=f.querySelector('[data-act="customcolor"]'); if(cc) cc.addEventListener('input', ()=>applyColor(it, ed, f, cc.value));
+    }
+    f.querySelectorAll('[data-act]').forEach(b=>{
+      const act = b.dataset.act;
+      if(act==='reset') b.onclick=()=>resetField(it,f);
+      if(act==='pickimg') b.onclick=()=>pickImage(it,f);
+    });
+  });
+}
+function findItem(uid){ for(const p of state.pages) for(const it of p.items) if(it.uid===uid) return it; return null; }
+function syncRich(it, ed, f){
+  it.el.innerHTML = sanitizeRich(ed.innerHTML);
+  it.value = it.el.innerHTML;
+  it.changed = (it.value !== it.original);
+  markSlot(it);
+  if(f){ f.classList.toggle('changed', it.changed); f.classList.toggle('is-empty', !((it.el.textContent||'').replace(/[\s​]/g,'').length)); }
+  markDirty(it.page); livePreview(it);
+}
+function applyColor(it, ed, f, color){
+  ed.focus();
+  const sel = window.getSelection();
+  if(!sel.rangeCount || sel.isCollapsed || !ed.contains(sel.anchorNode)){
+    const r = document.createRange(); r.selectNodeContents(ed); sel.removeAllRanges(); sel.addRange(r);   // no selection -> whole field
+  }
+  document.execCommand('styleWithCSS', false, true);
+  document.execCommand('foreColor', false, color);
+  syncRich(it, ed, f);
+}
+function resetField(it,f){
+  if(it.kind==='image'){ it.pendingFile=null; it.pendingURL=null; it.value=it.original; it.changed=false;
+    if(it.el) it.el.setAttribute('src', it.original); }
+  else { if(it.mode==='rich') it.el.innerHTML=it.original; else setText(it, it.original); it.value=it.original; it.changed=false; markSlot(it); }
+  f.classList.remove('changed'); recomputeDirty(it.page);
+  if(it.kind==='image') renderPreview(); else livePreview(it);   // full rebuild restores original srcset
+  renderFields($('#search').value.trim().toLowerCase()||null);
+}
+function pickImage(it,f){
+  const inp=document.createElement('input'); inp.type='file'; inp.accept='image/*';
+  inp.onchange=()=>{ const file=inp.files[0]; if(!file) return;
+    if(it.pendingURL) URL.revokeObjectURL(it.pendingURL);
+    it.pendingFile=file; it.pendingURL=URL.createObjectURL(file); it.changed=true;
+    markDirty(it.page); livePreview(it);
+    renderFields($('#search').value.trim().toLowerCase()||null);
+  };
+  inp.click();
+}
+
+/* ---- shared propagation on typing ---- */
+function propagateShared(it){
+  const f = document.querySelector('.field[data-uid="'+it.uid+'"]');
+  const cb = f && f.querySelector('[data-act="applyall"]');
+  if(!it.shared || !cb || !cb.checked) return;
+  const arr = state.sharedIndex.get(it.original.trim())||[];
+  for(const other of arr){ if(other===it) continue;
+    setText(other, it.value); other.value=it.value; other.changed=(it.value!==other.original);
+    markDirty(other.page);
+  }
+}
+
+/* ============================ preview ============================ */
+// Build a faithful preview: clone the real page (keeps all CSS + scripts/animations),
+// tag every editable target so we can update it live, and load it via srcdoc.
+function buildPreviewHTML(page){
+  const clone = page.doc.cloneNode(true);
+  ceStampPaths(clone);            // gan data-cepath TRUOC khi boc text-node -> path khop voi page.doc
+  const T = collectTargets(clone);
+  T.texts.forEach((t,i)=>{
+    if(t.mode!=='textnode'){ t.node.setAttribute('data-se','t'+i); }
+    else { const sp=clone.createElement('span'); sp.setAttribute('data-se','t'+i);
+           t.node.parentNode.replaceChild(sp, t.node); sp.appendChild(t.node); }
+  });
+  T.imgs.forEach((img,i)=> img.setAttribute('data-se','g'+i));
+  T.phs.forEach((inp,i)=> inp.setAttribute('data-se','p'+i));
+  // reflect any not-yet-saved image choices
+  for(const it of page.items){ if(it.cat==='img' && it.pendingURL){ applyImageSrc(clone.querySelector('[data-se="'+it.seid+'"]'), it.pendingURL); } }
+  // correct relative asset paths regardless of page location
+  const dir = page.name.includes('/') ? '/'+page.name.slice(0, page.name.lastIndexOf('/')+1) : '/';
+  const head = clone.querySelector('head');
+  if(head && !head.querySelector('base')){ const b=clone.createElement('base'); b.setAttribute('href', dir); head.insertBefore(b, head.firstChild); }
+  return '<!DOCTYPE html>'+clone.documentElement.outerHTML;
+}
+const PREVIEW_DESIGN_W = 1280;                 // render at desktop width, then scale to fit the pane
+function fitPreview(){
+  const stage = $('#pstage'); if(!stage) return;
+  const w = stage.clientWidth, h = stage.clientHeight;
+  if(w < 40){ return; }
+  const scale = w / PREVIEW_DESIGN_W;
+  const ifr = $('#preview');
+  ifr.style.width = PREVIEW_DESIGN_W + 'px';
+  ifr.style.height = (h / scale) + 'px';
+  ifr.style.transform = 'scale(' + scale + ')';
+}
+function renderPreview(){
+  const p = state.active; if(!p) return;
+  const ifr = $('#preview');
+  ifr.onload = ()=>{ fitPreview(); wirePreviewInteractions(); };
+  ifr.srcdoc = buildPreviewHTML(p);
+  fitPreview();
+}
+// Resolve which editable element is under a click point, even through overlays or
+// pointer-events:none images: try normal hit-test first, then geometry (smallest box containing the point).
+function seFromPoint(d, x, y){
+  // Many decorative images have pointer-events:none, so hit-testing skips them.
+  // Temporarily enable it on tagged images, then read the real stacking order at the point.
+  const imgs = d.querySelectorAll ? Array.from(d.querySelectorAll('img[data-se]')) : [];
+  const saved = imgs.map(i=>i.style.pointerEvents);
+  imgs.forEach(i=>{ i.style.pointerEvents = 'auto'; });
+  let found = null;
+  const stack = d.elementsFromPoint ? d.elementsFromPoint(x, y) : [];
+  for(const el of stack){ const m = el.closest && el.closest('[data-se]'); if(m){ found = m; break; } }
+  imgs.forEach((i,k)=>{ i.style.pointerEvents = saved[k]; });
+  if(found) return found;
+  // last resort: smallest tagged box that contains the point
+  let scope = (d.elementFromPoint && d.elementFromPoint(x,y)) || d.body, best=null, bestArea=Infinity, hops=0;
+  while(scope && hops < 6){
+    for(const c of (scope.querySelectorAll ? scope.querySelectorAll('[data-se]') : [])){
+      const r = c.getBoundingClientRect();
+      if(x>=r.left && x<=r.right && y>=r.top && y<=r.bottom){ const a=r.width*r.height; if(a<bestArea){ bestArea=a; best=c; } }
+    }
+    if(best) return best; scope = scope.parentElement; hops++;
+  }
+  return null;
+}
+// Click any element in the preview -> find & highlight its edit box
+function wirePreviewInteractions(){
+  const d = $('#preview').contentDocument; if(!d) return;
+  if(!d.getElementById('__se_style')){
+    const st = d.createElement('style'); st.id='__se_style';
+    st.textContent = '[data-se]{cursor:pointer}[data-se]:hover{outline:2px dashed #0740C1;outline-offset:2px;background:rgba(7,64,193,.06)}[data-se].__se_hit{outline:3px solid #0740C1 !important;outline-offset:2px}';
+    (d.head||d.documentElement).appendChild(st);
+  }
+  d.addEventListener('click', e=>{
+    if(CE.on){ e.preventDefault(); e.stopPropagation(); ceClickPreview(e, d); return; }   // che do Mau: chon element de doi mau
+    let t = e.target && e.target.closest ? e.target.closest('[data-se]') : null;
+    if(!t) t = seFromPoint(d, e.clientX, e.clientY);   // pierce overlays / pointer-events:none images
+    if(!t) return;
+    const a = e.target.closest && e.target.closest('a'); if(a) e.preventDefault();   // don't navigate away
+    const seid = t.getAttribute('data-se');
+    t.classList.add('__se_hit'); setTimeout(()=>t.classList.remove('__se_hit'), 1000);
+    locateField(seid);
+  }, true);
+  ceAfterPreviewLoad();
+}
+function locateField(seid){
+  const p = state.active; if(!p) return;
+  const it = p.items.find(x=>x.seid===seid); if(!it) return;
+  openSections.add(it.section);                 // make sure its section is expanded
+  if($('#search').value.trim()) $('#search').value='';   // clear filter so the field is present
+  pendingOpenUid = it.uid;                       // render it already open
+  renderFields();
+  const node = document.querySelector('.tnode[data-uid="'+it.uid+'"]');
+  if(!node) return;
+  node.classList.add('open');
+  node.scrollIntoView({behavior:'smooth', block:'center'});
+  node.classList.remove('flash'); void node.offsetWidth; node.classList.add('flash');
+  const inp = node.querySelector('textarea,.rich-ed'); if(inp) inp.focus({preventScroll:true});
+}
+// Live, instant update of a single node inside the loaded preview (no reload)
+// Point an <img> at a new source. Responsive images use srcset over src, so we must
+// clear srcset/sizes (and any <picture><source>) or the old image keeps showing.
+function applyImageSrc(node, url){
+  if(!node) return;
+  node.setAttribute('src', url);
+  node.removeAttribute('srcset');
+  node.removeAttribute('sizes');
+  const par = node.parentElement;
+  if(par && par.tagName === 'PICTURE') par.querySelectorAll('source').forEach(s=>s.remove());
+}
+function livePreview(it){
+  const d = $('#preview').contentDocument; if(!d) return;
+  const n = d.querySelector('[data-se="'+it.seid+'"]'); if(!n) return;
+  if(it.cat==='img') applyImageSrc(n, it.pendingURL || it.value);
+  else if(it.cat==='ph') n.setAttribute('placeholder', it.value);
+  else if(it.mode==='textnode') n.textContent = it.value;
+  else n.innerHTML = it.el.innerHTML;   // plain (may hold <br>) or rich markup
+}
+function schedulePreview(){ /* kept for compatibility; live updates are instant */ }
+
+/* ============================ dirty + save ============================ */
+function markDirty(page){ page.dirty=true; refreshDirtyUI(); }
+function recomputeDirty(page){ page.dirty = page.items.some(i=>i.changed); refreshDirtyUI(); }
+function refreshDirtyUI(){
+  const anyDirty = state.pages.some(p=>p.dirty);
+  $('#saveBtn').disabled = !anyDirty;
+  const n = state.pages.reduce((a,p)=>a+p.items.filter(i=>i.changed).length,0);
+  if(anyDirty) setStatus('dirty', n+' thay đổi chưa lưu');
+  else setStatus('saved','Đã lưu — khớp với file');
+  document.querySelectorAll('.pagelink').forEach(a=>{
+    const p=state.pages.find(x=>x.name===a.dataset.page);
+    let b=a.querySelector('.badge');
+    if(p&&p.dirty){ if(!b){ b=document.createElement('span'); b.className='badge'; b.textContent='•'; a.insertBefore(b,a.querySelector('.cnt')); } }
+    else if(b) b.remove();
+  });
+  // nhom dang gap van phai bao co trang chua luu
+  document.querySelectorAll('.grouphead[data-gkey]').forEach(gh=>{
+    const k = gh.dataset.gkey;
+    const gDirty = state.pages.some(p=>groupKeyOf(p.name)===k && p.dirty);
+    let b = gh.querySelector('.badge');
+    if(gDirty){ if(!b){ b=document.createElement('span'); b.className='badge'; b.textContent='•'; gh.insertBefore(b, gh.querySelector('.cnt')); } }
+    else if(b) b.remove();
+  });
+}
+function setStatus(kind,txt){ const s=$('#status'); s.className='status '+kind; s.querySelector('.txt').textContent=txt; }
+
+async function saveAll(){
+  const dirtyPages = state.pages.filter(p=>p.dirty);
+  if(!dirtyPages.length) return;
+  // make sure shared edits propagated
+  for(const p of state.pages) for(const it of p.items) if(it.changed && it.shared) propagateShared(it);
+  $('#saveBtn').disabled=true; setStatus('dirty','Đang lưu…');
+  try{
+    // 1) upload any new images, set final src in the docs
+    for(const p of state.pages){
+      for(const it of p.items){
+        if(it.kind==='image' && it.pendingFile){
+          const b64 = await fileToBase64(it.pendingFile);
+          const r = await fetch('/__api/save-image',{method:'POST',headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({name:it.pendingFile.name, dataBase64:b64, subdir:guessSubdir(it.original)})});
+          const j = await r.json(); if(!j.ok) throw new Error(j.error||'upload ảnh lỗi');
+          applyImageSrc(it.el, j.path); it.value=j.path; it.original=j.path;
+          it.pendingFile=null; if(it.pendingURL){URL.revokeObjectURL(it.pendingURL);it.pendingURL=null;}
+          markDirty(p);
+        }
+      }
+    }
+    // 2) write each dirty page
+    let saved=0;
+    for(const p of state.pages.filter(x=>x.dirty)){
+      const html = '<!DOCTYPE html>\n'+p.doc.documentElement.outerHTML;
+      const r = await fetch('/__api/save',{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({file:p.name, html})});
+      const j = await r.json(); if(!j.ok) throw new Error(j.error||('lưu '+p.name+' lỗi'));
+      p.dirty=false; p.items.forEach(i=>{ i.original = i.kind==='image'?i.value:getText(i); i.changed=false; }); saved++;
+    }
+    buildSharedIndex();
+    refreshDirtyUI(); renderFields($('#search').value.trim().toLowerCase()||null); renderPreview();
+    toast('Đã lưu '+saved+' trang vào file ✓ (bản gốc nằm trong thư mục _editor_backup)');
+    setStatus('saved','Đã lưu vào file');
+  }catch(e){ toast('Lỗi: '+e.message, true); setStatus('dirty','Lưu chưa xong'); $('#saveBtn').disabled=false; }
+}
+function guessSubdir(src){ const m=/^(images|assets|img|media|fonts)\b/i.exec(src.replace(/^\.?\//,'')); return m?m[1].toLowerCase():'images'; }
+function fileToBase64(file){ return new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(file); }); }
+
+/* ============================ misc ============================ */
+function toast(msg,err){ const t=$('#toast'); t.textContent=msg; t.className='show'+(err?' err':''); clearTimeout(t._t); t._t=setTimeout(()=>t.className='',4200); }
+$('#saveBtn').onclick=saveAll;
+$('#search').addEventListener('input', e=>{ if(state.active) renderFields(e.target.value.trim().toLowerCase()||null); });
+/* ---- draggable divider (widen/narrow the preview) ---- */
+(function initResize(){
+  const g=$('#gutter'), app=document.querySelector('.app'), root=document.documentElement;
+  function onMove(e){
+    const rect=app.getBoundingClientRect();
+    let w = rect.right - e.clientX;                 // preview width
+    w = Math.max(300, Math.min(app.clientWidth-470, w));
+    root.style.setProperty('--pw', w+'px'); fitPreview();
+  }
+  function stop(){ document.body.classList.remove('resizing'); g.classList.remove('drag');
+    window.removeEventListener('pointermove',onMove); window.removeEventListener('pointerup',stop); }
+  g.addEventListener('pointerdown', e=>{ e.preventDefault(); g.classList.add('drag'); document.body.classList.add('resizing');
+    window.addEventListener('pointermove',onMove); window.addEventListener('pointerup',stop); });
+  g.addEventListener('dblclick', ()=>{ root.style.setProperty('--pw','40vw'); fitPreview(); });   // reset
+})();
+window.addEventListener('resize', fitPreview);
+$('#previewToggle').onclick=()=>{ document.querySelector('.app').classList.toggle('no-preview'); setTimeout(fitPreview,30); };
+window.addEventListener('beforeunload', e=>{ if(state.pages.some(p=>p.dirty)){ e.preventDefault(); e.returnValue=''; } });
+document.addEventListener('input', e=>{ // propagate shared while typing (debounced by browser)
+  const f=e.target.closest && e.target.closest('.field'); if(!f) return;
+  const it=findItem(f.dataset.uid); if(!it) return;
+  const node=e.target.closest('.tnode'); if(node) node.classList.toggle('changed', it.changed);   // live "edited" dot on the tree
+  if(it.changed&&it.shared) propagateShared(it);
+});
+function _scBoxes(page){return page&&page.doc?Array.from(page.doc.querySelectorAll('[data-optional-box="sua-chua"]')):[];}function _scAllHidden(){let any=false,all=true;for(const p of state.pages){for(const el of _scBoxes(p)){any=true;if(el.style.display!=="none")all=false;}}return any&&all;}function _scUpdateBtn(){const b=document.querySelector("#hideRepairBtn");if(!b)return;const cnt=state.pages.reduce((a,p)=>a+_scBoxes(p).length,0);b.style.display=cnt?"":"none";const hidden=_scAllHidden();b.classList.toggle("active",hidden);const l=b.querySelector(".lbl");if(l)l.textContent=hidden?"Hiện Sửa chữa":"Ẩn Sửa chữa";}function _scToggle(){const hide=!_scAllHidden();for(const p of state.pages){const boxes=_scBoxes(p);if(!boxes.length)continue;boxes.forEach(el=>{if(hide)el.style.setProperty("display","none","important");else el.style.removeProperty("display");});markDirty(p);}_scUpdateBtn();renderPreview();}var _scb=document.querySelector("#hideRepairBtn");if(_scb)_scb.onclick=_scToggle;
+
+/* ============================================================
+   CHE DO MAU  —  bam vao element/CTA/button trong khung xem truoc
+   roi doi Mau nen / Mau chu / Mau vien (ca trang thai hover).
+   Pham vi ap dung duoc hoi lai sau moi lan doi mau.
+   ============================================================ */
+const CE_PALETTE = [
+  ['#0052CD','Xanh brand'], ['#058EF4','Xanh sáng'], ['#3373D7','Xanh vừa'], ['#021E6B','Xanh đậm'],
+  ['#041335','Navy'],       ['#99B7EB','Xanh nhạt'], ['#CCDBF5','Xanh rất nhạt'], ['#F0F4FC','Nền xanh nhạt'],
+  ['#FFFFFF','Trắng'],      ['#F3F4F6','Xám nền'],   ['#E2E5EA','Xám viền'],   ['#6B7280','Xám chữ'],
+  ['#0F172A','Đen chữ'],    ['#1A7F3C','Xanh lá'],   ['#E6F4EA','Nền xanh lá'],['#E11D48','Đỏ']
+];
+const CE_PROPS = [
+  { prop:'background-color', label:'Màu nền' },
+  { prop:'color',            label:'Màu chữ' },
+  { prop:'border-color',     label:'Màu viền' }
+];
+const CE_PLABEL = { 'background-color':'màu nền', 'color':'màu chữ', 'border-color':'màu viền' };
+const CE = { on:false, page:null, path:null, chain:[], tab:'base', scope:'el', applied:{}, lastProp:null };
+
+/* ---------- path: dinh vi 1 element bang chi so con, dung chung doc <-> preview ---------- */
+function cePathOf(el, root){
+  const parts=[]; let n=el;
+  while(n && n!==root && n.parentElement){
+    const p=n.parentElement; let i=0;
+    for(const c of p.children){ if(c===n) break; i++; }
+    parts.unshift(i); n=p;
+  }
+  return parts.join('.');
+}
+function ceNodeAt(root, path){
+  if(path===''||path==null) return root;
+  let n=root;
+  for(const s of String(path).split('.')){ n = n && n.children ? n.children[+s] : null; if(!n) return null; }
+  return n;
+}
+function ceStampPaths(clone){
+  const body = clone.body; if(!body) return;
+  (function walk(el, path){
+    try{ el.setAttribute('data-cepath', path); }catch(e){}
+    const kids = el.children; if(!kids) return;
+    for(let i=0;i<kids.length;i++) walk(kids[i], path===''? String(i) : path+'.'+i);
+  })(body, '');
+}
+function cePreviewEl(path){
+  const d=$('#preview').contentDocument; if(!d||path==null) return null;
+  return d.querySelector('[data-cepath="'+path+'"]');
+}
+
+/* ---------- khoi tao state mau cho 1 trang (doc lai rule da luu trong file) ---------- */
+function cePage(p){
+  if(!p || p._ceInit) return p;
+  p._ceInit = true;
+  p.ceRules  = new Map();     // key "sel||prop||state" -> {sel,prop,value,state}
+  p.ceInline = new Map();     // path -> { prop: giaTriInlineGoc|null }
+  const st = p.doc.getElementById('__ce_styles');
+  if(st){
+    const css = String(st.textContent||'').replace(/\/\*[\s\S]*?\*\//g,'');   // bo comment truoc khi doc
+    const re=/([^{}]+)\{([^{}]*)\}/g; let m;
+    while((m=re.exec(css))){
+      let sel=m[1].trim(), stt='base';
+      if(/:hover\s*$/.test(sel)){ stt='hover'; sel=sel.replace(/:hover\s*$/,''); }
+      for(const decl of m[2].split(';')){
+        const i=decl.indexOf(':'); if(i<0) continue;
+        const prop=decl.slice(0,i).trim(), value=decl.slice(i+1).replace(/!important/i,'').trim();
+        if(prop && value) p.ceRules.set(sel+'||'+prop+'||'+stt, {sel,prop,value,state:stt});
+      }
+    }
+  }
+  let mx=0;
+  p.doc.querySelectorAll('[class]').forEach(el=>{
+    (el.getAttribute('class')||'').split(/\s+/).forEach(c=>{ const m=/^ce-u(\d+)$/.exec(c); if(m) mx=Math.max(mx,+m[1]); });
+  });
+  p.ceUid = mx;
+  return p;
+}
+
+/* ---------- ghi lai khoi <style> sinh boi editor vao doc (va vao preview) ---------- */
+function ceWriteRules(page){
+  const write = (doc)=>{
+    let st = doc.getElementById('__ce_styles');
+    let out='';
+    for(const r of page.ceRules.values())
+      out += (r.state==='hover' ? r.sel+':hover' : r.sel) + '{' + r.prop + ':' + r.value + ' !important}\n';
+    if(!out){ if(st) st.remove(); return; }
+    if(!st){ st = doc.createElement('style'); st.id='__ce_styles'; (doc.head||doc.documentElement).appendChild(st); }
+    st.textContent = '\n/* mau chinh boi Site Editor */\n' + out;
+  };
+  write(page.doc);
+  if(page===state.active){ const d=$('#preview').contentDocument; if(d) write(d); }
+}
+
+/* ---------- selector ---------- */
+function ceClassSel(el){
+  if(!el || !el.getAttribute) return null;
+  // bo class rieng cua editor + class trang thai (w--current cua Webflow, active/open/…)
+  const NOISE=/^(ce-u\d+|__.*|w--.*|active|current|open|selected|is-active|is-open)$/i;
+  const clean=(el.getAttribute('class')||'').trim().split(/\s+/).filter(c=>c && !NOISE.test(c));
+  if(!clean.length) return null;
+  return '.'+clean.map(c=>c.replace(/([^\w-])/g,'\\$1')).join('.');
+}
+function ceUniqSel(el){
+  const m=/(^|\s)(ce-u\d+)(\s|$)/.exec(el.getAttribute('class')||'');
+  return m ? '.'+m[2] : null;
+}
+function ceEnsureUniq(page, path){
+  const el = ceNodeAt(page.doc.body, path); if(!el) return null;
+  let s = ceUniqSel(el);
+  if(!s){ const cls='ce-u'+(++page.ceUid); el.classList.add(cls); s='.'+cls;
+    const pv=cePreviewEl(path); if(pv) pv.classList.add(cls); }
+  return s;
+}
+
+/* ---------- mau hien tai ---------- */
+function ceNorm(v){
+  v=String(v||'').trim(); if(!v) return '';
+  const m=/^rgba?\(([^)]+)\)$/i.exec(v);
+  if(m){
+    const a=m[1].split(/[,\s\/]+/).filter(x=>x!=='').map(Number);
+    if(a.length>=4 && a[3]===0) return 'transparent';
+    return '#'+a.slice(0,3).map(n=>Math.max(0,Math.min(255,Math.round(n||0))).toString(16).padStart(2,'0')).join('');
+  }
+  return v;
+}
+function ceHex(v){ const n=ceNorm(v); return /^#[0-9a-f]{6}$/i.test(n) ? n : null; }
+function ceCurrent(el, prop, tab){
+  const p=CE.page;
+  if(tab==='hover'){
+    for(const sel of [ceUniqSel(el), ceClassSel(el)]){
+      if(!sel) continue;
+      const r=p.ceRules.get(sel+'||'+prop+'||hover'); if(r) return r.value;
+    }
+    return '';
+  }
+  for(const sel of [ceUniqSel(el), ceClassSel(el)]){
+    if(!sel) continue;
+    const r=p.ceRules.get(sel+'||'+prop+'||base'); if(r) return r.value;
+  }
+  const inl = el.style && el.style.getPropertyValue(prop);
+  if(inl) return ceNorm(inl);
+  const pv=cePreviewEl(CE.path);
+  if(pv){ try{ return ceNorm(pv.ownerDocument.defaultView.getComputedStyle(pv).getPropertyValue(prop)); }catch(e){} }
+  return '';
+}
+
+/* ---------- ap dung / go bo ---------- */
+function ceInlineSet(page, path, prop, value){
+  const el = ceNodeAt(page.doc.body, path); if(!el) return;
+  let rec = page.ceInline.get(path); if(!rec){ rec={}; page.ceInline.set(path, rec); }
+  if(!(prop in rec)) rec[prop] = el.style.getPropertyValue(prop) || null;
+  const pv = (page===state.active) ? cePreviewEl(path) : null;
+  const apply=(n)=>{
+    if(!n) return;
+    if(value==null){
+      const orig = rec[prop];
+      if(orig) n.style.setProperty(prop, orig); else n.style.removeProperty(prop);
+    } else {
+      n.style.setProperty(prop, value, 'important');
+      if(prop==='border-color' && value!=='transparent'){
+        const w = pv ? parseFloat(getComputedStyle(pv).borderTopWidth||'0') : 0;
+        if(!w){ n.style.setProperty('border-style','solid','important'); n.style.setProperty('border-width','1px','important'); }
+      }
+    }
+  };
+  apply(el); apply(pv);
+  if(value==null){ delete rec[prop]; if(!Object.keys(rec).length) page.ceInline.delete(path); }
+}
+function ceRuleSet(page, sel, prop, value, tab){
+  const key = sel+'||'+prop+'||'+tab;
+  if(value==null) page.ceRules.delete(key);
+  else page.ceRules.set(key, {sel, prop, value, state:tab});
+  ceWriteRules(page);
+}
+function ceApplyOne(prop, value, tab, scope){
+  const page=CE.page, path=CE.path, el=ceNodeAt(page.doc.body, path); if(!el) return;
+  if(scope==='el'){
+    if(tab==='base'){ ceInlineSet(page, path, prop, value); }
+    else { const s=ceEnsureUniq(page, path); if(s) ceRuleSet(page, s, prop, value, 'hover'); }
+    markDirty(page); return;
+  }
+  const sel = ceClassSel(el); if(!sel) return;
+  const pages = (scope==='site') ? state.pages.filter(p=>{ cePage(p); try{ return p.doc.querySelector(sel); }catch(e){ return false; } }) : [page];
+  for(const p of pages){ cePage(p); ceRuleSet(p, sel, prop, value, tab); markDirty(p); }
+}
+function ceUnapplyOne(prop, tab, scope){
+  const page=CE.page, path=CE.path, el=ceNodeAt(page.doc.body, path); if(!el) return;
+  if(scope==='el'){
+    if(tab==='base') ceInlineSet(page, path, prop, null);
+    else { const s=ceUniqSel(el); if(s) ceRuleSet(page, s, prop, null, 'hover'); }
+    return;
+  }
+  const sel = ceClassSel(el); if(!sel) return;
+  const pages = (scope==='site') ? state.pages : [page];
+  for(const p of pages){ if(!p._ceInit) continue; ceRuleSet(p, sel, prop, null, tab); }
+}
+
+/* ---------- tuong tac ---------- */
+function ceSetColor(prop, value){
+  if(!CE.page || CE.path==null) return;
+  ceApplyOne(prop, value, CE.tab, CE.scope);
+  CE.applied[prop+'|'+CE.tab] = { prop, tab:CE.tab, value };
+  CE.lastProp = prop;
+  ceRenderBody();
+}
+function ceSetScope(next){
+  if(next===CE.scope) return;
+  const items = Object.values(CE.applied);
+  for(const a of items) ceUnapplyOne(a.prop, a.tab, CE.scope);
+  CE.scope = next;
+  for(const a of items) ceApplyOne(a.prop, a.value, a.tab, CE.scope);
+  ceRenderBody();
+  toast(next==='el' ? 'Chỉ áp dụng cho phần tử này'
+      : next==='page' ? 'Đã áp dụng cho cả trang này'
+      : 'Đã áp dụng cho toàn site');
+}
+function ceResetEl(){
+  if(!CE.page || CE.path==null) return;
+  const page=CE.page, el=ceNodeAt(page.doc.body, CE.path); if(!el) return;
+  const uniq=ceUniqSel(el), sel=ceClassSel(el);
+  for(const {prop} of CE_PROPS){
+    ceInlineSet(page, CE.path, prop, null);
+    for(const tab of ['base','hover']){
+      if(uniq) ceRuleSet(page, uniq, prop, null, tab);
+      if(sel) for(const p of state.pages){ if(p._ceInit) ceRuleSet(p, sel, prop, null, tab); }
+    }
+  }
+  el.style.removeProperty('border-style'); el.style.removeProperty('border-width');
+  const pv=cePreviewEl(CE.path); if(pv){ pv.style.removeProperty('border-style'); pv.style.removeProperty('border-width'); }
+  CE.applied={}; CE.lastProp=null; CE.scope='el';
+  markDirty(page); ceRenderDrawer(); toast('Đã hoàn tác màu của phần tử này');
+}
+
+/* ---------- chon element ---------- */
+function ceFriendly(el){
+  const t=el.tagName, cls=(el.getAttribute('class')||'').toLowerCase();
+  if(t==='A'||t==='BUTTON'||/btn|button|cta/.test(cls)) return 'Nút / CTA';
+  if(/^H[1-6]$/.test(t)) return 'Tiêu đề';
+  if(t==='P') return 'Đoạn chữ';
+  if(t==='IMG') return 'Ảnh';
+  if(t==='SPAN'||t==='STRONG'||t==='EM'||t==='LI') return 'Chữ';
+  if(/^(SECTION|FOOTER|HEADER|NAV|MAIN|ASIDE)$/.test(t)) return 'Khối / Section';
+  return 'Khối';
+}
+function ceElLabel(el){
+  const cls=(el.getAttribute('class')||'').trim().split(/\s+/).filter(c=>c && !/^ce-u\d+$/.test(c));
+  return el.tagName.toLowerCase() + (cls.length ? '.'+cls.slice(0,3).join('.') : '');
+}
+function cePreferred(el, root){
+  let n=el, hops=0;
+  while(n && n!==root && n.nodeType===1 && hops<4){
+    const t=n.tagName, cls=(n.getAttribute && (n.getAttribute('class')||'')||'').toLowerCase();
+    if(t==='A'||t==='BUTTON'||/btn|button|cta/.test(cls)) return n;
+    n=n.parentElement; hops++;
+  }
+  return el;
+}
+function ceClickPreview(e, d){
+  let t = e.target; if(!t || t.nodeType!==1) return;
+  t = cePreferred(t, d.body);
+  let path = t.getAttribute && t.getAttribute('data-cepath');
+  if(path==null && t.closest){ const a=t.closest('[data-cepath]'); if(a) path=a.getAttribute('data-cepath'); }
+  if(path==null) return;
+  CE.page = cePage(state.active);
+  CE.applied={}; CE.lastProp=null; CE.scope='el';
+  ceSelect(path); ceOpen();
+}
+function ceSelect(path){
+  const p=CE.page; if(!p) return;
+  const el=ceNodeAt(p.doc.body, path); if(!el) return;
+  CE.path=path;
+  const chain=[]; let n=el;
+  while(n && n!==p.doc.body){ chain.unshift(cePathOf(n, p.doc.body)); n=n.parentElement; }
+  CE.chain = chain.slice(-5);
+  ceHighlight(path); ceRenderDrawer();
+}
+function ceHighlight(path){
+  const d=$('#preview').contentDocument; if(!d) return;
+  d.querySelectorAll('.__ce_sel').forEach(n=>n.classList.remove('__ce_sel'));
+  if(path==null) return;
+  const n=d.querySelector('[data-cepath="'+path+'"]');
+  if(n){ n.classList.add('__ce_sel'); try{ n.scrollIntoView({block:'center', behavior:'smooth'}); }catch(e){} }
+}
+function cePreviewStyle(){
+  const d=$('#preview').contentDocument; if(!d) return;
+  let st=d.getElementById('__ce_ui');
+  if(!st){ st=d.createElement('style'); st.id='__ce_ui'; (d.head||d.documentElement).appendChild(st); }
+  st.textContent = '.__ce_sel{outline:3px solid #0052CD !important;outline-offset:1px}' + (CE.on
+    ? 'html,body,*{cursor:crosshair !important}[data-se]:hover{outline:none !important;background:none !important}'
+      +'[data-cepath]:hover{outline:2px dashed #058EF4 !important;outline-offset:1px}'
+    : '');
+}
+
+/* ---------- ve giao dien drawer ---------- */
+function ceRenderDrawer(){
+  const p=CE.page, el = (p && CE.path!=null) ? ceNodeAt(p.doc.body, CE.path) : null;
+  if(!el){
+    $('#ceElName').textContent = 'Chưa chọn phần tử nào';
+    $('#ceCrumbs').innerHTML = '';
+    $('#ceBody').innerHTML = '<div class="ce-empty">Bấm vào một <b>nút</b>, <b>CTA</b> hay <b>khối</b> bất kỳ trong khung xem trước bên phải để đổi màu.<br><br>Mẹo: bấm trúng chữ bên trong nút thì dùng dải <b>đường dẫn</b> ở trên để chọn ra nút cha.</div>';
+    return;
+  }
+  $('#ceElName').textContent = ceFriendly(el)+' · '+ceElLabel(el);
+  $('#ceCrumbs').innerHTML = CE.chain.map(pt=>{
+    const n=ceNodeAt(p.doc.body, pt); if(!n) return '';
+    return '<button class="ce-crumb'+(pt===CE.path?' cur':'')+'" data-cepath="'+pt+'" title="'+esc(ceElLabel(n))+'">'+esc(ceElLabel(n))+'</button>';
+  }).filter(Boolean).join('<span class="ce-arrow">›</span>');
+  $('#ceCrumbs').querySelectorAll('.ce-crumb').forEach(b=>b.onclick=()=>{
+    CE.applied={}; CE.lastProp=null; CE.scope='el'; ceSelect(b.dataset.cepath);
+  });
+  document.querySelectorAll('.ce-tab').forEach(t=>t.classList.toggle('active', t.dataset.tab===CE.tab));
+  ceRenderBody();
+}
+function ceRenderBody(){
+  const p=CE.page, el=(p && CE.path!=null) ? ceNodeAt(p.doc.body, CE.path) : null; if(!el) return;
+  let html = ceScopeHTML(el);
+  for(const {prop,label} of CE_PROPS){
+    const cur = ceCurrent(el, prop, CE.tab);
+    const show = cur || (CE.tab==='hover' ? 'chưa đặt' : '—');
+    html += '<div class="ce-row" data-prop="'+prop+'">'+
+      '<div class="ce-lab">'+label+'<span class="ce-cur"><i style="background:'+esc(cur||'transparent')+'"></i></span>'+
+      '<span class="ce-val">'+esc(show)+'</span></div>'+
+      '<div class="ce-sws">'+
+        CE_PALETTE.map(([c,t])=>'<button class="ce-sw" data-color="'+c+'" title="'+t+'" style="background:'+c+'"></button>').join('')+
+        '<label class="ce-pick" title="Chọn màu khác">+<input type="color" value="'+(ceHex(cur)||'#0052CD')+'"></label>'+
+        '<button class="ce-clear" data-clear="1">Trong suốt</button>'+
+        (cur ? '<button class="ce-clear" data-undo="1">Bỏ</button>' : '')+
+      '</div></div>';
+  }
+  $('#ceBody').innerHTML = html;
+  $('#ceBody').querySelectorAll('.ce-row').forEach(row=>{
+    const prop=row.dataset.prop;
+    row.querySelectorAll('.ce-sw').forEach(b=>b.onclick=()=>ceSetColor(prop, b.dataset.color));
+    const pick=row.querySelector('.ce-pick input');
+    if(pick){ pick.oninput=()=>ceSetColor(prop, pick.value); }
+    const cl=row.querySelector('[data-clear]'); if(cl) cl.onclick=()=>ceSetColor(prop,'transparent');
+    const un=row.querySelector('[data-undo]'); if(un) un.onclick=()=>{
+      ceUnapplyOne(prop, CE.tab, CE.scope); delete CE.applied[prop+'|'+CE.tab]; markDirty(CE.page); ceRenderBody();
+    };
+  });
+  $('#ceBody').querySelectorAll('[data-scope]').forEach(b=>b.onclick=()=>ceSetScope(b.dataset.scope));
+}
+function ceScopeHTML(el){
+  if(!CE.lastProp) return '';
+  const sel = ceClassSel(el);
+  let nPage=0, nSite=0;
+  if(sel){
+    try{ nPage = CE.page.doc.querySelectorAll(sel).length; }catch(e){ nPage=0; }
+    for(const p of state.pages){ try{ nSite += p.doc.querySelectorAll(sel).length; }catch(e){} }
+  }
+  const dis = sel ? '' : ' disabled';
+  const short = sel && sel.length>26 ? sel.slice(0,26)+'…' : sel;
+  return '<div class="ce-scope"><div class="t">Vừa đổi <b>'+(CE_PLABEL[CE.lastProp]||CE.lastProp)+'</b>'+
+    (CE.tab==='hover'?' (khi rê chuột)':'')+' — áp dụng cho:</div><div class="ce-scopebtns">'+
+    '<button class="ce-sc'+(CE.scope==='el'?' on':'')+'" data-scope="el">Chỉ phần tử này</button>'+
+    '<button class="ce-sc'+(CE.scope==='page'?' on':'')+'" data-scope="page"'+dis+'>'+
+      (sel ? 'Mọi phần tử <b>'+esc(short)+'</b> trong trang này ('+nPage+')' : 'Phần tử này không có class — không dùng được')+'</button>'+
+    '<button class="ce-sc'+(CE.scope==='site'?' on':'')+'" data-scope="site"'+dis+'>'+
+      (sel ? 'Toàn site — tất cả trang ('+nSite+' chỗ)' : 'Toàn site — không dùng được')+'</button>'+
+    '</div></div>';
+}
+
+/* ---------- bat / tat ---------- */
+function ceOpen(){
+  document.body.classList.add('ce-open');
+  $('#ceDrawer').classList.add('open');
+  if(!CE.on){ CE.on=true; $('#colorBtn').classList.add('active'); }
+  const l=$('#colorBtn').querySelector('.lbl'); if(l) l.textContent='Tắt đổi màu';
+  if(!CE.page) CE.page = cePage(state.active);
+  cePreviewStyle(); ceRenderDrawer(); setTimeout(fitPreview, 240);
+}
+function ceClose(){
+  CE.on=false;
+  document.body.classList.remove('ce-open');
+  $('#ceDrawer').classList.remove('open');
+  $('#colorBtn').classList.remove('active');
+  const l=$('#colorBtn').querySelector('.lbl'); if(l) l.textContent='Đổi màu';
+  ceHighlight(null); cePreviewStyle(); setTimeout(fitPreview, 240);
+}
+function ceAfterPreviewLoad(){
+  if(CE.page !== state.active){
+    CE.page = state.active ? cePage(state.active) : null;
+    CE.path=null; CE.chain=[]; CE.applied={}; CE.lastProp=null; CE.scope='el';
+  }
+  cePreviewStyle();
+  if(CE.path!=null) ceHighlight(CE.path);
+  if($('#ceDrawer').classList.contains('open')) ceRenderDrawer();
+}
+/* ---- nut Blog SEO: mo dashboard bai viet (blog-server.js chay o cong 8899+) ---- */
+$('#blogBtn').onclick = async ()=>{
+  const b=$('#blogBtn'); b.disabled=true;
+  try{
+    const r = await fetch('/__api/blog-url');
+    if(r.status===404){    // server.js dang chay la ban cu, chua co API nay
+      toast('Server đang chạy là bản cũ. Bấm Ctrl + C ở cửa sổ đen rồi mở lại start.command, sau đó tải lại trang này.', true);
+      return;
+    }
+    const j = await r.json();
+    if(j.ok && j.url) window.open(j.url, 'blog-admin');
+    else toast('Chưa thấy dashboard blog đang chạy. Tắt cửa sổ đen rồi bấm lại start.command (bản mới tự bật cả hai).', true);
+  }catch(e){ toast('Không mở được dashboard blog: '+e.message, true); }
+  b.disabled=false;
+};
+
+$('#colorBtn').onclick = ()=>{ if(CE.on) ceClose(); else ceOpen(); };
+$('#ceClose').onclick  = ceClose;
+$('#ceReset').onclick  = ceResetEl;
+document.querySelectorAll('.ce-tab').forEach(t=>t.onclick=()=>{
+  CE.tab = t.dataset.tab; CE.lastProp=null;
+  document.querySelectorAll('.ce-tab').forEach(x=>x.classList.toggle('active', x===t));
+  ceRenderBody();
+});
+document.addEventListener('keydown', e=>{ if(e.key==='Escape' && CE.on) ceClose(); });
+
+boot();
+</script>
+</body>
+</html>

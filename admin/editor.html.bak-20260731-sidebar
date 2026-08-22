@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Site Content Editor</title>
+<style>
+  :root{
+    --blue:#0740C1; --blue-600:#0a4fd8; --blue-050:#eef3ff;
+    --ink:#0f172a; --muted:#64748b; --line:#e6eaf1; --bg:#f4f6fb; --card:#ffffff;
+    --amber:#b45309; --amber-bg:#fef3c7; --green:#047857; --green-bg:#dcfce7;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;color:var(--ink);background:var(--bg)}
+  button{font-family:inherit;cursor:pointer}
+  /* ---------- top bar ---------- */
+  .topbar{height:56px;display:flex;align-items:center;gap:14px;padding:0 16px;background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
+  .brand{display:flex;align-items:center;gap:9px;font-weight:700;font-size:15px;color:var(--blue)}
+  .brand .dot{width:22px;height:22px;border-radius:6px;background:var(--blue);display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:13px}
+  .topbar .sep{width:1px;height:26px;background:var(--line)}
+  .search{flex:1;max-width:360px;position:relative}
+  .search input{width:100%;height:36px;border:1px solid var(--line);border-radius:9px;padding:0 12px 0 34px;font-size:13.5px;background:#fbfcfe}
+  .search svg{position:absolute;left:10px;top:9px;color:var(--muted)}
+  .spacer{flex:1}
+  .status{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--muted)}
+  .status .pill{width:9px;height:9px;border-radius:50%;background:#cbd5e1}
+  .status.dirty .pill{background:var(--amber)}
+  .status.saved .pill{background:var(--green)}
+  .btn{height:36px;border:1px solid var(--line);background:#fff;border-radius:9px;padding:0 14px;font-size:13.5px;font-weight:600;color:var(--ink);display:inline-flex;align-items:center;gap:7px}
+  .btn:hover{background:#f8fafc}
+  .btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}
+  .btn.primary:hover{background:var(--blue-600)}
+  .btn:disabled{opacity:.5;cursor:default}
+  /* ---------- layout ---------- */
+  .app{display:grid;grid-template-columns:212px minmax(340px,1fr) 8px var(--pw,40vw);height:calc(100vh - 56px)}
+  .app.no-preview{grid-template-columns:212px 1fr 0 0}
+  .col{overflow:auto;height:100%}
+  .left{border-right:1px solid var(--line);background:#fbfcfe;padding:12px 10px}
+  .mid{padding:14px 16px 70px;min-width:0}
+  .right{background:#fff;display:flex;flex-direction:column;min-width:0}
+  .app.no-preview .right,.app.no-preview .gutter{display:none}
+  /* draggable divider */
+  .gutter{background:var(--line);cursor:col-resize;position:relative}
+  .gutter::before{content:"";position:absolute;left:-5px;right:-5px;top:0;bottom:0;z-index:5}
+  .gutter::after{content:"⋮⋮";writing-mode:vertical-rl;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#9aa6b5;font-size:12px;letter-spacing:-2px}
+  .gutter:hover,.gutter.drag{background:var(--blue)}
+  body.resizing{cursor:col-resize;user-select:none}
+  body.resizing #preview{pointer-events:none}
+  .left h4{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:8px 8px 6px}
+  .pagelink{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:8px 10px;border-radius:8px;font-size:13.5px;color:#334155;cursor:pointer;margin-bottom:2px}
+  .pagelink:hover{background:#eef2f9}
+  .pagelink.active{background:var(--blue);color:#fff;font-weight:600}
+  .pagelink .cnt{font-size:11px;background:rgba(0,0,0,.08);padding:1px 7px;border-radius:20px;color:inherit}
+  .pagelink.active .cnt{background:rgba(255,255,255,.25)}
+  .pagelink .badge{font-size:10px;background:var(--amber-bg);color:var(--amber);border-radius:20px;padding:1px 6px}
+  .pagelink.active .badge{background:rgba(255,255,255,.25);color:#fff}
+  /* ---------- middle: fields ---------- */
+  .page-title{font-size:17px;font-weight:700;margin:0 0 2px}
+  .page-sub{font-size:12.5px;color:var(--muted);margin:0}
+  .mid-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px;position:sticky;top:0;z-index:3;background:linear-gradient(var(--bg),var(--bg) 70%,transparent);padding:2px 0 8px}
+  .mid-tools{display:flex;gap:7px;flex-shrink:0}
+  .btn.sm{height:30px;padding:0 11px;font-size:12px}
+  .section-group{margin-bottom:14px;border:1px solid var(--line);border-radius:12px;background:#fbfcfe;overflow:hidden}
+  .section-head{cursor:pointer;user-select:none;display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;letter-spacing:.02em;text-transform:uppercase;color:var(--blue);margin:0;padding:10px 12px;background:#fff;border-bottom:1px solid var(--line)}
+  .section-head:hover{background:#f6f9ff}
+  .section-head .chev{color:#94a3b8;transition:transform .15s;flex-shrink:0}
+  .section-group.collapsed .chev{transform:rotate(-90deg)}
+  .section-group.collapsed .section-head{border-bottom:0}
+  .section-head .n{font-size:11px;color:var(--muted);font-weight:600;margin-left:auto}
+  .fields-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:9px;align-items:start;padding:11px}
+  .section-group.collapsed .fields-grid{display:none}
+  .field{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:9px 10px;margin-bottom:0;transition:border-color .15s,box-shadow .15s}
+  .field.changed{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-050)}
+  .field.located{border-color:var(--blue);box-shadow:0 0 0 3px rgba(7,64,193,.25)}
+  .field.located textarea{font-weight:600;background:#fbfdff}
+  .field.located .field-type{background:var(--blue);color:#fff}
+  @keyframes seflash{0%{box-shadow:0 0 0 8px rgba(7,64,193,.40)}100%{box-shadow:0 0 0 3px rgba(7,64,193,.25)}}
+  .field.flash{animation:seflash .95s ease-out}
+  .field-top{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+  .field-type{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);background:#f1f5f9;padding:2px 7px;border-radius:5px}
+  .field-type.t-heading{color:#7c3aed;background:#f3e8ff}
+  .field-type.t-button{color:#b45309;background:#fef3c7}
+  .field-type.t-image{color:#0369a1;background:#e0f2fe}
+  .field-type.t-title{color:#be123c;background:#ffe4e6}
+  .field .shared{font-size:10.5px;color:var(--amber);background:var(--amber-bg);padding:2px 7px;border-radius:5px;font-weight:600}
+  .field .reset{margin-left:auto;border:none;background:none;color:var(--muted);font-size:12px;padding:3px 6px;border-radius:6px;visibility:hidden}
+  .field:hover .reset{visibility:visible}
+  .field .reset:hover{background:#f1f5f9;color:var(--ink)}
+  .field textarea{width:100%;border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-family:inherit;font-size:13.5px;line-height:1.5;color:var(--ink);resize:vertical;min-height:38px;background:#fff}
+  .field textarea:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-050)}
+  .rich-tools{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:6px;align-items:center}
+  .rich-tools .sw{width:20px;height:20px;border-radius:5px;border:1px solid rgba(0,0,0,.18);cursor:pointer;padding:0;transition:transform .1s}
+  .rich-tools .sw:hover{transform:scale(1.15)}
+  .rich-tools .sw-custom{width:20px;height:20px;border-radius:5px;border:1px dashed #94a3b8;display:inline-flex;align-items:center;justify-content:center;font-size:13px;color:#64748b;cursor:pointer;position:relative;overflow:hidden;line-height:1}
+  .rich-tools .sw-custom input{position:absolute;inset:0;opacity:0;cursor:pointer}
+  .rich-ed{width:100%;min-height:38px;border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-family:inherit;font-size:13.5px;line-height:1.5;color:var(--ink);background:#fff;outline:none}
+  .rich-ed:focus{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-050)}
+  .rich-hint{font-size:11px;color:#94a3b8;margin-top:5px}
+  .rich-ed:empty:before{content:attr(data-ph);color:#cbd5e1;pointer-events:none}
+  .field.is-empty{border-color:#fbbf24;background:#fffdf5}
+  .field.is-empty .empty-tag{font-size:10.5px;font-weight:600;color:#b45309;background:#fef3c7;border-radius:5px;padding:2px 7px}
+  .field .apply-all{display:none;align-items:center;gap:7px;margin-top:8px;font-size:12.5px;color:#475569}
+  .field.changed.is-shared .apply-all{display:flex}
+  .field .apply-all input{width:15px;height:15px;accent-color:var(--blue)}
+  /* image field */
+  .imgrow{display:flex;gap:12px;align-items:center}
+  .imgthumb{width:88px;height:64px;border:1px solid var(--line);border-radius:8px;background:#f8fafc center/contain no-repeat;flex-shrink:0}
+  .imgmeta{min-width:0;flex:1}
+  .imgmeta .fn{font-size:12px;color:var(--muted);word-break:break-all;margin-bottom:8px}
+  .imgmeta .pending{font-size:11.5px;color:var(--green);font-weight:600}
+  /* ---------- preview ---------- */
+  .preview-bar{height:42px;display:flex;align-items:center;gap:10px;padding:0 14px;border-bottom:1px solid var(--line);font-size:12.5px;color:var(--muted);flex-shrink:0}
+  .preview-bar .live{display:inline-flex;align-items:center;gap:6px;color:var(--green);font-weight:600}
+  .preview-bar .live .d{width:8px;height:8px;border-radius:50%;background:var(--green)}
+  .preview-bar .pv-hint{margin-left:auto;font-size:11px;color:#9aa6b5}
+  .preview-stage{flex:1;overflow:hidden;position:relative;background:#fff}
+  #preview{border:0;background:#fff;transform-origin:top left;position:absolute;top:0;left:0}
+  .empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center;color:var(--muted);padding:30px}
+  .empty h3{color:var(--ink);margin:14px 0 6px}
+  .empty .big{width:66px;height:66px;border-radius:16px;background:var(--blue-050);display:flex;align-items:center;justify-content:center}
+  /* toast */
+  #toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:11px 18px;border-radius:10px;font-size:13.5px;opacity:0;pointer-events:none;transition:.25s;z-index:50;box-shadow:0 10px 30px rgba(0,0,0,.2)}
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  #toast.err{background:#b91c1c}
+  .hidden{display:none!important}
+  .loadwrap{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(244,246,251,.85);z-index:40;flex-direction:column;gap:14px}
+  .spin{width:34px;height:34px;border:3px solid var(--blue-050);border-top-color:var(--blue);border-radius:50%;animation:sp .8s linear infinite}
+  @keyframes sp{to{transform:rotate(360deg)}}
+</style>
+<style>.btn.active{background:#0740C1;color:#fff;border-color:#0740C1;}</style>
+<style>
+  /* ---------- tree map (middle panel) ---------- */
+  .tree{padding-bottom:40px}
+  .tsection{margin-bottom:8px;border:1px solid var(--line);border-radius:10px;background:#fff;overflow:hidden}
+  .tsection>.thead{display:flex;align-items:center;gap:8px;padding:10px 12px;cursor:pointer;user-select:none;font-size:13px;font-weight:700;color:var(--blue);background:#fff}
+  .tsection>.thead:hover{background:#f6f9ff}
+  .tsection>.thead .chev{transition:transform .15s;color:#94a3b8;flex-shrink:0}
+  .tsection:not(.open)>.thead .chev{transform:rotate(-90deg)}
+  .tsection>.thead .n{margin-left:auto;font-size:11px;color:var(--muted);font-weight:600}
+  .tsection>.tinner{display:none;padding:6px 8px 8px}
+  .tsection.open>.tinner{display:block}
+  .tblock{border:1px dashed #d5deec;border-radius:9px;margin:6px 0;background:#fbfcfe}
+  .tblock>.bhead{display:flex;align-items:center;gap:5px;padding:6px 8px}
+  .tblock>.bhead .blabel{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11.5px;color:#475569;font-weight:600}
+  .tblock .bbtn{border:1px solid var(--line);background:#fff;border-radius:6px;width:27px;height:27px;display:inline-flex;align-items:center;justify-content:center;color:#64748b;padding:0;font-size:13px;line-height:1}
+  .tblock .bbtn:hover{background:#eef2f9;color:var(--blue);border-color:#c7d6ef}
+  .tblock .bbtn.danger:hover{background:#fee2e2;color:#b91c1c;border-color:#fecaca}
+  .tblock>.bchildren{padding:0 6px 6px}
+  /* --- thao tac cap khu vuc --- */
+  .tsection>.thead .sops{display:flex;gap:4px;margin-left:8px}
+  .tsection>.thead .bbtn{border:1px solid var(--line);background:#fff;border-radius:6px;width:25px;height:25px;display:inline-flex;align-items:center;justify-content:center;color:#64748b;padding:0;font-size:12px;line-height:1;font-weight:400}
+  .tsection>.thead .bbtn:hover{background:#eef2f9;color:var(--blue);border-color:#c7d6ef}
+  .tsection>.thead .bbtn.danger:hover{background:#fee2e2;color:#b91c1c;border-color:#fecaca}
+  /* --- keo tha --- */
+  .bbtn.drag-h{cursor:grab;letter-spacing:-2px}
+  .bbtn.drag-h:active{cursor:grabbing}
+  .tblock.dragging,.tsection.dragging{opacity:.4}
+  .tblock.dz-before,.tsection.dz-before{box-shadow:0 -3px 0 -1px var(--blue)}
+  .tblock.dz-after,.tsection.dz-after{box-shadow:0 3px 0 -1px var(--blue)}
+  /* --- bang bo cuc trang --- */
+  .layout-box{border:1px solid #c7d6ef;background:#f6f9ff;border-radius:10px;margin-bottom:8px;overflow:hidden}
+  .layout-box .lhead{padding:8px 12px;font-size:12px;font-weight:700;color:var(--blue)}
+  .layout-row{display:flex;align-items:center;gap:5px;padding:5px 8px 5px 10px;border-top:1px solid #dbe6f7;background:#fff}
+  .layout-row .lnum{width:20px;text-align:center;font-size:10.5px;color:#94a3b8;font-weight:700;flex-shrink:0}
+  .layout-row .lname{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;color:#334155;font-weight:600}
+  .layout-row .bbtn{border:1px solid var(--line);background:#fff;border-radius:6px;width:27px;height:27px;display:inline-flex;align-items:center;justify-content:center;color:#64748b;padding:0;font-size:13px;line-height:1;flex-shrink:0}
+  .layout-row .bbtn:hover{background:#eef2f9;color:var(--blue);border-color:#c7d6ef}
+  .layout-row .bbtn.danger:hover{background:#fee2e2;color:#b91c1c;border-color:#fecaca}
+  .layout-row.dragging{opacity:.4}
+  .layout-row.dz-before{box-shadow:inset 0 3px 0 -1px var(--blue)}
+  .layout-row.dz-after{box-shadow:inset 0 -3px 0 -1px var(--blue)}
+  /* --- bang khoi dang an --- */
+  .hidden-box{border:1px solid #fde68a;background:#fffbeb;border-radius:10px;margin-bottom:8px;overflow:hidden}
+  .hidden-box .hhead{padding:8px 12px;font-size:12px;font-weight:700;color:#92400e}
+  .hidden-box .hrow{display:flex;align-items:center;gap:5px;padding:5px 8px 5px 12px;border-top:1px solid #fde68a}
+  .hidden-box .hlab{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11.5px;color:#92400e;font-weight:600}
+  .hidden-box .bbtn{border:1px solid #fcd34d;background:#fff;border-radius:6px;width:27px;height:27px;display:inline-flex;align-items:center;justify-content:center;color:#92400e;padding:0;font-size:13px;line-height:1}
+  .hidden-box .bbtn:hover{background:#fef3c7}
+  .hidden-box .bbtn.danger:hover{background:#fee2e2;color:#b91c1c;border-color:#fecaca}
+  .tnode{border-top:1px solid #eef1f6}
+  .tnode:first-child{border-top:0}
+  .trow{display:flex;align-items:center;gap:8px;padding:7px 8px;cursor:pointer;border-radius:7px}
+  .trow:hover{background:#f1f5f9}
+  .tnode.open>.trow{background:#eef3ff}
+  .trow .tt{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--muted);background:#f1f5f9;padding:2px 6px;border-radius:5px;flex-shrink:0}
+  .trow .tt.t-heading{color:#7c3aed;background:#f3e8ff}
+  .trow .tt.t-button{color:#b45309;background:#fef3c7}
+  .trow .tt.t-image{color:#0369a1;background:#e0f2fe}
+  .trow .tt.t-title{color:#be123c;background:#ffe4e6}
+  .trow .tprev{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;color:#334155}
+  .trow .dot{width:7px;height:7px;border-radius:50%;background:var(--blue);flex-shrink:0;visibility:hidden}
+  .tnode.changed .trow .dot{visibility:visible}
+  .tbody{display:none;padding:8px 8px 10px}
+  .tnode.open>.tbody{display:block}
+  .tbody .field{border:0;padding:0;background:transparent;box-shadow:none!important}
+  @keyframes tflash{0%{box-shadow:0 0 0 6px rgba(7,64,193,.35)}100%{box-shadow:0 0 0 0 rgba(7,64,193,0)}}
+  .tnode.flash>.trow{animation:tflash .95s ease-out;border-radius:7px}
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="brand"><span class="dot">✎</span> Site Editor</div>
+    <div class="sep"></div>
+    <div class="search">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      <input id="search" type="text" placeholder="Tìm chữ trong trang..." autocomplete="off">
+    </div>
+    <div class="spacer"></div>
+    <div id="status" class="status"><span class="pill"></span><span class="txt">Chưa mở website</span></div>
+    <button id="previewToggle" class="btn" title="Ẩn / hiện khung xem trước">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
+      Xem trước
+    </button>
+    <button id="hideRepairBtn" class="btn" title="Ẩn / hiện các mục Sửa chữa trên toàn site" style="display:none"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><line x1="3" y1="3" x2="21" y2="21"/></svg><span class="lbl">Ẩn Sửa chữa</span></button><button id="saveBtn" class="btn primary" disabled>
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>
+      Lưu tất cả
+    </button>
+  </div>
+
+  <div class="app">
+    <div class="col left" id="left"></div>
+    <div class="col mid" id="mid">
+      <div class="empty">
+        <div class="big"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#0740C1" stroke-width="1.7"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg></div>
+        <h3>Đang tải nội dung website…</h3>
+        <p>Công cụ sẽ tự quét toàn bộ chữ và ảnh của các trang.</p>
+      </div>
+    </div>
+    <div class="gutter" id="gutter" title="Kéo để thay đổi độ rộng khung xem trước"></div>
+    <div class="col right">
+      <div class="preview-bar"><span class="live"><span class="d"></span>Xem trước trực tiếp</span><span id="previewName"></span><span class="pv-hint">bản desktop thu nhỏ · bấm vào để tìm ô sửa</span></div>
+      <div class="preview-stage" id="pstage"><iframe id="preview" title="preview"></iframe></div>
+    </div>
+  </div>
+
+  <div id="toast"></div>
+  <div id="loader" class="loadwrap"><div class="spin"></div><div id="loadmsg" style="color:#475569;font-size:13.5px">Đang kết nối…</div></div>
+
+<script>
+"use strict";
+/* ============================================================
+   Site Content Editor  — works with any static-site folder
+   ============================================================ */
+const state = { pages: [], active: null, sharedIndex: new Map() };
+const collapsedSections = new Set();
+const $ = s => document.querySelector(s);
+
+/* -------- section label detection (class-name heuristics) -------- */
+const SECTION_MAP = [
+  [/nav|menu/, 'Thanh điều hướng'], [/hero|banner|masthead/, 'Hero (đầu trang)'],
+  [/partner|client|logo-?strip|brand/, 'Đối tác / Logo'], [/solution/, 'Giải pháp'],
+  [/feature/, 'Tính năng'], [/benefit/, 'Lợi ích'], [/statistic|counter|stat\b/, 'Số liệu'],
+  [/pricing|plan|price/, 'Bảng giá'], [/testimonial|review|feedback/, 'Đánh giá'],
+  [/work|process|step|how/, 'Cách hoạt động'], [/faq|question/, 'Câu hỏi thường gặp'],
+  [/income|financial|saving|analytic|dashboard|product-?screen/, 'Minh hoạ sản phẩm'],
+  [/addition|extra|more/, 'Nội dung bổ sung'], [/app|download|get-app|store/, 'Tải ứng dụng'],
+  [/cta|call-?to|subscribe|newsletter/, 'Kêu gọi hành động (CTA)'],
+  [/blog|post|article|news/, 'Blog / Bài viết'], [/footer/, 'Chân trang'],
+  [/header|topbar/, 'Đầu trang'],
+];
+function sectionOf(el){
+  let n = el, depth = 0;
+  while(n && n.nodeType === 1 && depth < 40){
+    const cls = (n.getAttribute && (n.getAttribute('class')||'')) + ' ' + (n.id||'');
+    for(const [re,label] of SECTION_MAP){ if(re.test(cls.toLowerCase())) return label; }
+    if(/^(section|footer|header|nav|main)$/i.test(n.tagName)) {
+      const cls2 = (n.getAttribute('class')||'').toLowerCase();
+      for(const [re,label] of SECTION_MAP){ if(re.test(cls2)) return label; }
+    }
+    n = n.parentElement; depth++;
+  }
+  return 'Nội dung';
+}
+
+/* -------- classify a text element -------- */
+const HEADING_TAGS = new Set(['H1','H2','H3','H4','H5','H6']);
+function textType(el){
+  if(!el) return 'text';
+  const t = el.tagName;
+  if(HEADING_TAGS.has(t)) return 'heading';
+  const cls = (el.getAttribute('class')||'').toLowerCase();
+  if(t==='A' || t==='BUTTON' || /button|btn|cta/.test(cls)) return 'button';
+  return 'text';
+}
+const TYPE_LABEL = { heading:'Tiêu đề', text:'Đoạn chữ', button:'Nút bấm', image:'Hình ảnh', title:'Tiêu đề trang', placeholder:'Ô nhập' };
+
+const SKIP_TAGS = new Set(['SCRIPT','STYLE','NOSCRIPT','SVG','TEMPLATE','CODE','PATH','G']);
+const INLINE_TAGS = new Set(['SPAN','B','STRONG','I','EM','U','A','BR','SMALL','SUP','SUB','MARK','FONT','WBR','ABBR']);
+function isVisibleText(s){ return s && s.replace(/[\s ​]+/g,'').length > 0; }
+
+/* -------- walk a document, produce editable items bound to live nodes -------- */
+let uidSeq = 0;
+// Deterministic walk shared by extraction AND preview tagging so indices line up 1:1
+function collectTargets(doc){
+  const texts=[], imgs=[], phs=[];
+  let title=null;
+  const t=doc.querySelector('title'); if(t && isVisibleText(t.textContent)) title=t;
+  const body=doc.body;
+  if(body){
+    (function walk(el){
+      if(!el || SKIP_TAGS.has(el.tagName)) return;
+      const childEls = Array.from(el.children).filter(c=>!SKIP_TAGS.has(c.tagName));
+      const directText = Array.from(el.childNodes).filter(n=>n.nodeType===3 && isVisibleText(n.nodeValue));
+      const isSlot = el.hasAttribute && el.hasAttribute('data-se-slot');   // an emptied-but-kept field
+      if(childEls.length===0){
+        if(directText.length>0 || isSlot) texts.push({mode:'plain', node:el});
+      } else if(childEls.every(c=>INLINE_TAGS.has(c.tagName)) && (isVisibleText(el.textContent) || isSlot)){
+        const hasRich = childEls.some(c=>c.tagName!=='BR');   // spans/links -> rich; only <br> -> plain multiline
+        texts.push({mode: hasRich?'rich':'plain', node:el});
+      } else { for(const tn of directText) texts.push({mode:'textnode', node:tn}); for(const c of childEls) walk(c); }
+    })(body);
+    body.querySelectorAll('img').forEach(img=>{ const s=img.getAttribute('src')||''; if(s && !s.startsWith('data:')) imgs.push(img); });
+    body.querySelectorAll('input[placeholder],textarea[placeholder]').forEach(inp=>{ if(isVisibleText(inp.getAttribute('placeholder'))) phs.push(inp); });
+  }
+  return { title, texts, imgs, phs };
+}
+function extract(page){
+  const items=[], T=collectTargets(page.doc);
+  if(T.title){ const it=mkItem(page,'title',T.title,null,'Đầu trang',T.title.textContent.trim(),'element'); it.cat='title'; it.seid='title'; items.push(it); }
+  T.texts.forEach((t,i)=>{
+    const isTN = t.mode==='textnode';
+    const el = isTN ? t.node.parentElement : t.node;
+    const type = isTN ? 'text' : textType(t.node);
+    const it = mkItem(page, type, el, (isTN?t.node:null), sectionOf(el), '', t.mode);
+    it.cat='text'; it.seid='t'+i;
+    it.original = it.value = getText(it);
+    items.push(it);
+  });
+  T.imgs.forEach((img,i)=>{ const it=mkImage(page,img,img.getAttribute('src')); it.cat='img'; it.seid='g'+i; items.push(it); });
+  T.phs.forEach((inp,i)=>{ const it=mkItem(page,'placeholder',inp,null,sectionOf(inp),(inp.getAttribute('placeholder')||'').trim(),'placeholder'); it.cat='ph'; it.seid='p'+i; items.push(it); });
+  return items;
+}
+function mkItem(page,type,el,textNode,section,value,mode){
+  return { uid:'f'+(uidSeq++), kind:'text', type, el, textNode, mode:mode||'element',
+           section, original:value, value, changed:false, page };
+}
+function mkImage(page,img,src){
+  return { uid:'f'+(uidSeq++), kind:'image', type:'image', el:img, section:sectionOf(img),
+           original:src, value:src, changed:false, pendingFile:null, pendingURL:null, page };
+}
+function getText(it){
+  if(it.type==='title') return it.el.textContent;
+  if(it.type==='placeholder') return it.el.getAttribute('placeholder')||'';
+  if(it.mode==='textnode') return it.textNode.nodeValue;
+  if(it.mode==='rich') return it.el.innerHTML;
+  return plainGet(it.el);
+}
+function setText(it,val){
+  if(it.type==='title'){ it.el.textContent = val; return; }
+  if(it.type==='placeholder'){ it.el.setAttribute('placeholder', val); return; }
+  if(it.mode==='textnode'){ it.textNode.nodeValue = val; return; }
+  if(it.mode==='rich'){ it.el.innerHTML = sanitizeRich(val); return; }
+  plainSet(it.el, val);
+}
+function plainGet(el){
+  let s='';
+  el.childNodes.forEach(n=>{ if(n.nodeType===3) s+=n.nodeValue; else if(n.nodeType===1 && n.tagName==='BR') s+='\n'; });
+  return s.replace(/​/g,'');
+}
+function plainSet(el,val){
+  if(/\n/.test(val)) el.innerHTML = val.split('\n').map(esc).join('<br>');
+  else el.textContent = val;
+}
+// When a field is emptied, keep a marker so it stays an editable slot after save/reload.
+function markSlot(it){
+  if(it.kind!=='text' || it.type==='title' || it.type==='placeholder' || it.mode==='textnode' || !it.el) return;
+  const empty = !((it.el.textContent||'').replace(/[\s​]/g,'').length);
+  if(empty) it.el.setAttribute('data-se-slot',''); else it.el.removeAttribute('data-se-slot');
+}
+// keep only safe inline tags + class / color / href so edits preserve colours and links
+function sanitizeRich(html){
+  const box=document.createElement('div'); box.innerHTML=html;
+  const ALLOW=new Set(['SPAN','BR','B','STRONG','I','EM','U','A','MARK','SUP','SUB','SMALL','FONT']);
+  box.querySelectorAll('font').forEach(f=>{ const s=document.createElement('span'); const c=f.getAttribute('color')||(f.style&&f.style.color); if(c) s.style.color=c; s.innerHTML=f.innerHTML; f.replaceWith(s); });
+  (function clean(node){
+    Array.from(node.childNodes).forEach(n=>{
+      if(n.nodeType===1){
+        if(!ALLOW.has(n.tagName)){ while(n.firstChild) node.insertBefore(n.firstChild,n); node.removeChild(n); return; }
+        const keepClass=n.getAttribute('class'), keepColor=n.style&&n.style.color, keepHref=n.tagName==='A'?n.getAttribute('href'):null;
+        Array.from(n.attributes).forEach(a=>n.removeAttribute(a.name));
+        if(keepClass) n.setAttribute('class',keepClass);
+        if(keepColor) n.style.color=keepColor;
+        if(keepHref) n.setAttribute('href',keepHref);
+        clean(n);
+      } else if(n.nodeType===8){ node.removeChild(n); }
+    });
+  })(box);
+  return box.innerHTML.replace(/(?:\s*<br\s*\/?>)+\s*$/i,'');   // drop trailing line-break artifacts
+}
+
+/* -------- shared-text index (same text on >=2 pages) -------- */
+function buildSharedIndex(){
+  const map = new Map();
+  for(const p of state.pages) for(const it of p.items){
+    if(it.kind!=='text') continue;
+    const key = it.original.trim(); if(key.length<2) continue;
+    if(!map.has(key)) map.set(key,[]);
+    map.get(key).push(it);
+  }
+  for(const [k,arr] of map){
+    const pageSet = new Set(arr.map(i=>i.page.name));
+    if(pageSet.size>=2) for(const it of arr){ it.shared=true; it.sharedCount=pageSet.size; }
+  }
+  state.sharedIndex = map;
+}
+
+/* ============================ loading ============================ */
+async function boot(){
+  try{
+    const r = await fetch('/__api/list');
+    if(!r.ok) throw new Error('no-server');
+    const data = await r.json();
+    if(!data.files || !data.files.length){ loadMsg('Không tìm thấy file .html nào trong thư mục.'); return; }
+    setLoad('Đang tải '+data.files.length+' trang…');
+    for(const f of data.files){
+      const html = await (await fetch('/'+f.split('/').map(encodeURIComponent).join('/'))).text();
+      const doc = new DOMParser().parseFromString(html, 'text/html');
+      const page = { name:f, doc, items:[], dirty:false };
+      page.items = extract(page);
+      state.pages.push(page);
+    }
+    buildSharedIndex();
+    $('#loader').classList.add('hidden');
+    renderSidebar();
+    if(state.pages.length) selectPage(state.pages[0]);
+    setStatus('saved','Sẵn sàng — mọi thay đổi sẽ lưu vào file'); _scUpdateBtn();
+  }catch(e){
+    $('#loader').classList.remove('hidden');
+    loadMsg('Chưa chạy qua server. Hãy mở bằng file start (start.bat / start.command) để công cụ có thể lưu vào file.');
+  }
+}
+function setLoad(m){ $('#loadmsg').textContent = m; }
+function loadMsg(m){ $('#loader').innerHTML = '<div class="empty" style="max-width:460px"><div class="big">⚠️</div><h3>'+m+'</h3></div>'; }
+
+/* ============================ rendering ============================ */
+function renderSidebar(){
+  const el = $('#left');
+  let html = '<h4>Các trang ('+state.pages.length+')</h4>';
+  for(const p of state.pages){
+    const nText = p.items.filter(i=>i.kind==='text').length;
+    const nImg = p.items.filter(i=>i.kind==='image').length;
+    const dirty = p.dirty ? '<span class="badge">•</span>' : '';
+    html += '<div class="pagelink" data-page="'+p.name+'"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+prettyName(p.name)+'</span>'+dirty+'<span class="cnt">'+(nText+nImg)+'</span></div>';
+  }
+  el.innerHTML = html;
+  el.querySelectorAll('.pagelink').forEach(a=>a.onclick=()=>selectPage(state.pages.find(p=>p.name===a.dataset.page)));
+  markActive();
+}
+function prettyName(f){ return f.replace(/\.html?$/i,'').replace(/[-_]/g,' ').replace(/\bqranty\b/gi,'').trim() || f; }
+function markActive(){
+  document.querySelectorAll('.pagelink').forEach(a=>a.classList.toggle('active', state.active && a.dataset.page===state.active.name));
+}
+function selectPage(p){
+  state.active = p; markActive(); renderFields(); renderPreview();
+  $('#previewName').textContent = p.name;
+}
+
+/* ---------- tree state + block detection ---------- */
+const openSections = new Set();          // which sections are expanded (default: all collapsed)
+const blockReg = new Map(); let bidSeq = 0;   // bid -> live block element (rebuilt each render)
+const secReg   = new Map();                   // sid -> live section element
+const hidReg   = new Map();                   // hid -> comment node dang an
+let pendingOpenUid = null;               // a field node to auto-open on next render
+
+function classSig(el){ return (el && el.getAttribute && (el.getAttribute('class')||'').trim().replace(/\s+/g,' ')) || ''; }
+// nearest ancestor of `el` that is one of >=2 same-class siblings (a repeatable "card")
+function repeatedAncestor(el){
+  let n = el;
+  while(n && n.nodeType===1 && n.parentElement && n.tagName!=='BODY'){
+    const sig = classSig(n);
+    if(sig){
+      const sibs = n.parentElement.children;
+      for(let k=0;k<sibs.length;k++){ if(sibs[k]!==n && classSig(sibs[k])===sig){ return n; } }
+    }
+    n = n.parentElement;
+  }
+  return null;
+}
+function blockLabel(el, fallback){
+  const h = el.querySelector('h1,h2,h3,h4,h5,h6');
+  let t = (h && h.textContent ? h.textContent : '').trim();
+  if(!t) t = (fallback||'').trim();
+  if(!t){ const c=(el.getAttribute('class')||'').split(/\s+/)[0]||''; t=c.replace(/[-_]/g,' ').replace(/\bsingle\b/gi,'').trim(); }
+  t = t.replace(/\s+/g,' ').trim() || 'Khối';
+  return t.length>40 ? t.slice(0,40)+'…' : t;
+}
+/* ---------- an / hien bang comment HTML ----------
+   Khoi bi an duoc boc thanh  <!--QB-HIDE[nhan]...html...-->
+   Ky tu ket thuc comment duoc thay the de khong lam vo file, va doi nguoc lai
+   duoc 1-1 khi hien. Google khong doc noi dung trong comment -> khong hai SEO. */
+const HIDE_RE = /^QB-HIDE\[([^\]]*)\]([\s\S]*)$/;
+function hideEnc(x){ return String(x).replace(/§/g,'§S').replace(/--!>/g,'§B').replace(/-->/g,'§G'); }
+function hideDec(x){ return String(x).replace(/§B/g,'--!>').replace(/§G/g,'-->').replace(/§S/g,'§'); }
+function hideLabelSafe(t){
+  return (String(t||'Khoi').replace(/[\]\[\-\r\n]+/g,' ').replace(/\s+/g,' ').trim().slice(0,60)) || 'Khoi';
+}
+function hideEl(doc, el, label){
+  const cm = doc.createComment('QB-HIDE['+hideLabelSafe(label)+']'+hideEnc(el.outerHTML));
+  el.parentNode.replaceChild(cm, el);
+  return cm;
+}
+function listHidden(doc){
+  const out=[]; if(!doc || !doc.body) return out;
+  const w = doc.createTreeWalker(doc.body, 128 /* SHOW_COMMENT */);
+  let n; while((n = w.nextNode())){ const m = HIDE_RE.exec(n.nodeValue||''); if(m) out.push({node:n, label:m[1]}); }
+  return out;
+}
+function showHidden(doc, cm){
+  const m = HIDE_RE.exec(cm.nodeValue||''); if(!m || !cm.parentNode) return false;
+  const box = doc.createElement('div');
+  box.innerHTML = hideDec(m[2]);
+  const frag = doc.createDocumentFragment();
+  while(box.firstChild) frag.appendChild(box.firstChild);
+  cm.parentNode.replaceChild(frag, cm);
+  return true;
+}
+
+/* ---------- bo cuc that cua trang ----------
+   Cac khu vuc cap 1 la con truc tiep cua "khung trang" (vd .pages-wrapper).
+   Chung la anh em ruot nen keo tha doi cho luon an toan. */
+const LAYOUT_SKIP = new Set(['SCRIPT','STYLE','NOSCRIPT','LINK','TEMPLATE','META','BR']);
+function layoutKids(el){
+  return Array.from(el.children).filter(c => !LAYOUT_SKIP.has(c.tagName) && c.children.length);
+}
+function layoutHost(doc){
+  let host = doc && doc.body; if(!host) return null;
+  for(let g=0; g<6; g++){
+    const k = layoutKids(host);
+    if(k.length===1 && layoutKids(k[0]).length>1) host = k[0]; else break;
+  }
+  return host;
+}
+function pageSections(doc){
+  const host = layoutHost(doc);
+  return host ? layoutKids(host) : [];
+}
+function layoutName(el){
+  const zone = sectionOf(el);
+  const head = blockLabel(el, '');
+  if(head && head!=='Khối' && zone!==head) return zone + ' — ' + head;
+  return zone;
+}
+
+// group a section's items (doc order) into block nodes + loose field nodes
+function buildSectionNodes(arr){
+  const nodes=[]; let i=0;
+  while(i<arr.length){
+    const blk = repeatedAncestor(arr[i].el);
+    if(blk){
+      const group=[arr[i]]; let j=i+1;
+      while(j<arr.length && repeatedAncestor(arr[j].el)===blk){ group.push(arr[j]); j++; }
+      nodes.push({type:'block', el:blk, items:group}); i=j;
+    } else { nodes.push({type:'field', item:arr[i]}); i++; }
+  }
+  return nodes;
+}
+function fieldPreview(it){
+  if(it.kind==='image') return it.value.split('/').pop()||'(ảnh)';
+  const t = searchText(it).replace(/\s+/g,' ').trim();
+  return t || '(trống)';
+}
+function fieldNodeHTML(it){
+  const tl = TYPE_LABEL[it.type]||'Chữ';
+  const body = it.kind==='image' ? imageFieldHTML(it) : textFieldHTML(it);
+  const open = (pendingOpenUid===it.uid) ? ' open' : '';
+  return '<div class="tnode'+(it.changed?' changed':'')+open+'" data-uid="'+it.uid+'">'+
+    '<div class="trow" data-tfield><span class="dot"></span>'+
+    '<span class="tt t-'+it.type+'">'+tl+'</span>'+
+    '<span class="tprev">'+esc(fieldPreview(it))+'</span></div>'+
+    '<div class="tbody">'+body+'</div></div>';
+}
+
+function renderFields(filter){
+  const p = state.active, mid = $('#mid');
+  const groups = new Map();
+  for(const it of p.items){
+    if(filter){ const hay = (it.kind==='image'? it.value : searchText(it)).toLowerCase(); if(!hay.includes(filter)) continue; }
+    if(!groups.has(it.section)) groups.set(it.section, []);
+    groups.get(it.section).push(it);
+  }
+  let html = '<div class="mid-head"><div><h2 class="page-title">'+prettyName(p.name)+'</h2>'+
+    '<p class="page-sub">'+p.name+' — '+p.items.length+' mục • '+groups.size+' khu vực · bấm để mở/sửa</p></div>'+
+    '<div class="mid-tools"><button class="btn sm" id="expandAll">Mở tất cả</button>'+
+    '<button class="btn sm" id="collapseAll">Thu gọn</button></div></div>';
+  if(groups.size===0) html += '<div class="empty" style="height:auto;padding:40px">Không có mục nào khớp tìm kiếm.</div>';
+  html += '<div class="tree">';
+  blockReg.clear(); secReg.clear(); hidReg.clear();
+  // bang "Bo cuc trang": cac khu vuc that cua trang, keo tha / an / nhan ban / xoa
+  const secs = pageSections(p.doc);
+  if(secs.length>1){
+    let lrows = '';
+    secs.forEach((el,i)=>{
+      const sid = 's'+(bidSeq++); secReg.set(sid, el);
+      const nm = layoutName(el);
+      lrows += '<div class="layout-row" data-sid="'+sid+'" data-dragid="s:'+sid+'" data-lname="'+esc(nm)+'">'+
+        '<span class="bbtn drag-h" data-drag title="Kéo để đổi vị trí khu vực">⠿</span>'+
+        '<span class="lnum">'+(i+1)+'</span>'+
+        '<span class="lname">'+esc(nm)+'</span>'+
+        '<button class="bbtn" data-sop="dup" title="Nhân bản khu vực">⧉</button>'+
+        '<button class="bbtn" data-sop="up" title="Đưa lên trên">↑</button>'+
+        '<button class="bbtn" data-sop="down" title="Đưa xuống dưới">↓</button>'+
+        '<button class="bbtn" data-sop="hide" title="Ẩn khu vực (bật lại được)">👁</button>'+
+        '<button class="bbtn danger" data-sop="del" title="Xoá hẳn khu vực">🗑</button></div>';
+    });
+    html += '<div class="layout-box"><div class="lhead">Bố cục trang — '+secs.length+' khu vực · kéo ⠿ để đổi thứ tự</div>'+lrows+'</div>';
+  }
+  // bang liet ke cac khoi dang an (khong con trong cay vi da thanh comment)
+  const hidden = listHidden(p.doc);
+  if(hidden.length){
+    let hrows = '';
+    hidden.forEach((h,i)=>{ const hk='h'+i; hidReg.set(hk, h.node);
+      hrows += '<div class="hrow"><span class="hlab">🚫 '+esc(h.label)+'</span>'+
+        '<button class="bbtn" data-hop="show" data-hid="'+hk+'" title="Hiện lại đúng vị trí cũ">↩</button>'+
+        '<button class="bbtn danger" data-hop="drop" data-hid="'+hk+'" title="Xoá hẳn khỏi file">🗑</button></div>';
+    });
+    html += '<div class="hidden-box"><div class="hhead">Đang ẩn ('+hidden.length+') — không hiện trên web, vẫn nằm trong file</div>'+hrows+'</div>';
+  }
+  for(const [section, arr] of groups){
+    const open = (filter || openSections.has(section)) ? ' open' : '';
+    let inner='';
+    for(const nd of buildSectionNodes(arr)){
+      if(nd.type==='field'){ inner += fieldNodeHTML(nd.item); continue; }
+      const bid='b'+(bidSeq++); blockReg.set(bid, nd.el);
+      let kids=''; for(const it of nd.items) kids += fieldNodeHTML(it);
+      inner += '<div class="tblock" data-bid="'+bid+'" data-dragid="b:'+bid+'">'+
+        '<div class="bhead">'+
+        '<span class="bbtn drag-h" data-drag title="Kéo để đổi vị trí">⠿</span>'+
+        '<span class="blabel">▦ '+esc(blockLabel(nd.el, searchText(nd.items[0])))+'</span>'+
+        '<button class="bbtn" data-bop="dup" title="Nhân bản khối này">⧉</button>'+
+        '<button class="bbtn" data-bop="up" title="Chuyển lên / sang trái">↑</button>'+
+        '<button class="bbtn" data-bop="down" title="Chuyển xuống / sang phải">↓</button>'+
+        '<button class="bbtn" data-bop="hide" title="Ẩn khối này (giữ lại trong file, bật lại được)">👁</button>'+
+        '<button class="bbtn danger" data-bop="del" title="Xoá hẳn khối này">🗑</button>'+
+        '</div><div class="bchildren">'+kids+'</div></div>';
+    }
+    html += '<div class="tsection'+open+'" data-section="'+esc(section)+'">'+
+      '<div class="thead" data-tsec><svg class="chev" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="m6 9 6 6 6-6"/></svg>'+
+      esc(section)+'<span class="n">'+arr.length+' mục</span></div>'+
+      '<div class="tinner">'+inner+'</div></div>';
+  }
+  html += '</div>';
+  mid.innerHTML = html;
+  wireTree(mid);
+  const ea=$('#expandAll'), ca=$('#collapseAll');
+  if(ea) ea.onclick=()=>{ groups.forEach((_,s)=>openSections.add(s)); renderFields(filter); };
+  if(ca) ca.onclick=()=>{ openSections.clear(); renderFields(filter); };
+  pendingOpenUid = null;
+}
+
+function wireTree(root){
+  root.querySelectorAll('.thead[data-tsec]').forEach(h=>{
+    h.onclick=()=>{ const sec=h.closest('.tsection'), name=sec.dataset.section;
+      sec.classList.toggle('open');
+      if(sec.classList.contains('open')) openSections.add(name); else openSections.delete(name);
+    };
+  });
+  root.querySelectorAll('.tblock [data-bop]').forEach(b=>{
+    b.onclick=e=>{ e.stopPropagation(); const el=blockReg.get(b.closest('.tblock').dataset.bid); if(el) blockOp(b.dataset.bop, el); };
+  });
+  // nut thao tac trong bang "Bo cuc trang"
+  root.querySelectorAll('.layout-row [data-sop]').forEach(b=>{
+    b.onclick=e=>{ e.stopPropagation(); const row=b.closest('.layout-row'); const el=secReg.get(row.dataset.sid);
+      if(el) blockOp(b.dataset.sop, el, row.dataset.lname || 'khu vực này'); };
+  });
+  // bang "Dang an"
+  root.querySelectorAll('.hidden-box [data-hop]').forEach(b=>{
+    b.onclick=e=>{ e.stopPropagation();
+      const p=state.active, cm=hidReg.get(b.dataset.hid); if(!p||!cm) return;
+      if(b.dataset.hop==='show'){ if(!showHidden(p.doc, cm)) return; afterStructural('Đã hiện lại ✓'); }
+      else { if(!confirm('Xoá hẳn khối đang ẩn này khỏi file? Sau khi lưu sẽ không lấy lại được.')) return;
+             if(cm.parentNode) cm.parentNode.removeChild(cm); afterStructural('Đã xoá hẳn ✓'); }
+    };
+  });
+  wireDrag(root);
+  root.querySelectorAll('.tnode>.trow[data-tfield]').forEach(r=>{
+    r.onclick=()=>{ const node=r.closest('.tnode'); node.classList.toggle('open');
+      if(node.classList.contains('open')){ const inp=node.querySelector('textarea,.rich-ed'); if(inp) setTimeout(()=>inp.focus({preventScroll:true}),0); } };
+  });
+  wireFields(root);   // reuse existing per-field editing (textarea / rich / color / image / reset)
+}
+
+/* ---------- structural ops: nhan ban / an / xoa / doi thu tu ---------- */
+function afterStructural(msg){
+  const p = state.active; if(!p) return;
+  markDirty(p);
+  p.items = extract(p);          // quet lai trang sau khi doi cau truc
+  buildSharedIndex();
+  renderFields($('#search').value.trim().toLowerCase()||null);
+  renderPreview();
+  if(msg) toast(msg);
+}
+function blockOp(op, el, what){
+  const p = state.active; if(!p || !el || !el.parentNode) return;
+  const name = what || 'khối này';
+  if(op==='del' || op==='hide'){
+    // luoi an toan doc lap voi cay: khong bao gio cho mot thao tac nuot gan het trang
+    const docLen = (p.doc.body && p.doc.body.innerHTML.length) || 1;
+    if(el.outerHTML.length > docLen*0.6){
+      alert('Khối này chiếm gần như toàn bộ trang nên không thao tác được.\n\nHãy mở khu vực ra rồi ẩn/xoá từng khối nhỏ bên trong.');
+      return;
+    }
+  }
+  if(op==='del'){
+    if(!confirm('Xoá hẳn '+name+' khỏi trang?\n\nMuốn lấy lại được thì dùng nút 👁 Ẩn thay vì xoá.')) return;
+    el.remove();
+  }
+  else if(op==='hide'){ hideEl(p.doc, el, (what && what!=='khối này') ? what : blockLabel(el)); }
+  else if(op==='dup'){ const c=el.cloneNode(true); el.parentNode.insertBefore(c, el.nextSibling); }
+  else if(op==='up'){ const prev=el.previousElementSibling; if(!prev){ toast('Đã ở đầu nhóm'); return; } el.parentNode.insertBefore(el, prev); }
+  else if(op==='down'){ const next=el.nextElementSibling; if(!next){ toast('Đã ở cuối nhóm'); return; } el.parentNode.insertBefore(next, el); }
+  afterStructural(op==='dup'?'Đã nhân bản ✓':op==='del'?'Đã xoá ✓':op==='hide'?'Đã ẩn ✓ — bật lại ở bảng "Đang ẩn"':'Đã đổi thứ tự ✓');
+}
+
+/* ---------- keo tha doi vi tri (chi trong cung phan tu cha) ---------- */
+let dragSrc = null;
+function dragElOf(host){
+  const id = host && host.dataset ? host.dataset.dragid : '';
+  if(!id) return null;
+  return id.charAt(0)==='b' ? blockReg.get(id.slice(2)) : secReg.get(id.slice(2));
+}
+function clearDropMarks(root){ root.querySelectorAll('.dz-before,.dz-after').forEach(n=>n.classList.remove('dz-before','dz-after')); }
+function wireDrag(root){
+  root.querySelectorAll('[data-drag]').forEach(h=>{
+    h.setAttribute('draggable','true');
+    h.addEventListener('dragstart', e=>{
+      const host = h.closest('[data-dragid]'); const el = dragElOf(host);
+      if(!host || !el){ e.preventDefault(); return; }
+      dragSrc = {host, el};
+      host.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+      try{ e.dataTransfer.setData('text/plain', host.dataset.dragid); }catch(_){}
+      e.stopPropagation();
+    });
+    h.addEventListener('dragend', ()=>{
+      clearDropMarks(root);
+      if(dragSrc && dragSrc.host) dragSrc.host.classList.remove('dragging');
+      dragSrc = null;
+    });
+  });
+  root.querySelectorAll('[data-dragid]').forEach(host=>{
+    const okTarget = ()=>{
+      if(!dragSrc) return null;
+      const t = dragElOf(host);
+      if(!t || t===dragSrc.el) return null;
+      if(t.parentNode !== dragSrc.el.parentNode) return null;   // chi cho doi cho trong cung cha
+      return t;
+    };
+    host.addEventListener('dragover', e=>{
+      const t = okTarget(); if(!t) return;
+      e.preventDefault(); e.stopPropagation();
+      e.dataTransfer.dropEffect = 'move';
+      const r = host.getBoundingClientRect();
+      const after = (e.clientY - r.top) > r.height/2;
+      clearDropMarks(root);
+      host.classList.add(after ? 'dz-after' : 'dz-before');
+    });
+    host.addEventListener('drop', e=>{
+      const t = okTarget(); if(!t) return;
+      e.preventDefault(); e.stopPropagation();
+      const r = host.getBoundingClientRect();
+      const after = (e.clientY - r.top) > r.height/2;
+      const moved = dragSrc.el;
+      t.parentNode.insertBefore(moved, after ? t.nextSibling : t);
+      clearDropMarks(root);
+      if(dragSrc.host) dragSrc.host.classList.remove('dragging');
+      dragSrc = null;
+      afterStructural('Đã đổi vị trí ✓');
+    });
+  });
+}
+function esc(s){ return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function searchText(it){
+  if(it.type==='placeholder') return it.el.getAttribute('placeholder')||'';
+  if(it.mode==='textnode') return it.textNode.nodeValue||'';
+  return it.el.textContent||'';
+}
+function colorSwatchesHTML(){
+  const cols=[['#0f172a','Đậm'],['#1a72e8','Xanh'],['#2ba6db','Xanh nhạt'],['#e11d48','Đỏ'],['#059669','Lục'],['#64748b','Xám'],['#ffffff','Trắng']];
+  let s=''; for(const [c,t] of cols) s+='<button class="sw" data-color="'+c+'" title="Đổi màu: '+t+'" style="background:'+c+'"></button>';
+  s+='<label class="sw-custom" title="Màu khác">+<input type="color" data-act="customcolor"></label>';
+  return s;
+}
+function textFieldHTML(it){
+  const tl = TYPE_LABEL[it.type]||'Chữ';
+  const shared = it.shared ? '<span class="shared">Dùng chung '+it.sharedCount+' trang</span>' : '';
+  const isEmpty = it.type!=='placeholder' && it.type!=='title' && it.el && !((it.el.textContent||'').replace(/[\s​]/g,'').length);
+  const cls = 'field'+(it.changed?' changed':'')+(it.shared?' is-shared':'')+(isEmpty?' is-empty':'');
+  const emptyTag = isEmpty ? '<span class="empty-tag">trống</span>' : '';
+  let body;
+  if(it.mode==='rich'){
+    body = '<div class="rich-tools">'+colorSwatchesHTML()+'</div>'+
+           '<div class="rich-ed" contenteditable="true" data-act="richedit" spellcheck="false" data-ph="(trống — gõ để thêm chữ)">'+it.value+'</div>'+
+           '<div class="rich-hint">Sửa cả câu ở đây · Enter để xuống dòng · bôi đen chữ rồi bấm màu để đổi màu</div>';
+  } else {
+    const txt = getText(it);
+    const rows = Math.min(8, Math.max(1, Math.ceil((txt.length||1)/46) + (txt.match(/\n/g)||[]).length));
+    body = '<textarea rows="'+rows+'" data-act="edit" placeholder="(trống — gõ để thêm lại chữ)">'+esc(txt)+'</textarea>';
+  }
+  return '<div class="'+cls+'" data-uid="'+it.uid+'">'+
+    '<div class="field-top"><span class="field-type t-'+it.type+'">'+tl+'</span>'+shared+emptyTag+
+    '<button class="reset" data-act="reset">Hoàn tác</button></div>'+ body +
+    (it.shared?'<label class="apply-all"><input type="checkbox" data-act="applyall" checked> Áp dụng cho tất cả '+it.sharedCount+' trang có chữ này</label>':'')+
+    '</div>';
+}
+function imageFieldHTML(it){
+  const fn = it.value.split('/').pop();
+  const raw = it.pendingURL || it.value;
+  const thumb = /^(https?:|data:|blob:)/i.test(raw) ? raw : '/'+raw.split('/').map(encodeURIComponent).join('/');
+  const pend = it.pendingFile ? '<div class="pending">✓ Ảnh mới đã chọn — sẽ lưu khi bấm “Lưu tất cả”</div>' : '';
+  return '<div class="field'+(it.changed?' changed':'')+'" data-uid="'+it.uid+'">'+
+    '<div class="field-top"><span class="field-type t-image">Hình ảnh</span>'+
+    '<button class="reset" data-act="reset">Hoàn tác</button></div>'+
+    '<div class="imgrow"><div class="imgthumb" style="background-image:url(\''+thumb.replace(/'/g,"%27")+'\')"></div>'+
+    '<div class="imgmeta"><div class="fn">'+esc(fn)+'</div>'+
+    '<button class="btn" data-act="pickimg"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15l-5-5L5 21"/><circle cx="9" cy="9" r="2"/><path d="M3 3h18v18H3z"/></svg> Đổi ảnh</button>'+pend+'</div></div></div>';
+}
+
+function wireFields(root){
+  root.querySelectorAll('.section-head[data-toggle]').forEach(h=>{
+    h.onclick=()=>{ const s=h.dataset.toggle, g=h.closest('.section-group');
+      g.classList.toggle('collapsed');
+      if(g.classList.contains('collapsed')) collapsedSections.add(s); else collapsedSections.delete(s);
+    };
+  });
+  root.querySelectorAll('.field').forEach(f=>{
+    const it = findItem(f.dataset.uid); if(!it) return;
+    const ta = f.querySelector('textarea');
+    if(ta){
+      ta.addEventListener('input', ()=>{
+        setText(it, ta.value); it.value = getText(it);
+        it.changed = (it.value !== it.original);
+        markSlot(it);
+        f.classList.toggle('changed', it.changed);
+        f.classList.toggle('is-empty', !ta.value.replace(/[\s​]/g,'').length);
+        markDirty(it.page); livePreview(it);
+      });
+    }
+    const ed = f.querySelector('.rich-ed');
+    if(ed){
+      ed.addEventListener('input', ()=>syncRich(it, ed, f));
+      ed.addEventListener('keydown', e=>{ if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); document.execCommand('insertLineBreak'); } });
+      f.querySelectorAll('.sw[data-color]').forEach(b=>b.addEventListener('mousedown', e=>{ e.preventDefault(); applyColor(it, ed, f, b.dataset.color); }));
+      const cc=f.querySelector('[data-act="customcolor"]'); if(cc) cc.addEventListener('input', ()=>applyColor(it, ed, f, cc.value));
+    }
+    f.querySelectorAll('[data-act]').forEach(b=>{
+      const act = b.dataset.act;
+      if(act==='reset') b.onclick=()=>resetField(it,f);
+      if(act==='pickimg') b.onclick=()=>pickImage(it,f);
+    });
+  });
+}
+function findItem(uid){ for(const p of state.pages) for(const it of p.items) if(it.uid===uid) return it; return null; }
+function syncRich(it, ed, f){
+  it.el.innerHTML = sanitizeRich(ed.innerHTML);
+  it.value = it.el.innerHTML;
+  it.changed = (it.value !== it.original);
+  markSlot(it);
+  if(f){ f.classList.toggle('changed', it.changed); f.classList.toggle('is-empty', !((it.el.textContent||'').replace(/[\s​]/g,'').length)); }
+  markDirty(it.page); livePreview(it);
+}
+function applyColor(it, ed, f, color){
+  ed.focus();
+  const sel = window.getSelection();
+  if(!sel.rangeCount || sel.isCollapsed || !ed.contains(sel.anchorNode)){
+    const r = document.createRange(); r.selectNodeContents(ed); sel.removeAllRanges(); sel.addRange(r);   // no selection -> whole field
+  }
+  document.execCommand('styleWithCSS', false, true);
+  document.execCommand('foreColor', false, color);
+  syncRich(it, ed, f);
+}
+function resetField(it,f){
+  if(it.kind==='image'){ it.pendingFile=null; it.pendingURL=null; it.value=it.original; it.changed=false;
+    if(it.el) it.el.setAttribute('src', it.original); }
+  else { if(it.mode==='rich') it.el.innerHTML=it.original; else setText(it, it.original); it.value=it.original; it.changed=false; markSlot(it); }
+  f.classList.remove('changed'); recomputeDirty(it.page);
+  if(it.kind==='image') renderPreview(); else livePreview(it);   // full rebuild restores original srcset
+  renderFields($('#search').value.trim().toLowerCase()||null);
+}
+function pickImage(it,f){
+  const inp=document.createElement('input'); inp.type='file'; inp.accept='image/*';
+  inp.onchange=()=>{ const file=inp.files[0]; if(!file) return;
+    if(it.pendingURL) URL.revokeObjectURL(it.pendingURL);
+    it.pendingFile=file; it.pendingURL=URL.createObjectURL(file); it.changed=true;
+    markDirty(it.page); livePreview(it);
+    renderFields($('#search').value.trim().toLowerCase()||null);
+  };
+  inp.click();
+}
+
+/* ---- shared propagation on typing ---- */
+function propagateShared(it){
+  const f = document.querySelector('.field[data-uid="'+it.uid+'"]');
+  const cb = f && f.querySelector('[data-act="applyall"]');
+  if(!it.shared || !cb || !cb.checked) return;
+  const arr = state.sharedIndex.get(it.original.trim())||[];
+  for(const other of arr){ if(other===it) continue;
+    setText(other, it.value); other.value=it.value; other.changed=(it.value!==other.original);
+    markDirty(other.page);
+  }
+}
+
+/* ============================ preview ============================ */
+// Build a faithful preview: clone the real page (keeps all CSS + scripts/animations),
+// tag every editable target so we can update it live, and load it via srcdoc.
+function buildPreviewHTML(page){
+  const clone = page.doc.cloneNode(true);
+  const T = collectTargets(clone);
+  T.texts.forEach((t,i)=>{
+    if(t.mode!=='textnode'){ t.node.setAttribute('data-se','t'+i); }
+    else { const sp=clone.createElement('span'); sp.setAttribute('data-se','t'+i);
+           t.node.parentNode.replaceChild(sp, t.node); sp.appendChild(t.node); }
+  });
+  T.imgs.forEach((img,i)=> img.setAttribute('data-se','g'+i));
+  T.phs.forEach((inp,i)=> inp.setAttribute('data-se','p'+i));
+  // reflect any not-yet-saved image choices
+  for(const it of page.items){ if(it.cat==='img' && it.pendingURL){ applyImageSrc(clone.querySelector('[data-se="'+it.seid+'"]'), it.pendingURL); } }
+  // correct relative asset paths regardless of page location
+  const dir = page.name.includes('/') ? '/'+page.name.slice(0, page.name.lastIndexOf('/')+1) : '/';
+  const head = clone.querySelector('head');
+  if(head && !head.querySelector('base')){ const b=clone.createElement('base'); b.setAttribute('href', dir); head.insertBefore(b, head.firstChild); }
+  return '<!DOCTYPE html>'+clone.documentElement.outerHTML;
+}
+const PREVIEW_DESIGN_W = 1280;                 // render at desktop width, then scale to fit the pane
+function fitPreview(){
+  const stage = $('#pstage'); if(!stage) return;
+  const w = stage.clientWidth, h = stage.clientHeight;
+  if(w < 40){ return; }
+  const scale = w / PREVIEW_DESIGN_W;
+  const ifr = $('#preview');
+  ifr.style.width = PREVIEW_DESIGN_W + 'px';
+  ifr.style.height = (h / scale) + 'px';
+  ifr.style.transform = 'scale(' + scale + ')';
+}
+function renderPreview(){
+  const p = state.active; if(!p) return;
+  const ifr = $('#preview');
+  ifr.onload = ()=>{ fitPreview(); wirePreviewInteractions(); };
+  ifr.srcdoc = buildPreviewHTML(p);
+  fitPreview();
+}
+// Resolve which editable element is under a click point, even through overlays or
+// pointer-events:none images: try normal hit-test first, then geometry (smallest box containing the point).
+function seFromPoint(d, x, y){
+  // Many decorative images have pointer-events:none, so hit-testing skips them.
+  // Temporarily enable it on tagged images, then read the real stacking order at the point.
+  const imgs = d.querySelectorAll ? Array.from(d.querySelectorAll('img[data-se]')) : [];
+  const saved = imgs.map(i=>i.style.pointerEvents);
+  imgs.forEach(i=>{ i.style.pointerEvents = 'auto'; });
+  let found = null;
+  const stack = d.elementsFromPoint ? d.elementsFromPoint(x, y) : [];
+  for(const el of stack){ const m = el.closest && el.closest('[data-se]'); if(m){ found = m; break; } }
+  imgs.forEach((i,k)=>{ i.style.pointerEvents = saved[k]; });
+  if(found) return found;
+  // last resort: smallest tagged box that contains the point
+  let scope = (d.elementFromPoint && d.elementFromPoint(x,y)) || d.body, best=null, bestArea=Infinity, hops=0;
+  while(scope && hops < 6){
+    for(const c of (scope.querySelectorAll ? scope.querySelectorAll('[data-se]') : [])){
+      const r = c.getBoundingClientRect();
+      if(x>=r.left && x<=r.right && y>=r.top && y<=r.bottom){ const a=r.width*r.height; if(a<bestArea){ bestArea=a; best=c; } }
+    }
+    if(best) return best; scope = scope.parentElement; hops++;
+  }
+  return null;
+}
+// Click any element in the preview -> find & highlight its edit box
+function wirePreviewInteractions(){
+  const d = $('#preview').contentDocument; if(!d) return;
+  if(!d.getElementById('__se_style')){
+    const st = d.createElement('style'); st.id='__se_style';
+    st.textContent = '[data-se]{cursor:pointer}[data-se]:hover{outline:2px dashed #0740C1;outline-offset:2px;background:rgba(7,64,193,.06)}[data-se].__se_hit{outline:3px solid #0740C1 !important;outline-offset:2px}';
+    (d.head||d.documentElement).appendChild(st);
+  }
+  d.addEventListener('click', e=>{
+    let t = e.target && e.target.closest ? e.target.closest('[data-se]') : null;
+    if(!t) t = seFromPoint(d, e.clientX, e.clientY);   // pierce overlays / pointer-events:none images
+    if(!t) return;
+    const a = e.target.closest && e.target.closest('a'); if(a) e.preventDefault();   // don't navigate away
+    const seid = t.getAttribute('data-se');
+    t.classList.add('__se_hit'); setTimeout(()=>t.classList.remove('__se_hit'), 1000);
+    locateField(seid);
+  }, true);
+}
+function locateField(seid){
+  const p = state.active; if(!p) return;
+  const it = p.items.find(x=>x.seid===seid); if(!it) return;
+  openSections.add(it.section);                 // make sure its section is expanded
+  if($('#search').value.trim()) $('#search').value='';   // clear filter so the field is present
+  pendingOpenUid = it.uid;                       // render it already open
+  renderFields();
+  const node = document.querySelector('.tnode[data-uid="'+it.uid+'"]');
+  if(!node) return;
+  node.classList.add('open');
+  node.scrollIntoView({behavior:'smooth', block:'center'});
+  node.classList.remove('flash'); void node.offsetWidth; node.classList.add('flash');
+  const inp = node.querySelector('textarea,.rich-ed'); if(inp) inp.focus({preventScroll:true});
+}
+// Live, instant update of a single node inside the loaded preview (no reload)
+// Point an <img> at a new source. Responsive images use srcset over src, so we must
+// clear srcset/sizes (and any <picture><source>) or the old image keeps showing.
+function applyImageSrc(node, url){
+  if(!node) return;
+  node.setAttribute('src', url);
+  node.removeAttribute('srcset');
+  node.removeAttribute('sizes');
+  const par = node.parentElement;
+  if(par && par.tagName === 'PICTURE') par.querySelectorAll('source').forEach(s=>s.remove());
+}
+function livePreview(it){
+  const d = $('#preview').contentDocument; if(!d) return;
+  const n = d.querySelector('[data-se="'+it.seid+'"]'); if(!n) return;
+  if(it.cat==='img') applyImageSrc(n, it.pendingURL || it.value);
+  else if(it.cat==='ph') n.setAttribute('placeholder', it.value);
+  else if(it.mode==='textnode') n.textContent = it.value;
+  else n.innerHTML = it.el.innerHTML;   // plain (may hold <br>) or rich markup
+}
+function schedulePreview(){ /* kept for compatibility; live updates are instant */ }
+
+/* ============================ dirty + save ============================ */
+function markDirty(page){ page.dirty=true; refreshDirtyUI(); }
+function recomputeDirty(page){ page.dirty = page.items.some(i=>i.changed); refreshDirtyUI(); }
+function refreshDirtyUI(){
+  const anyDirty = state.pages.some(p=>p.dirty);
+  $('#saveBtn').disabled = !anyDirty;
+  const n = state.pages.reduce((a,p)=>a+p.items.filter(i=>i.changed).length,0);
+  if(anyDirty) setStatus('dirty', n+' thay đổi chưa lưu');
+  else setStatus('saved','Đã lưu — khớp với file');
+  document.querySelectorAll('.pagelink').forEach(a=>{
+    const p=state.pages.find(x=>x.name===a.dataset.page);
+    let b=a.querySelector('.badge');
+    if(p&&p.dirty){ if(!b){ b=document.createElement('span'); b.className='badge'; b.textContent='•'; a.insertBefore(b,a.querySelector('.cnt')); } }
+    else if(b) b.remove();
+  });
+}
+function setStatus(kind,txt){ const s=$('#status'); s.className='status '+kind; s.querySelector('.txt').textContent=txt; }
+
+async function saveAll(){
+  const dirtyPages = state.pages.filter(p=>p.dirty);
+  if(!dirtyPages.length) return;
+  // make sure shared edits propagated
+  for(const p of state.pages) for(const it of p.items) if(it.changed && it.shared) propagateShared(it);
+  $('#saveBtn').disabled=true; setStatus('dirty','Đang lưu…');
+  try{
+    // 1) upload any new images, set final src in the docs
+    for(const p of state.pages){
+      for(const it of p.items){
+        if(it.kind==='image' && it.pendingFile){
+          const b64 = await fileToBase64(it.pendingFile);
+          const r = await fetch('/__api/save-image',{method:'POST',headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({name:it.pendingFile.name, dataBase64:b64, subdir:guessSubdir(it.original)})});
+          const j = await r.json(); if(!j.ok) throw new Error(j.error||'upload ảnh lỗi');
+          applyImageSrc(it.el, j.path); it.value=j.path; it.original=j.path;
+          it.pendingFile=null; if(it.pendingURL){URL.revokeObjectURL(it.pendingURL);it.pendingURL=null;}
+          markDirty(p);
+        }
+      }
+    }
+    // 2) write each dirty page
+    let saved=0;
+    for(const p of state.pages.filter(x=>x.dirty)){
+      const html = '<!DOCTYPE html>\n'+p.doc.documentElement.outerHTML;
+      const r = await fetch('/__api/save',{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({file:p.name, html})});
+      const j = await r.json(); if(!j.ok) throw new Error(j.error||('lưu '+p.name+' lỗi'));
+      p.dirty=false; p.items.forEach(i=>{ i.original = i.kind==='image'?i.value:getText(i); i.changed=false; }); saved++;
+    }
+    buildSharedIndex();
+    refreshDirtyUI(); renderFields($('#search').value.trim().toLowerCase()||null); renderPreview();
+    toast('Đã lưu '+saved+' trang vào file ✓ (bản gốc nằm trong thư mục _editor_backup)');
+    setStatus('saved','Đã lưu vào file');
+  }catch(e){ toast('Lỗi: '+e.message, true); setStatus('dirty','Lưu chưa xong'); $('#saveBtn').disabled=false; }
+}
+function guessSubdir(src){ const m=/^(images|assets|img|media|fonts)\b/i.exec(src.replace(/^\.?\//,'')); return m?m[1].toLowerCase():'images'; }
+function fileToBase64(file){ return new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(file); }); }
+
+/* ============================ misc ============================ */
+function toast(msg,err){ const t=$('#toast'); t.textContent=msg; t.className='show'+(err?' err':''); clearTimeout(t._t); t._t=setTimeout(()=>t.className='',4200); }
+$('#saveBtn').onclick=saveAll;
+$('#search').addEventListener('input', e=>{ if(state.active) renderFields(e.target.value.trim().toLowerCase()||null); });
+/* ---- draggable divider (widen/narrow the preview) ---- */
+(function initResize(){
+  const g=$('#gutter'), app=document.querySelector('.app'), root=document.documentElement;
+  function onMove(e){
+    const rect=app.getBoundingClientRect();
+    let w = rect.right - e.clientX;                 // preview width
+    w = Math.max(300, Math.min(app.clientWidth-470, w));
+    root.style.setProperty('--pw', w+'px'); fitPreview();
+  }
+  function stop(){ document.body.classList.remove('resizing'); g.classList.remove('drag');
+    window.removeEventListener('pointermove',onMove); window.removeEventListener('pointerup',stop); }
+  g.addEventListener('pointerdown', e=>{ e.preventDefault(); g.classList.add('drag'); document.body.classList.add('resizing');
+    window.addEventListener('pointermove',onMove); window.addEventListener('pointerup',stop); });
+  g.addEventListener('dblclick', ()=>{ root.style.setProperty('--pw','40vw'); fitPreview(); });   // reset
+})();
+window.addEventListener('resize', fitPreview);
+$('#previewToggle').onclick=()=>{ document.querySelector('.app').classList.toggle('no-preview'); setTimeout(fitPreview,30); };
+window.addEventListener('beforeunload', e=>{ if(state.pages.some(p=>p.dirty)){ e.preventDefault(); e.returnValue=''; } });
+document.addEventListener('input', e=>{ // propagate shared while typing (debounced by browser)
+  const f=e.target.closest && e.target.closest('.field'); if(!f) return;
+  const it=findItem(f.dataset.uid); if(!it) return;
+  const node=e.target.closest('.tnode'); if(node) node.classList.toggle('changed', it.changed);   // live "edited" dot on the tree
+  if(it.changed&&it.shared) propagateShared(it);
+});
+function _scBoxes(page){return page&&page.doc?Array.from(page.doc.querySelectorAll('[data-optional-box="sua-chua"]')):[];}function _scAllHidden(){let any=false,all=true;for(const p of state.pages){for(const el of _scBoxes(p)){any=true;if(el.style.display!=="none")all=false;}}return any&&all;}function _scUpdateBtn(){const b=document.querySelector("#hideRepairBtn");if(!b)return;const cnt=state.pages.reduce((a,p)=>a+_scBoxes(p).length,0);b.style.display=cnt?"":"none";const hidden=_scAllHidden();b.classList.toggle("active",hidden);const l=b.querySelector(".lbl");if(l)l.textContent=hidden?"Hiện Sửa chữa":"Ẩn Sửa chữa";}function _scToggle(){const hide=!_scAllHidden();for(const p of state.pages){const boxes=_scBoxes(p);if(!boxes.length)continue;boxes.forEach(el=>{if(hide)el.style.setProperty("display","none","important");else el.style.removeProperty("display");});markDirty(p);}_scUpdateBtn();renderPreview();}var _scb=document.querySelector("#hideRepairBtn");if(_scb)_scb.onclick=_scToggle;
+
+boot();
+</script>
+</body>
+</html>

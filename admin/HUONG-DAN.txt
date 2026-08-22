@@ -1,0 +1,123 @@
+================================================================
+  SITE CONTENT EDITOR — Sửa nội dung & ảnh cho website tĩnh
+================================================================
+
+Công cụ này dùng cho BẤT KỲ website nào bạn clone/tải về (dạng
+các file .html tĩnh, ví dụ site xuất từ Webflow). Nó tự quét toàn
+bộ chữ và ảnh của mọi trang, cho bạn sửa trong 1 bảng điều khiển,
+rồi LƯU THẲNG vào file — không cần biết code, không cần gõ prompt.
+
+----------------------------------------------------------------
+YÊU CẦU (chỉ 1 lần)
+----------------------------------------------------------------
+- Đã cài Node.js  (tải: https://nodejs.org — bản LTS).
+- Dùng trình duyệt Chrome hoặc Edge (khuyên dùng).
+
+----------------------------------------------------------------
+CÁCH DÙNG
+----------------------------------------------------------------
+1. Chép 3 file này vào THƯ MỤC GỐC của website cần sửa
+   (nơi chứa các file .html):
+        server.js
+        editor.html
+        start.bat        (Windows)   /  start.command (macOS)
+
+2. Bấm đúp:  start.bat   (Windows)
+   (macOS: bấm đúp start.command — nếu báo chặn, chuột phải > Open)
+
+3. Trình duyệt tự mở bảng điều khiển. Nếu không tự mở, vào:
+        http://localhost:8787/editor.html
+
+4. Sửa chữ trong các ô, bấm "Đổi ảnh" để thay hình.
+   Cột phải xem trước trực tiếp.
+
+5. Bấm "Lưu tất cả" -> ghi thẳng vào file .html.
+
+6. Xong thì quay lại cửa sổ đen, nhấn Ctrl + C để tắt server.
+
+----------------------------------------------------------------
+NHÓM TRANG Ở CỘT TRÁI
+----------------------------------------------------------------
+Công cụ tự gom trang theo tiền tố tên file:
+        home__home.html, home__home-v2.html   -> nhóm "Trang chủ"
+        about-us__*.html                      -> nhóm "Giới thiệu"
+        blog.html + blog__<slug>.html         -> nhóm "Blog"
+Họ nào chỉ có 1 trang thì nằm ở mục "Trang chính" trên cùng.
+Bấm tên nhóm để gập / mở; công cụ nhớ nhóm nào đang mở.
+Trang trong nhóm hiện tên rút gọn ("Home v2"), trang tổng của họ
+(blog.html, services.html) hiện là "Trang tổng".
+
+----------------------------------------------------------------
+BLOG / SEO
+----------------------------------------------------------------
+Bấm nút "Blog SEO" trên thanh trên cùng -> mở dashboard quản lý
+bài viết ở tab mới. start.bat / start.command bản mới tự bật cả
+hai server nên chỉ cần bấm 1 lần.
+
+Dashboard tự nhận diện cấu trúc blog trong public/: nó tìm họ file
+đông nhất có tên kiểu blog để suy ra trang danh sách + tiền tố bài
+viết, rồi ghi kho dữ liệu riêng cho từng site (blog-posts.<họ>.json)
+để bài của site này không lẫn sang site kia. Kết quả nhận diện và
+những gì còn thiếu hiện ngay trên đầu dashboard.
+
+Dashboard hỗ trợ 2 bộ giao diện (gọi là "profile"), tự chọn đúng bộ
+theo markup của trang bài viết:
+   qranty  - template blog gốc Qranty (class blog-single-*)
+   aeline  - bản export Webflow Aeline / Wistorix
+             (sec_internal-blog + sec_internal-content, lưới
+              content-blog_wrap, thẻ blog_card)
+Mỗi profile có file template riêng:
+   blog-post-template.html          <- qranty
+   blog-post-template.aeline.html   <- aeline
+Thêm site dùng bộ giao diện khác: thêm 1 profile trong blog-server.js
+(mục PROFILE GIAO DIEN) + 1 file template tương ứng.
+
+CẦN LÀM 1 LẦN cho site Wistorix: vào tab Cài đặt điền "Địa chỉ site"
+(vd https://wistorix.com). Để trống thì canonical / og:url / sitemap.xml
+sẽ thiếu tên miền.
+
+Lưới bài trong blog.html đã được bọc cặp marker
+<!--QR-BLOG-GRID:START--> ... <!--QR-BLOG-GRID:END-->  — dashboard chỉ
+ghi lại phần bên trong cặp này, phần còn lại của trang giữ nguyên.
+Bản gốc blog.html nằm ở _blog_backup/blog.html.
+
+----------------------------------------------------------------
+ĐỔI MÀU NÚT / CTA / KHỐI
+----------------------------------------------------------------
+1. Bấm nút "Đổi màu" trên thanh trên cùng -> mở bảng màu bên phải.
+2. Bấm thẳng vào nút / CTA / khối trong khung xem trước.
+   - Bấm trúng chữ bên trong nút? Dùng dải "đường dẫn" ở đầu bảng
+     để chọn ngược lên nút cha.
+3. Chọn Màu nền / Màu chữ / Màu viền. Có 16 màu brand sẵn, nút "+"
+   để chọn màu tự do, "Trong suốt" để bỏ màu.
+4. Tab "Khi rê chuột" để đặt màu hover.
+5. Sau mỗi lần đổi, bảng hỏi PHẠM VI áp dụng:
+        Chỉ phần tử này          -> ghi style riêng cho nút đó
+        Mọi phần tử .xxx trong trang này
+        Toàn site — tất cả trang -> đổi 1 lần, mọi trang cùng đổi
+   Bấm lại nút khác để chuyển phạm vi bất cứ lúc nào.
+6. "Hoàn tác màu" ở đáy bảng: trả phần tử đang chọn về màu gốc.
+7. Nhớ bấm "Lưu tất cả" để ghi vào file.
+
+Kỹ thuật: màu ghi vào thuộc tính style của phần tử (phạm vi hẹp)
+hoặc vào khối <style id="__ce_styles"> ở cuối <head> (phạm vi rộng).
+Muốn xoá sạch màu đã chỉnh: xoá khối <style id="__ce_styles"> đó.
+
+----------------------------------------------------------------
+AN TOÀN
+----------------------------------------------------------------
+- Lần đầu lưu mỗi file, bản gốc được sao lưu vào thư mục:
+        _editor_backup/
+  Muốn khôi phục: chép file từ _editor_backup ra đè lại.
+- Ảnh mới bạn chọn được lưu vào thư mục images/ (kèm mốc thời gian),
+  KHÔNG ghi đè ảnh cũ.
+- Công cụ chạy hoàn toàn trên máy bạn (localhost), không gửi đi đâu.
+
+----------------------------------------------------------------
+MẸO
+----------------------------------------------------------------
+- Ô tìm kiếm trên cùng: gõ để lọc nhanh đoạn chữ cần sửa.
+- Chữ dùng chung (menu, footer) có nhãn "Dùng chung N trang" và
+  ô tick "Áp dụng cho tất cả" — sửa 1 lần, đổi hết mọi trang.
+- Nút "Hoàn tác" ở mỗi ô để trả về nội dung gốc.
+================================================================

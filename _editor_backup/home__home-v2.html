@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html data-wf-page="6929c116366a14507fc84249" data-wf-site="6929c116366a14507fc8424d" lang="vi"><head><meta charset="utf-8"><title>Wistorix — Quét, dọn dẹp và kiểm soát Google Drive</title><meta content="Wistorix là tiện ích Chrome quét toàn bộ Google Drive của bạn: tìm file đang công khai, file rỗng, file trùng lặp; thu hồi quyền chia sẻ và chuyển giao quyền sở hữu chỉ trong vài phút." name="description"><meta content="Wistorix — Quét, dọn dẹp và kiểm soát Google Drive" property="og:title"><meta content="Wistorix là tiện ích Chrome quét toàn bộ Google Drive của bạn: tìm file đang công khai, file rỗng, file trùng lặp; thu hồi quyền chia sẻ và chuyển giao quyền sở hữu chỉ trong vài phút." property="og:description"><meta content="Wistorix — Quét, dọn dẹp và kiểm soát Google Drive" name="twitter:title"><meta content="Wistorix là tiện ích Chrome quét toàn bộ Google Drive của bạn: tìm file đang công khai, file rỗng, file trùng lặp; thu hồi quyền chia sẻ và chuyển giao quyền sở hữu chỉ trong vài phút." name="twitter:description"><meta property="og:type" content="website"><meta content="summary_large_image" name="twitter:card"><meta content="width=device-width, initial-scale=1" name="viewport"><meta content="Webflow" name="generator"><link href="assets/aeline.webflow.shared.113d25edf.min.css" rel="stylesheet" type="text/css"><style>html.w-mod-js:not(.w-mod-ix3) :is([title-icon], [animation="right"], [cta], [animation="hero"], [hero-text], [animation="hero-button"], [animation="visual"], [hero-bg], [animation="wrap"], [animation="opacity"], [animation="scroll"], .loop_logos) {visibility: hidden !important;}</style><link href="https://fonts.googleapis.com" rel="preconnect"><link href="https://fonts.gstatic.com" rel="preconnect"><script src="assets/webfont.js" type="text/javascript"></script><script type="text/javascript">WebFont.load({  google: {    families: ["Inter:300,400,500,600,700","Plus Jakarta Sans:300,400,500,600,700"]  }});</script><script type="text/javascript">!function(o,c){var n=c.documentElement,t=" w-mod-";n.className+=t+"js",("ontouchstart"in o||o.DocumentTouch&&c instanceof DocumentTouch)&&(n.className+=t+"touch")}(window,document);</script><link href="assets/665a4535765980c07e93225b_Group_2942.png" rel="shortcut icon" type="image/x-icon"><link href="assets/665a45115482c06bb38d0091_Group_2940.png" rel="apple-touch-icon"></head><body><div class="page-wrapper"><div class="global-styles w-embed"><style>
+
+
+/* Make text look crisper and more legible in all browsers */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Focus state style for keyboard navigation for the focusable elements */
+*[tabindex]:focus-visible,
+  input[type="file"]:focus-visible {
+   outline: 0.125rem solid #4d65ff;
+   outline-offset: 0.125rem;
+}
+
+/* Set color style to inherit */
+.inherit-color * {
+    color: inherit;
+}
+
+/* Get rid of top margin on first element in any rich text element */
+.w-richtext > :not(div):first-child, .w-richtext > div:first-child > :first-child {
+  margin-top: 0 !important;
+}
+
+/* Get rid of bottom margin on last element in any rich text element */
+.w-richtext>:last-child, .w-richtext ol li:last-child, .w-richtext ul li:last-child {
+	margin-bottom: 0 !important;
+}
+
+
+/* Make sure containers never lose their center alignment */
+.container-medium,.container-small, .container-large {
+	margin-right: auto !important;
+  margin-left: auto !important;
+}
+
+/* 
+Make the following elements inherit typography styles from the parent and not have hardcoded values. 
+Important: You will not be able to style for example "All Links" in Designer with this CSS applied.
+Uncomment this CSS to use it in the project. Leave this message for future hand-off.
+*/
+/*
+a,
+.w-input,
+.w-select,
+.w-tab-link,
+.w-nav-link,
+.w-dropdown-btn,
+.w-dropdown-toggle,
+.w-dropdown-link {
+  color: inherit;
+  text-decoration: inherit;
+  font-size: inherit;
+}
+*/
+
+/* Apply "..." after 3 lines of text */
+.text-style-3lines {
+	display: -webkit-box;
+	overflow: hidden;
+	-webkit-line-clamp: 3;
+	-webkit-box-orient: vertical;
+}
+
+/* Apply "..." after 2 lines of text */
+.text-style-2lines {
+	display: -webkit-box;
+	overflow: hidden;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+}
+
+/* Adds inline flex display */
+.display-inlineflex {
+  display: inline-flex;
+}
+
+/* These classes are never overwritten */
+.hide {
+  display: none !important;
+}
+
+@media screen and (max-width: 991px) {
+    .hide, .hide-tablet {
+        display: none !important;
+    }
+}
+  @media screen and (max-width: 767px) {
+    .hide-mobile-landscape{
+      display: none !important;
+    }
+}
+  @media screen and (max-width: 479px) {
+    .hide-mobile{
+      display: none !important;
+    }
+}
+ 
+.margin-0 {
+  margin: 0rem !important;
+}
+  
+.padding-0 {
+  padding: 0rem !important;
+}
+
+.spacing-clean {
+padding: 0rem !important;
+margin: 0rem !important;
+}
+
+.margin-top {
+  margin-right: 0rem !important;
+  margin-bottom: 0rem !important;
+  margin-left: 0rem !important;
+}
+
+.padding-top {
+  padding-right: 0rem !important;
+  padding-bottom: 0rem !important;
+  padding-left: 0rem !important;
+}
+  
+.margin-right {
+  margin-top: 0rem !important;
+  margin-bottom: 0rem !important;
+  margin-left: 0rem !important;
+}
+
+.padding-right {
+  padding-top: 0rem !important;
+  padding-bottom: 0rem !important;
+  padding-left: 0rem !important;
+}
+
+.margin-bottom {
+  margin-top: 0rem !important;
+  margin-right: 0rem !important;
+  margin-left: 0rem !important;
+}
+
+.padding-bottom {
+  padding-top: 0rem !important;
+  padding-right: 0rem !important;
+  padding-left: 0rem !important;
+}
+
+.margin-left {
+  margin-top: 0rem !important;
+  margin-right: 0rem !important;
+  margin-bottom: 0rem !important;
+}
+  
+.padding-left {
+  padding-top: 0rem !important;
+  padding-right: 0rem !important;
+  padding-bottom: 0rem !important;
+}
+  
+.margin-horizontal {
+  margin-top: 0rem !important;
+  margin-bottom: 0rem !important;
+}
+
+.padding-horizontal {
+  padding-top: 0rem !important;
+  padding-bottom: 0rem !important;
+}
+
+.margin-vertical {
+  margin-right: 0rem !important;
+  margin-left: 0rem !important;
+}
+  
+.padding-vertical {
+  padding-right: 0rem !important;
+  padding-left: 0rem !important;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.sidebar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.sidebar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.spacer * { padding: 0 }
+
+.img-carousel__face-front {
+  --b: 1px;
+  --b2: 0.5px;              /* border thickness */
+  --r: 1px;             /* radius */
+  --top: #fff;           /* top border color */
+  --side: #fff;          /* side start color */
+
+  border-radius: var(--r);
+
+  background:
+    /* TOP border (solid white) */
+    linear-gradient(var(--top), var(--top)) top / 100% var(--b) no-repeat,
+
+    /* LEFT border (white -> transparent downward) */
+    linear-gradient(to bottom, var(--side), transparent)
+      left / var(--b2) 100% no-repeat,
+
+    /* RIGHT border (white -> transparent downward) */
+    linear-gradient(to bottom, var(--side), transparent)
+      right / var(--b2) 100% no-repeat,
+
+    /* Fill */
+    transparent; /* your actual background */
+
+}
+
+</style></div><div data-animation="default" class="navbar w-nav" data-wf--navbar--variant="base" data-easing2="ease-in-back" data-easing="ease-out" data-collapse="medium" data-w-id="9edf84aa-1c78-d247-2c17-fa546717f184" role="banner" data-no-scroll="1" data-duration="500"><div class="padding-global is-navbar"><div class="container-large"><div class="navbar_content"><a animation="hero" href="index.html" class="navbar_logo-link w-inline-block"><img src="assets/69bc6c8e343f8f1f1832309a_aeline-logo.svg" loading="lazy" alt="" class="navbar_logo"><img src="assets/69bc6d7009609c64ae255bd9_aeline.-black.svg" loading="lazy" alt="" class="navbar_logo is-black"></a><div class="nav_wrap"><nav role="navigation" class="nav_mobile w-nav-menu"><div class="navbar_list"><a href="home__home.html" animation="hero" class="nav_links w-nav-link">Trang chủ</a><a href="services.html" animation="hero" class="nav_links w-nav-link">Tính năng</a><a href="about-us__about-us.html" animation="hero" class="nav_links w-nav-link">Về Wistorix</a><div data-delay="0" data-hover="false" data-w-id="9edf84aa-1c78-d247-2c17-fa546717f193" class="nav_dropdown w-dropdown"><div animation="hero" class="nav_links is-dropdown w-dropdown-toggle"><div class="geistmono">Xem thêm</div><div class="nav_link-icon w-icon-dropdown-toggle"></div></div><nav class="nav_link-dropdown w-dropdown-list"><div class="nav_dropdown-wrap"><div class="nav_dropdown-content"><div class="nav_dropdown-column"><a href="index.html" class="nav_dropdown-link w-dropdown-link">Trang chủ</a><a href="home__home-v2.html" aria-current="page" class="nav_dropdown-link w-dropdown-link w--current">Cách hoạt động</a><a href="home__home-v3.html" class="nav_dropdown-link w-dropdown-link">Bảo mật dữ liệu</a><a href="services.html" class="nav_dropdown-link w-dropdown-link">Tính năng</a></div><div class="nav_dropdown-column"><a href="about-us__about-us.html" class="nav_dropdown-link w-dropdown-link">Về Wistorix</a><a href="about-us__about-us-2.html" class="nav_dropdown-link w-dropdown-link">Câu chuyện sản phẩm</a><a href="about-us__about-us-3.html" class="nav_dropdown-link w-dropdown-link">Đội ngũ</a><a href="pricing.html" class="nav_dropdown-link w-dropdown-link">Bảng giá</a></div><div class="nav_dropdown-column"><a href="contact-us__contact-us.html" class="nav_dropdown-link w-dropdown-link">Liên hệ</a><a href="contact-us__contact-us-2.html" class="nav_dropdown-link w-dropdown-link">Hỗ trợ</a><a href="contact-us__contact-us-3.html" class="nav_dropdown-link w-dropdown-link">Đặt lịch demo</a><a href="blog.html" class="nav_dropdown-link w-dropdown-link">Blog</a></div></div></div></nav></div></div></nav></div><div class="nav_buttons-wrap"><div animation="hero" class="login-wrap hide-mobile-landscape"><a animation="" data-wf--button--variant="base" href="https://www.wistorix.com/" class="button w-inline-block"><div class="text-button-wrap"><div>Cài miễn phí</div></div></a></div><div class="menu-button w-nav-button"><div class="nav-button_component"><div class="nav-button_line is-first"></div><div class="nav-button_line is-second"></div><div class="nav-button_line is-third"></div></div></div></div></div></div></div></div><main class="main-wrapper"><section class="section_her"><img class="img is-hero" src="assets/6930befc1a623bed56a68eb6_hero-bg-2.avif" alt="" sizes="(max-width: 2512px) 100vw, 2512px" hero-bg="" loading="lazy" srcset="assets/6930befc1a623bed56a68eb6_hero-bg-2-p-500.avif 500w, assets/6930befc1a623bed56a68eb6_hero-bg-2-p-800.avif 800w, assets/6930befc1a623bed56a68eb6_hero-bg-2-p-1080.avif 1080w, assets/6930befc1a623bed56a68eb6_hero-bg-2.avif 2512w"><div class="padding-global"><div class="container-large"><div class="her_top-wrap"><div class="her_top"><h1 hero-text="" data-w-id="cd54582a-c80a-5418-c7ae-9c60a7d641e9" style="opacity:0" class="text-5xl"><span class="opacity-73"><span style="color: rgb(255, 255, 255);">Dọn dẹp, kiểm soát và </span><br><span style="color: rgb(255, 255, 255);">bàn giao dữ liệu Google Drive</span></span></h1><div class="spacer-xsmall"></div><div class="max-width-medium"><div hero-text="" data-w-id="cd54582a-c80a-5418-c7ae-9c60a7d641ef" style="opacity:0" class="text-base text-color-on-primary">Wistorix quét toàn bộ Google Drive của bạn và chỉ ra file đang công khai, file rỗng, file trùng lặp — rồi thu hồi quyền, dọn dẹp và chuyển giao quyền sở hữu ngay trong một màn hình.</div></div><div class="spacer-huge"></div><div data-w-id="4b24bbcb-16b4-a1d0-b009-3bb1b11d217e" style="opacity:0" class="button_wrapper"><a animation="" data-w-id="53498126-dd01-7a2b-d835-864e4ace85ed" href="https://www.wistorix.com/" class="button-arrow w-inline-block"><div class="button-arrow_wrap"><div class="button-arrow_text"><div class="text_button">Quét Drive của tôi</div></div><div class="button_container-arrow"><svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 20 20" fill="none" class="icon-1x1-main"><path d="M13.0457 8.13128L5.8733 15.3037L4.69479 14.1252L11.8672 6.95277L5.54568 6.95277L5.54568 5.28636H14.7121V14.4528L13.0457 14.4528V8.13128Z" fill="currentColor"></path></svg></div><div class="button-arrow_bg"></div></div></a></div></div><div data-w-id="cd54582a-c80a-5418-c7ae-9c60a7d641f6" style="opacity:0" class="her_bottom"><div class="text-color-on-primary">Quét thử miễn phí · Không cần thẻ tín dụng · Gỡ quyền truy cập bất cứ lúc nào</div><div class="stars-wrap"><svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 16 16" fill="none" class="icon-1x1-small"><path d="M3.88203 13.9987L4.96536 9.31536L1.33203 6.16536L6.13203 5.7487L7.9987 1.33203L9.86536 5.7487L14.6654 6.16536L11.032 9.31536L12.1154 13.9987L7.9987 11.5154L3.88203 13.9987Z" fill="#F1EE46"></path></svg><svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 16 16" fill="none" class="icon-1x1-small"><path d="M3.88203 13.9987L4.96536 9.31536L1.33203 6.16536L6.13203 5.7487L7.9987 1.33203L9.86536 5.7487L14.6654 6.16536L11.032 9.31536L12.1154 13.9987L7.9987 11.5154L3.88203 13.9987Z" fill="#F1EE46"></path></svg><svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 16 16" fill="none" class="icon-1x1-small"><path d="M3.88203 13.9987L4.96536 9.31536L1.33203 6.16536L6.13203 5.7487L7.9987 1.33203L9.86536 5.7487L14.6654 6.16536L11.032 9.31536L12.1154 13.9987L7.9987 11.5154L3.88203 13.9987Z" fill="#F1EE46"></path></svg><svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 16 16" fill="none" class="icon-1x1-small"><path d="M3.88203 13.9987L4.96536 9.31536L1.33203 6.16536L6.13203 5.7487L7.9987 1.33203L9.86536 5.7487L14.6654 6.16536L11.032 9.31536L12.1154 13.9987L7.9987 11.5154L3.88203 13.9987Z" fill="#F1EE46"></path></svg><svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 16 16" fill="none" class="icon-1x1-small"><path d="M3.88203 13.9987L4.96536 9.31536L1.33203 6.16536L6.13203 5.7487L7.9987 1.33203L9.86536 5.7487L14.6654 6.16536L11.032 9.31536L12.1154 13.9987L7.9987 11.5154L3.88203 13.9987Z" fill="#F1EE46"></path></svg></div></div></div></div></div><div data-w-id="b39078ee-546f-391d-faeb-5a21dacea715" style="opacity:0" class="loop_img"><div style="-webkit-transform:translate3d(0%, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(0%, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(0%, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(0%, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)" class="loop_img-group"><img src="assets/69a5007e27ef20e6e3edd02e_card-4.avif" loading="lazy" alt="" class="loop_img-card"><img src="assets/69a5007d21f950db130e28c9_card-6.avif" loading="lazy" sizes="(max-width: 880px) 100vw, 880px" srcset="assets/69a5007d21f950db130e28c9_card-6-p-500.avif 500w, assets/69a5007d21f950db130e28c9_card-6.avif 880w" alt="" class="loop_img-card"><img src="assets/69a5007eb87553c5aa32934f_card-1.avif" loading="lazy" alt="" class="loop_img-card"><img src="assets/69a5007dd38878bbefc784aa_card-8.avif" loading="lazy" alt="" class="loop_img-card"><img src="assets/69a5007d1354bb8698409c38_card-5.avif" loading="lazy" sizes="(max-width: 880px) 100vw, 880px" srcset="assets/69a5007d1354bb8698409c38_card-5-p-500.avif 500w, assets/69a5007d1354bb8698409c38_card-5.avif 880w" alt="" class="loop_img-card"></div><div style="-webkit-transform:translate3d(0%, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(0%, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(0%, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(0%, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)" class="loop_img-group"><img src="assets/69a5007e27ef20e6e3edd02e_card-4.avif" loading="lazy" alt="" class="loop_img-card"><img src="assets/69a5007d21f950db130e28c9_card-6.avif" loading="lazy" sizes="(max-width: 880px) 100vw, 880px" srcset="assets/69a5007d21f950db130e28c9_card-6-p-500.avif 500w, assets/69a5007d21f950db130e28c9_card-6.avif 880w" alt="" class="loop_img-card"><img src="assets/69a5007eb87553c5aa32934f_card-1.avif" loading="lazy" alt="" class="loop_img-card"><img src="assets/69a5007dd38878bbefc784aa_card-8.avif" loading="lazy" alt="" class="loop_img-card"><img src="assets/69a5007d1354bb8698409c38_card-5.avif" loading="lazy" sizes="(max-width: 880px) 100vw, 880px" srcset="assets/69a5007d1354bb8698409c38_card-5-p-500.avif 500w, assets/69a5007d1354bb8698409c38_card-5.avif 880w" alt="" class="loop_img-card"></div></div></section><section class="section_abou"><div class="padding-section-large"></div><div class="padding-global"><div class="container-large"><div class="abou_header"><div animation="right" data-wf--tag-section--variant="base" class="tag"><div class="dot-square"></div><div>Về Wistorix</div></div><div class="max-width-medium is-41rem scroll-right"><div animation="title" class="title-wrap is-left"><h2>Wistorix</h2><h2>giúp</h2><h2>bạn</h2><h2>thấy</h2><h2>rõ</h2><h2>toàn</h2><h2>bộ</h2><img src="assets/69a8b414d6ce72030aa90514_icon1.svg" loading="lazy" title-icon="" alt="" class="title-icon"><h2>Drive</h2><h2 class="opacity-50">và</h2><img src="assets/69a8b414217a32d2ca851e82_icon2.svg" loading="lazy" title-icon="" alt="" class="title-icon"><h2 class="opacity-50">lấy lại</h2><h2 class="opacity-50">quyền kiểm soát</h2></div></div></div><div class="spacer-section-large"></div><div class="grid-4-col"><div class="about_card is-first scroll-right"><div data-anim="marquee-tags" class="about_items"><div data-anim="marquee-right" class="gcard_tags-row"><div class="about_item"><p>File công khai</p></div><div class="about_item"><p>File rỗng</p></div><div class="about_item"><p>Trùng lặp</p></div><div class="about_item"><p>Ít dùng</p></div><div class="about_item"><p>File công khai</p></div><div class="about_item"><p>File rỗng</p></div><div class="about_item"><p>Trùng lặp</p></div><div class="about_item"><p>Ít dùng</p></div></div><div data-anim="marquee-left" class="gcard_tags-row"><div class="about_item"><p>Thu hồi</p></div><div class="about_item"><p>Dọn dẹp</p></div><div class="about_item"><p>Chuyển quyền</p></div><div class="about_item"><p>An toàn</p></div><div class="about_item"><p>Thu hồi</p></div><div class="about_item"><p>Dọn dẹp</p></div><div class="about_item"><p>Chuyển quyền</p></div><div class="about_item"><p>An toàn</p></div></div><div data-anim="marquee-right" class="gcard_tags-row"><div class="about_item"><p>File công khai</p></div><div class="about_item"><p>File rỗng</p></div><div class="about_item"><p>Trùng lặp</p></div><div class="about_item"><p>Ít dùng</p></div><div class="about_item"><p>File công khai</p></div><div class="about_item"><p>File rỗng</p></div><div class="about_item"><p>Trùng lặp</p></div><div class="about_item"><p>Ít dùng</p></div></div><div class="about_left"></div><div class="about_right"></div></div><div><div class="text-weight-medium">Bước để dọn xong Drive</div><div class="text-wrap"><div fs-numbercount-duration="2000" fs-numbercount-element="number" fs-numbercount-start="0" fs-numbercount-end="3" class="text-4xl">3</div><div class="text-4xl"></div></div></div></div><div class="abou_card bg-green scroll-right"><div class="text-weight-medium">Quyền truy cập thuộc về bạn</div><div class="text-wrap"><div fs-numbercount-duration="2000" fs-numbercount-element="number" fs-numbercount-start="0" fs-numbercount-end="100" class="text-4xl">100</div><div class="text-4xl">%</div></div><div class="spacer-card-large"></div><div class="text-base text-weight-medium">Nhóm vấn đề được phát hiện tự động trong mỗi lần quét: công khai, rỗng, trùng lặp, ít dùng và mồ côi.</div></div><div class="abou_card scroll-right"><img src="assets/6930ce0ae54baa52a0590751_about-2-img-3.avif" loading="lazy" alt="" class="img"><div class="relative text-color-on-primary"><div class="text-wrap"><div fs-numbercount-duration="2100" fs-numbercount-element="number" fs-numbercount-start="0" fs-numbercount-end="120" class="text-4xl">120</div><div class="text-4xl"></div></div><div class="text-base text-weight-medium">Nhóm vấn đề được phát hiện tự động trong mỗi lần quét: công khai, rỗng, trùng lặp, ít dùng và mồ côi.</div></div></div><div class="about_card scroll-right"><div class="text-weight-medium">Dung lượng miễn phí</div><div class="text-wrap"><div fs-numbercount-duration="3000" fs-numbercount-element="number" fs-numbercount-start="0" fs-numbercount-end="15" class="text-4xl">15</div><div class="text-4xl">GB</div></div><div class="spacer-card-large"></div><div class="text-base text-weight-medium">Google cho mỗi tài khoản — Wistorix giúp bạn dùng hết công suất trước khi phải trả tiền nâng cấp.</div></div></div></div></div><div class="padding-section-large"></div></section><section class="section_loop"><div class="padding-global is-loop"><div class="container-full"><div class="loop"><div class="loop_logos"><img src="assets/692a0fbc0a00730d709003d2_logo-4.svg" loading="lazy" alt="" class="logo"><img src="assets/692a0fbc964ffb9e2e1f3831_logo-3.svg" loading="lazy" alt="" class="logo"><img src="assets/692a0fbc6e3d4146330879cb_logo-2.svg" loading="lazy" alt="" class="logo"><img src="assets/692a0fbc1d0331fc768fcaee_logo-1.svg" loading="lazy" alt="" class="logo"><img src="assets/692a0fbc0a00730d709003d2_logo-4.svg" loading="lazy" alt="" class="logo"><img src="assets/692a0fbc964ffb9e2e1f3831_logo-3.svg" loading="lazy" alt="" class="logo"><img src="assets/692a0fbc6e3d4146330879cb_logo-2.svg" loading="lazy" alt="" class="logo"><img src="assets/692a0fbc1d0331fc768fcaee_logo-1.svg" loading="lazy" alt="" class="logo"></div><div class="loop_logos"><img src="assets/692a0fbc0a00730d709003d2_logo-4.svg" loading="lazy" alt="" class="logo"><img src="assets/692a0fbc964ffb9e2e1f3831_logo-3.svg" loading="lazy" alt="" class="logo"><img src="assets/692a0fbc6e3d4146330879cb_logo-2.svg" loading="lazy" alt="" class="logo"><img src="assets/692a0fbc1d0331fc768fcaee_logo-1.svg" loading="lazy" alt="" class="logo"><img src="assets/692a0fbc0a00730d709003d2_logo-4.svg" loading="lazy" alt="" class="logo"><img src="assets/692a0fbc964ffb9e2e1f3831_logo-3.svg" loading="lazy" alt="" class="logo"><img src="assets/692a0fbc6e3d4146330879cb_logo-2.svg" loading="lazy" alt="" class="logo"><img src="assets/692a0fbc1d0331fc768fcaee_logo-1.svg" loading="lazy" alt="" class="logo"></div></div></div></div></section><section class="section_servic"><div class="padding-section-large"></div><div class="padding-global"><div class="container-large"><div class="vertical-center"><div animation="scroll" data-wf--tag-section--variant="base" class="tag"><div class="dot-square"></div><div>Tính năng</div></div><div class="spacer-large"></div><h2 animation="scroll" class="text-align-center">Quét, dọn dẹp và bàn giao Drive trong cùng một chỗ</h2><div class="spacer-large"></div><div class="max-width-small is-29rem"><div animation="scroll" class="text-align-center">Từ file công khai quên thu hồi đến file trùng lặp ngốn dung lượng — Wistorix chỉ ra và xử lý giúp bạn.</div></div><div class="spacer-large"></div><a animation="scroll" data-w-id="53498126-dd01-7a2b-d835-864e4ace85ed" href="services.html" class="button-arrow w-inline-block"><div class="button-arrow_wrap"><div class="button-arrow_text"><div class="text_button">Quét ngay</div></div><div class="button_container-arrow"><svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 20 20" fill="none" class="icon-1x1-main"><path d="M13.0457 8.13128L5.8733 15.3037L4.69479 14.1252L11.8672 6.95277L5.54568 6.95277L5.54568 5.28636H14.7121V14.4528L13.0457 14.4528V8.13128Z" fill="currentColor"></path></svg></div><div class="button-arrow_bg"></div></div></a></div><div class="spacer-section-large"></div><div animation="opacity" data-current="Tab 1" data-easing="ease" data-duration-in="300" data-duration-out="100" class="w-tabs"><div class="servic_tabs w-tab-menu"><a data-w-tab="Tab 1" class="tab_item w-inline-block w-tab-link w--current"><div>Quét &amp; phát hiện rủi ro</div></a><a data-w-tab="Tab 2" class="tab_item w-inline-block w-tab-link"><div>Dọn dẹp dung lượng</div></a><a data-w-tab="Tab 3" class="tab_item w-inline-block w-tab-link"><div>Chuyển giao quyền sở hữu</div></a></div><div class="w-tab-content"><div data-w-tab="Tab 1" class="tab_content w-tab-pane w--tab-active"><div class="servic_card"><div id="w-node-_964fb0bf-9c8f-e17d-769b-c37cf5296442-7fc84249" class="servic_content"><div id="w-node-_964fb0bf-9c8f-e17d-769b-c37cf5296443-7fc84249" class="card-padding-large"><div><div class="container-icon bg-green"><svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 24 24" fill="none" class="icon-1x1-medium"><path d="M9.10613 5.448C9.70413 3.698 12.1221 3.645 12.8311 5.289L12.8911 5.449L13.6981 7.809C13.8831 8.35023 14.1819 8.84551 14.5746 9.26142C14.9672 9.67734 15.4444 10.0042 15.9741 10.22L16.1911 10.301L18.5511 11.107C20.3011 11.705 20.3541 14.123 18.7111 14.832L18.5511 14.892L16.1911 15.699C15.6497 15.8838 15.1542 16.1826 14.7381 16.5753C14.3221 16.9679 13.995 17.4452 13.7791 17.975L13.6981 18.191L12.8921 20.552C12.2941 22.302 9.87613 22.355 9.16813 20.712L9.10613 20.552L8.30013 18.192C8.11531 17.6506 7.8165 17.1551 7.42387 16.739C7.03124 16.3229 6.55392 15.9959 6.02413 15.78L5.80813 15.699L3.44813 14.893C1.69713 14.295 1.64413 11.877 3.28813 11.169L3.44813 11.107L5.80813 10.301C6.34936 10.1161 6.84464 9.81719 7.26055 9.42457C7.67646 9.03195 8.00334 8.55469 8.21913 8.025L8.30013 7.809L9.10613 5.448ZM18.9991 2C19.1862 2 19.3695 2.05248 19.5283 2.15147C19.687 2.25046 19.8148 2.392 19.8971 2.56L19.9451 2.677L20.2951 3.703L21.3221 4.053C21.5096 4.1167 21.674 4.23462 21.7944 4.39182C21.9148 4.54902 21.9858 4.73842 21.9984 4.93602C22.011 5.13362 21.9647 5.33053 21.8653 5.50179C21.766 5.67304 21.618 5.81094 21.4401 5.898L21.3221 5.946L20.2961 6.296L19.9461 7.323C19.8823 7.51043 19.7643 7.6747 19.6071 7.79499C19.4498 7.91529 19.2604 7.98619 19.0628 7.99872C18.8652 8.01125 18.6683 7.96484 18.4971 7.86538C18.3259 7.76591 18.1881 7.61787 18.1011 7.44L18.0531 7.323L17.7031 6.297L16.6761 5.947C16.4886 5.8833 16.3243 5.76538 16.2039 5.60819C16.0835 5.45099 16.0125 5.26158 15.9999 5.06398C15.9872 4.86638 16.0335 4.66947 16.1329 4.49821C16.2323 4.32696 16.3803 4.18906 16.5581 4.102L16.6761 4.054L17.7021 3.704L18.0521 2.677C18.1196 2.47943 18.2471 2.30791 18.417 2.1865C18.5868 2.06509 18.7904 1.99987 18.9991 2Z" fill="currentColor"></path></svg></div><div class="spacer-xlarge"></div><h3 class="text-3xl">Quét &amp; phát hiện rủi ro</h3><div class="spacer-xsmall"></div><div class="text-base text-color-secondary">Rà soát toàn bộ Drive để tìm file đang công khai, chia sẻ ra ngoài tổ chức hoặc chia sẻ nhầm người.</div><div class="spacer-xhuge"></div><div class="button_wrapper"><a animation="" data-wf--button--variant="bg-gray" href="services__ai-strategy.html" class="button w-variant-29a3d87d-0352-056f-f3fc-7e15705035cc w-inline-block"><div class="text-button-wrap"><div>Xem chi tiết</div></div></a></div></div></div><div class="servic_card-img"><img src="assets/692a6039c059107c313b5709_services-card.avif" loading="lazy" alt="" class="img"></div></div></div></div><div data-w-tab="Tab 2" class="tab_content w-tab-pane"><div class="servic_card"><div id="w-node-_10a39751-45e6-a25c-5157-e5a8f88e9921-7fc84249" class="servic_content"><div id="w-node-_10a39751-45e6-a25c-5157-e5a8f88e9922-7fc84249" class="card-padding-large"><div><div class="container-icon bg-green"><svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 24 24" fill="none" class="icon-1x1-medium"><path d="M11.25 2.74393C11.25 2.62793 11.15 2.53593 11.034 2.54793C8.69384 2.78713 6.52565 3.88604 4.94914 5.63195C3.37263 7.37786 2.49994 9.64658 2.5 11.9989C2.49999 13.8809 3.05897 15.7205 4.10603 17.2844C5.15309 18.8482 6.64106 20.0658 8.38116 20.7827C10.1213 21.4996 12.0351 21.6836 13.8799 21.3111C15.7247 20.9387 17.4173 20.0268 18.743 18.6909C18.7624 18.6713 18.7774 18.6478 18.7871 18.622C18.7968 18.5962 18.801 18.5687 18.7994 18.5412C18.7978 18.5136 18.7904 18.4867 18.7778 18.4622C18.7652 18.4377 18.7475 18.4162 18.726 18.3989L11.529 12.5819C11.442 12.5117 11.3718 12.4229 11.3235 12.322C11.2752 12.2212 11.2501 12.1108 11.25 11.9989V2.74393Z" fill="currentColor"></path><path d="M19.67 17.2338C19.76 17.3068 19.894 17.2878 19.958 17.1898C20.7876 15.9216 21.3 14.4725 21.452 12.9648C21.4545 12.9375 21.4513 12.9099 21.4425 12.8839C21.4337 12.8578 21.4196 12.834 21.4011 12.8137C21.3825 12.7935 21.3599 12.7773 21.3348 12.7663C21.3096 12.7553 21.2825 12.7497 21.255 12.7498H14.687C14.6458 12.7499 14.6055 12.7627 14.5719 12.7865C14.5382 12.8104 14.5127 12.844 14.4989 12.8829C14.4851 12.9218 14.4837 12.964 14.4948 13.0037C14.5059 13.0434 14.529 13.0787 14.561 13.1048L19.67 17.2338ZM21.255 11.2498C21.371 11.2498 21.463 11.1498 21.452 11.0338C21.23 8.85886 20.2646 6.82706 18.7186 5.28115C17.1727 3.73525 15.1409 2.76984 12.966 2.54779C12.9386 2.54514 12.9109 2.54826 12.8848 2.55696C12.8586 2.56567 12.8346 2.57976 12.8142 2.59832C12.7939 2.61689 12.7777 2.63951 12.7666 2.66474C12.7555 2.68997 12.7499 2.71724 12.75 2.74479V10.9498C12.75 11.0294 12.7816 11.1057 12.8379 11.1619C12.8941 11.2182 12.9704 11.2498 13.05 11.2498H21.255Z" fill="currentColor"></path></svg></div><div class="spacer-xlarge"></div><h3 class="text-3xl">Dọn dẹp &amp; giải phóng dung lượng</h3><div class="spacer-xsmall"></div><div class="text-base text-color-secondary">Rà soát toàn bộ Drive để tìm file đang công khai, chia sẻ ra ngoài tổ chức hoặc chia sẻ nhầm người.</div><div class="spacer-xhuge"></div><div class="button_wrapper"><a animation="" data-wf--button--variant="bg-gray" href="services__business-consulting.html" class="button w-variant-29a3d87d-0352-056f-f3fc-7e15705035cc w-inline-block"><div class="text-button-wrap"><div>Xem chi tiết</div></div></a></div></div></div><div class="servic_card-img"><img src="assets/6940a103134f31eb54027413_ai-ab-img-2.avif" loading="lazy" sizes="100vw" srcset="assets/6940a103134f31eb54027413_ai-ab-img-2-p-500.avif 500w, assets/6940a103134f31eb54027413_ai-ab-img-2.avif 1075w" alt="" class="img"></div></div></div></div><div data-w-tab="Tab 3" class="tab_content w-tab-pane"><div class="servic_card"><div id="w-node-a10f88f8-e8d1-a57c-29c0-d2317a289cc1-7fc84249" class="servic_content"><div id="w-node-a10f88f8-e8d1-a57c-29c0-d2317a289cc2-7fc84249" class="card-padding-large"><div><div class="container-icon bg-green"><svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 24 24" fill="none" class="icon-1x1-medium"><path d="M19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3ZM8 17C7.45 17 7 16.55 7 16V11C7 10.45 7.45 10 8 10C8.55 10 9 10.45 9 11V16C9 16.55 8.55 17 8 17ZM12 17C11.45 17 11 16.55 11 16V8C11 7.45 11.45 7 12 7C12.55 7 13 7.45 13 8V16C13 16.55 12.55 17 12 17ZM16 17C15.45 17 15 16.55 15 16V14C15 13.45 15.45 13 16 13C16.55 13 17 13.45 17 14V16C17 16.55 16.55 17 16 17Z" fill="currentColor"></path></svg></div><div class="spacer-xlarge"></div><h3 class="text-3xl">Chuyển giao quyền sở hữu</h3><div class="spacer-xsmall"></div><div class="text-base text-color-secondary">Rà soát toàn bộ Drive để tìm file đang công khai, chia sẻ ra ngoài tổ chức hoặc chia sẻ nhầm người.</div><div class="spacer-xhuge"></div><div class="button_wrapper"><a animation="" data-wf--button--variant="bg-gray" href="services__data-insights.html" class="button w-variant-29a3d87d-0352-056f-f3fc-7e15705035cc w-inline-block"><div class="text-button-wrap"><div>Xem chi tiết</div></div></a></div></div></div><div class="servic_card-img"><img src="assets/6940a103b5837156e6ed1fd6_ai-ab-img-3.avif" loading="lazy" sizes="100vw" srcset="assets/6940a103b5837156e6ed1fd6_ai-ab-img-3-p-500.avif 500w, assets/6940a103b5837156e6ed1fd6_ai-ab-img-3.avif 1075w" alt="" class="img"></div></div></div></div></div></div></div></div><div class="code w-embed w-script"><!-- Finsweet Attributes -->
+<script async="" type="module" src="assets/attributes.js" fs-list=""></script></div><div class="padding-section-large"></div></section><section class="section_expertis"><div class="padding-section-large"></div><div class="padding-global"><div class="container-large"><div class="vertical-center"><div animation="scroll" data-wf--tag-section--variant="base" class="tag"><div class="dot-square"></div><div>Cách hoạt động</div></div><div class="spacer-large"></div><div class="max-width-medium is-41rem"><h2 animation="scroll" class="text-align-center">Mọi thứ bạn cần để làm chủ Google Drive</h2></div><div class="spacer-large"></div><div class="max-width-small is-30rem"><div animation="scroll" class="text-align-center text-color-secondary">Wistorix không quyết định thay bạn. Nó cho bạn thấy đúng thứ cần xử lý, và xử lý nhanh nhất có thể.</div></div></div><div class="spacer-section-medium"></div><div animation="opacity" class="expertis_cards"><div class="expertis_card"><div id="w-node-cd54582a-c80a-5418-c7ae-9c60a7d642b4-7fc84249" class="card-padding-medium"><div><div class="container-icon bg-green"><svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 24 24" fill="none" class="icon-1x1-medium"><path d="M15.0742 9.00001H14.2492C13.8514 9.00001 13.4699 9.15804 13.1886 9.43935C12.9073 9.72065 12.7492 10.1022 12.7492 10.5V13.5C12.7492 14.2957 12.4332 15.0587 11.8706 15.6213C11.3079 16.1839 10.5449 16.5 9.74924 16.5H8.92423C8.73837 17.4105 8.22104 18.2196 7.47254 18.7704C6.72404 19.3212 5.79769 19.5744 4.87309 19.481C3.94849 19.3876 3.0915 18.9542 2.46828 18.2649C1.84506 17.5755 1.5 16.6793 1.5 15.75C1.5 14.8207 1.84506 13.9245 2.46828 13.2351C3.0915 12.5458 3.94849 12.1124 4.87309 12.019C5.79769 11.9256 6.72404 12.1788 7.47254 12.7296C8.22104 13.2804 8.73837 14.0895 8.92423 15H9.74924C10.1471 15 10.5286 14.842 10.8099 14.5607C11.0912 14.2794 11.2492 13.8978 11.2492 13.5V10.5C11.2492 9.70436 11.5653 8.9413 12.1279 8.37869C12.6905 7.81608 13.4536 7.50001 14.2492 7.50001H15.0742C15.2601 6.58948 15.7774 5.78039 16.5259 5.22961C17.2744 4.67883 18.2008 4.42559 19.1254 4.519C20.05 4.6124 20.907 5.04579 21.5302 5.73514C22.1534 6.4245 22.4985 7.3207 22.4985 8.25001C22.4985 9.17932 22.1534 10.0755 21.5302 10.7649C20.907 11.4542 20.05 11.8876 19.1254 11.981C18.2008 12.0744 17.2744 11.8212 16.5259 11.2704C15.7774 10.7196 15.2601 9.91054 15.0742 9.00001Z" fill="currentColor"></path></svg></div><div class="spacer-xlarge"></div><h3 class="text-2xl">Quét &amp; dọn tự động</h3><div class="spacer-xsmall"></div><div class="text-base text-color-secondary">Wistorix rà soát Drive và gom sẵn danh sách file cần xử lý — bạn chỉ việc duyệt lại rồi bấm thu hồi hoặc dọn.</div></div></div><div class="expertis_card-img"><div class="expertis_wrap"><div class="visual_wrap-first"><div data-anim="card-reveal" class="vcard"><div class="vcard_inner"><div class="vcard_section"><div class="vcard_text-group"><p data-anim="fade-up" class="vcard_text-label text-weight-medium">Dung lượng đã dùng</p><div data-anim="fade-up" class="vcard_amount-wrap"><div class="text-wrap"><div class="vcard_text-amount"></div><div fs-numbercount-duration="3000" fs-numbercount-element="number" fs-numbercount-start="0" fs-numbercount-end="12" class="vcard_text-amount">12</div></div><p class="vcard_text-amount-muted text-weight-medium">/ 15 GB</p></div></div><div data-anim="progress" class="vcard_progress-bg"><div class="vcard_progress-fill"></div></div></div><div data-anim="stagger-rows" class="vcard_section-list"><div class="vcard_row"><div class="vcard_row-left"><svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 16 11" fill="none" class="vcard_row-icon"><g clip-path="url(#clip0_15680_42637)"><path fill-rule="evenodd" clip-rule="evenodd" d="M3.7711 1.55387L0 5.28706C0.75429 6.03378 1.61595 6.66309 2.5554 7.15543C2.81507 7.83731 3.2221 8.47678 3.77647 9.02557C5.86218 11.0903 9.24374 11.0903 11.3294 9.02557C11.8838 8.47678 12.2908 7.83731 12.5505 7.15539C13.4899 6.66309 14.3516 6.03378 15.1059 5.28706L11.3378 1.55691C11.335 1.55412 11.3322 1.55133 11.3294 1.54854C9.24374 -0.51618 5.86218 -0.51618 3.77647 1.54854C3.77468 1.55032 3.77289 1.55209 3.7711 1.55387ZM10.9686 7.82896C9.86962 8.19611 8.71598 8.38414 7.55294 8.38414C6.3899 8.38414 5.2363 8.19611 4.13735 7.82896C4.25642 7.98535 4.38788 8.13542 4.53176 8.27787C6.20032 9.92966 8.90556 9.92966 10.5741 8.27787C10.718 8.13542 10.8495 7.98535 10.9686 7.82896ZM4.60922 2.22147C4.89257 2.40679 5.19386 2.56536 5.50912 2.69465C6.15708 2.96034 6.85158 3.0971 7.55294 3.0971C8.25431 3.0971 8.9488 2.96034 9.59677 2.69465C9.91203 2.56536 10.2133 2.40678 10.4967 2.22146C8.84895 0.66939 6.25693 0.669394 4.60922 2.22147Z" fill="currentColor"></path></g><defs><clipPath id="clip0_15680_42637"><rect width="15.1059" height="10.5741" fill="currentColor"></rect></clipPath></defs></svg><div class="vcard_row-info"><p class="vcard_text-label text-weight-medium">Báo cáo Q2.xlsx</p><p class="vcard_text-date text-weight-medium">Đang công khai</p></div></div><p class="vcard_text-price text-weight-medium">Thu hồi</p></div><div class="vcard_row"><div class="vcard_row-left"><svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 16 11" fill="none" class="vcard_row-icon"><g clip-path="url(#clip0_15680_42637)"><path fill-rule="evenodd" clip-rule="evenodd" d="M3.7711 1.55387L0 5.28706C0.75429 6.03378 1.61595 6.66309 2.5554 7.15543C2.81507 7.83731 3.2221 8.47678 3.77647 9.02557C5.86218 11.0903 9.24374 11.0903 11.3294 9.02557C11.8838 8.47678 12.2908 7.83731 12.5505 7.15539C13.4899 6.66309 14.3516 6.03378 15.1059 5.28706L11.3378 1.55691C11.335 1.55412 11.3322 1.55133 11.3294 1.54854C9.24374 -0.51618 5.86218 -0.51618 3.77647 1.54854C3.77468 1.55032 3.77289 1.55209 3.7711 1.55387ZM10.9686 7.82896C9.86962 8.19611 8.71598 8.38414 7.55294 8.38414C6.3899 8.38414 5.2363 8.19611 4.13735 7.82896C4.25642 7.98535 4.38788 8.13542 4.53176 8.27787C6.20032 9.92966 8.90556 9.92966 10.5741 8.27787C10.718 8.13542 10.8495 7.98535 10.9686 7.82896ZM4.60922 2.22147C4.89257 2.40679 5.19386 2.56536 5.50912 2.69465C6.15708 2.96034 6.85158 3.0971 7.55294 3.0971C8.25431 3.0971 8.9488 2.96034 9.59677 2.69465C9.91203 2.56536 10.2133 2.40678 10.4967 2.22146C8.84895 0.66939 6.25693 0.669394 4.60922 2.22147Z" fill="currentColor"></path></g><defs><clipPath id="clip0_15680_42637"><rect width="15.1059" height="10.5741" fill="currentColor"></rect></clipPath></defs></svg><div class="vcard_row-info"><p class="vcard_text-label text-weight-medium">Onboarding.mp4</p><p class="vcard_text-date text-weight-medium">Trùng lặp · 1,2 GB</p></div></div><p class="vcard_text-price text-weight-medium">Dọn</p></div><div class="vcard_row"><div class="vcard_row-left"><svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 16 11" fill="none" class="vcard_row-icon"><g clip-path="url(#clip0_15680_42637)"><path fill-rule="evenodd" clip-rule="evenodd" d="M3.7711 1.55387L0 5.28706C0.75429 6.03378 1.61595 6.66309 2.5554 7.15543C2.81507 7.83731 3.2221 8.47678 3.77647 9.02557C5.86218 11.0903 9.24374 11.0903 11.3294 9.02557C11.8838 8.47678 12.2908 7.83731 12.5505 7.15539C13.4899 6.66309 14.3516 6.03378 15.1059 5.28706L11.3378 1.55691C11.335 1.55412 11.3322 1.55133 11.3294 1.54854C9.24374 -0.51618 5.86218 -0.51618 3.77647 1.54854C3.77468 1.55032 3.77289 1.55209 3.7711 1.55387ZM10.9686 7.82896C9.86962 8.19611 8.71598 8.38414 7.55294 8.38414C6.3899 8.38414 5.2363 8.19611 4.13735 7.82896C4.25642 7.98535 4.38788 8.13542 4.53176 8.27787C6.20032 9.92966 8.90556 9.92966 10.5741 8.27787C10.718 8.13542 10.8495 7.98535 10.9686 7.82896ZM4.60922 2.22147C4.89257 2.40679 5.19386 2.56536 5.50912 2.69465C6.15708 2.96034 6.85158 3.0971 7.55294 3.0971C8.25431 3.0971 8.9488 2.96034 9.59677 2.69465C9.91203 2.56536 10.2133 2.40678 10.4967 2.22146C8.84895 0.66939 6.25693 0.669394 4.60922 2.22147Z" fill="currentColor"></path></g><defs><clipPath id="clip0_15680_42637"><rect width="15.1059" height="10.5741" fill="currentColor"></rect></clipPath></defs></svg><div class="vcard_row-info"><p class="vcard_text-label text-weight-medium">Hợp đồng NCC.pdf</p><p class="vcard_text-date text-weight-medium">Chia sẻ ra ngoài</p></div></div><p class="vcard_text-price text-weight-medium">Thu hồi</p></div></div></div></div><div data-anim="card-reveal" class="pcard"><div class="pcard_inner"><div class="pcard_header"><div data-anim="fade-up" class="pcard_header-text"><p class="pcard_text-title">Kết quả quét</p><p class="pcard_text-muted">Lần quét gần nhất</p></div><svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 24 24" fill="none" data-anim="fade-up" class="pcard_icon"><path d="M4.20065 17.7827L9.50065 12.4827L12.7506 15.7327C13.1606 16.1427 13.8206 16.1227 14.2006 15.6927L21.3706 7.62274C21.7206 7.23274 21.7006 6.63274 21.3306 6.25274C21.2345 6.15693 21.1199 6.08169 20.9938 6.03158C20.8677 5.98148 20.7327 5.95758 20.5971 5.96132C20.4614 5.96506 20.3279 5.99637 20.2048 6.05335C20.0816 6.11033 19.9713 6.19178 19.8806 6.29274L13.4906 13.4727L10.2006 10.1827C10.1081 10.09 9.99824 10.0165 9.87727 9.96631C9.7563 9.91613 9.62662 9.8903 9.49565 9.8903C9.36468 9.8903 9.235 9.91613 9.11402 9.96631C8.99305 10.0165 8.88316 10.09 8.79065 10.1827L2.70065 16.2827C2.60794 16.3753 2.5344 16.4851 2.48421 16.6061C2.43403 16.7271 2.4082 16.8568 2.4082 16.9877C2.4082 17.1187 2.43403 17.2484 2.48421 17.3694C2.5344 17.4903 2.60794 17.6002 2.70065 17.6927L2.79065 17.7827C3.18065 18.1727 3.82065 18.1727 4.20065 17.7827Z" fill="fff"></path></svg></div><div data-anim="fade-up" class="pcard_body"><div class="text-wrap"><div fs-numbercount-duration="2000" fs-numbercount-element="number" fs-numbercount-start="0" fs-numbercount-end="50" class="pcard_text-value">50</div><div class="pcard_text-value">+</div></div><p class="pcard_text-muted">Dung lượng đã dùng</p></div></div></div></div></div></div></div><div class="expertis_card"><div class="expertis_card-img"><div class="expertis_wrap"><div class="visual_wrap-second"><div data-anim="card-reveal" class="bcard"><div class="bcard_inner"><div data-anim="fade-up" class="bcard_title-wrap"><p class="bcard_text-title">Dữ liệu Drive phình to theo từng năm</p></div><div data-anim="bar-grow" class="bcard_chart"><div class="bcard_chart-col"><div class="bcard_bar"></div><p class="bcard_text-year">2019</p></div><div class="bcard_chart-col"><div class="bcard_bar"></div><p class="bcard_text-year">2020</p></div><div class="bcard_chart-col"><div class="bcard_bar is-h2"></div><p class="bcard_text-year">2021</p></div><div class="bcard_chart-col"><div class="bcard_bar is-h3"></div><p class="bcard_text-year">2022</p></div><div class="bcard_chart-col"><div class="bcard_bar is-h4"></div><p class="bcard_text-year">2023</p></div><div class="bcard_chart-col"><div class="bcard_bar is-fill"></div><p class="bcard_text-year">2024</p></div><div class="bcard_chart-col"><div class="bcard_bar is-active is-h5"></div><p class="bcard_text-year">2025</p></div></div></div></div><div data-anim="card-reveal" class="ecard"><div data-anim="stagger-text" class="ecard_inner"><p class="ecard_text">Cách hoạt động</p><div class="ecard_badge"><svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 17 17" fill="none" class="ecard_badge-icon"><rect width="16.9398" height="16.9398" rx="8.46988" fill="000"></rect><g clip-path="url(#clip0_15685_42665)"><path d="M8.47038 4.9375C7.8152 4.9375 7.18685 5.19777 6.72356 5.66106C6.26027 6.12435 6 6.7527 6 7.40788C6 8.24781 6.41997 8.9854 7.05874 9.4336V10.2312C7.05874 10.3248 7.09592 10.4145 7.1621 10.4807C7.22829 10.5469 7.31805 10.5841 7.41165 10.5841H9.52912C9.62272 10.5841 9.71248 10.5469 9.77867 10.4807C9.84485 10.4145 9.88203 10.3248 9.88203 10.2312V9.4336C10.5208 8.9854 10.9408 8.24781 10.9408 7.40788C10.9408 6.7527 10.6805 6.12435 10.2172 5.66106C9.75392 5.19777 9.12557 4.9375 8.47038 4.9375ZM7.41165 11.6428C7.41165 11.7364 7.44883 11.8262 7.51501 11.8924C7.5812 11.9586 7.67096 11.9957 7.76456 11.9957H9.17621C9.26981 11.9957 9.35957 11.9586 9.42575 11.8924C9.49194 11.8262 9.52912 11.7364 9.52912 11.6428V11.2899H7.41165V11.6428Z" fill="currentColor"></path></g><defs><clipPath id="clip0_15685_42665"><rect width="8.46989" height="8.46989" fill="currentColor" transform="translate(4.23438 4.23438)"></rect></clipPath></defs></svg></div><p class="text-muted-40">tìm</p><p class="text-muted-40">file</p><p class="text-muted-40">trùng lặp,</p><p class="ecard_text">file rỗng,</p><p class="text-muted-40">và file</p><p class="ecard_text">công khai</p></div></div></div></div></div><div id="w-node-_3f1c86f2-1b43-7100-7335-cdb4a28ccf96-7fc84249" class="card-padding-medium"><div><div class="container-icon bg-green"><svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 24 24" fill="none" class="icon-1x1-medium"><path d="M15.21 2.00007H8.75C6.9606 2.00271 5.24525 2.71472 3.97995 3.98002C2.71465 5.24532 2.00265 6.96067 2 8.75007V15.2501C2.00265 17.0395 2.71465 18.7548 3.97995 20.0201C5.24525 21.2854 6.9606 21.9974 8.75 22.0001H15.25C17.0394 21.9974 18.7548 21.2854 20.0201 20.0201C21.2853 18.7548 21.9974 17.0395 22 15.2501V8.75007C21.9987 7.86064 21.8219 6.98022 21.4797 6.15925C21.1375 5.33829 20.6367 4.59292 20.0059 3.96586C19.3751 3.3388 18.6268 2.84238 17.8038 2.50505C16.9809 2.16773 16.0994 1.99612 15.21 2.00007ZM17.58 9.42007L15.13 13.1301C14.8734 13.5087 14.4801 13.7733 14.0327 13.8684C13.5853 13.9635 13.1184 13.8816 12.73 13.6401L10.34 12.1301C10.3134 12.1176 10.2844 12.1111 10.255 12.1111C10.2256 12.1111 10.1966 12.1176 10.17 12.1301C10.1068 12.1377 10.0493 12.17 10.01 12.2201L7.56 15.4601C7.44205 15.6053 7.27409 15.7012 7.08908 15.7289C6.90407 15.7567 6.71536 15.7143 6.56 15.6101C6.41478 15.4921 6.31888 15.3242 6.29113 15.1391C6.26338 14.9541 6.30578 14.7654 6.41 14.6101L8.86 11.3501C9.12372 10.9993 9.5096 10.7604 9.94116 10.6808C10.3727 10.6011 10.8184 10.6865 11.19 10.9201L13.58 12.4301C13.6094 12.445 13.642 12.4528 13.675 12.4528C13.708 12.4528 13.7406 12.445 13.77 12.4301C13.8004 12.4244 13.8294 12.4126 13.8552 12.3954C13.881 12.3782 13.903 12.356 13.92 12.3301L16.38 8.62007C16.4901 8.45431 16.6615 8.33906 16.8565 8.29968C17.0515 8.26029 17.2542 8.3 17.42 8.41007C17.5858 8.52013 17.701 8.69154 17.7404 8.88657C17.7798 9.08161 17.7401 9.28431 17.63 9.45007L17.58 9.42007Z" fill="currentColor"></path></svg></div><div class="spacer-xlarge"></div><h3 class="text-2xl">Báo cáo &amp; thống kê Drive</h3><div class="spacer-xsmall"></div><div class="text-base text-color-secondary">Biến hàng nghìn file thành một bảng rõ ràng: cái gì đang công khai, cái gì chiếm chỗ, cái gì nên xoá.</div></div></div></div><div class="expertis_card"><div id="w-node-ac313d65-938e-98b1-e793-0f1478168539-7fc84249" class="card-padding-medium"><div><div class="container-icon bg-green"><svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 24 24" fill="none" class="icon-1x1-medium"><path d="M6 4.125C6 2.676 7.176 1.5 8.625 1.5H15.375C16.824 1.5 18 2.676 18 4.125V19.875C18 20.5712 17.7234 21.2389 17.2312 21.7312C16.7389 22.2234 16.0712 22.5 15.375 22.5H8.625C7.92881 22.5 7.26113 22.2234 6.76884 21.7312C6.27656 21.2389 6 20.5712 6 19.875V4.125ZM10.5 18C10.3011 18 10.1103 18.079 9.96967 18.2197C9.82902 18.3603 9.75 18.5511 9.75 18.75C9.75 18.9489 9.82902 19.1397 9.96967 19.2803C10.1103 19.421 10.3011 19.5 10.5 19.5H13.5C13.6989 19.5 13.8897 19.421 14.0303 19.2803C14.171 19.1397 14.25 18.9489 14.25 18.75C14.25 18.5511 14.171 18.3603 14.0303 18.2197C13.8897 18.079 13.6989 18 13.5 18H10.5Z" fill="currentColor"></path></svg></div><div class="spacer-xlarge"></div><h3 class="text-2xl">Bàn giao &amp; offboarding</h3><div class="spacer-xsmall"></div><div class="text-base text-color-secondary">Khi nhân sự nghỉ việc, chuyển quyền sở hữu tài liệu về đúng người còn lại — có nhật ký chuyển giao để đối chiếu.</div></div></div><div class="expertis_card-img"><div class="expertis_wrap"><div class="visual_wrap-third"><div data-anim="card-reveal" class="gcard"><div class="gcard_inner"><div data-anim="fade-up" class="gcard_dark-block"><div class="pcard_header"><div class="pcard_header-text"><p class="pcard_text-title">Dung lượng đã dọn</p><p class="pcard_text-muted">Trong lần quét gần nhất</p></div><svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 24 24" fill="none" class="pcard_icon"><path d="M4.20065 17.7827L9.50065 12.4827L12.7506 15.7327C13.1606 16.1427 13.8206 16.1227 14.2006 15.6927L21.3706 7.62274C21.7206 7.23274 21.7006 6.63274 21.3306 6.25274C21.2345 6.15693 21.1199 6.08169 20.9938 6.03158C20.8677 5.98148 20.7327 5.95758 20.5971 5.96132C20.4614 5.96506 20.3279 5.99637 20.2048 6.05335C20.0816 6.11033 19.9713 6.19178 19.8806 6.29274L13.4906 13.4727L10.2006 10.1827C10.1081 10.09 9.99824 10.0165 9.87727 9.96631C9.7563 9.91613 9.62662 9.8903 9.49565 9.8903C9.36468 9.8903 9.235 9.91613 9.11402 9.96631C8.99305 10.0165 8.88316 10.09 8.79065 10.1827L2.70065 16.2827C2.60794 16.3753 2.5344 16.4851 2.48421 16.6061C2.43403 16.7271 2.4082 16.8568 2.4082 16.9877C2.4082 17.1187 2.43403 17.2484 2.48421 17.3694C2.5344 17.4903 2.60794 17.6002 2.70065 17.6927L2.79065 17.7827C3.18065 18.1727 3.82065 18.1727 4.20065 17.7827Z" fill="fff"></path></svg></div></div><div data-anim="fade-up" class="gcard_stats"><div class="gcard_value-row"><div class="text-wrap"><div fs-numbercount-duration="2000" fs-numbercount-element="number" fs-numbercount-start="0" fs-numbercount-end="49" class="pcard_text-value">49</div><div class="pcard_text-value">%</div></div><div class="gcard_badge"><p>-2,4 GB</p></div></div><p class="gcard_text-sub">Dung lượng giải phóng</p></div><div data-anim="marquee-tags" class="gcard_tags"><div data-anim="marquee-right" class="gcard_tags-row"><div class="gcard_tag"><p>File công khai</p></div><div class="gcard_tag"><p>File rỗng</p></div><div class="gcard_tag"><p>Trùng lặp</p></div><div class="gcard_tag"><p>Ít dùng</p></div><div class="gcard_tag"><p>File công khai</p></div><div class="gcard_tag"><p>File rỗng</p></div><div class="gcard_tag"><p>Trùng lặp</p></div><div class="gcard_tag"><p>Ít dùng</p></div></div><div data-anim="marquee-left" class="gcard_tags-row"><div class="gcard_tag"><p>Thu hồi</p></div><div class="gcard_tag"><p>Dọn dẹp</p></div><div class="gcard_tag"><p>Chuyển quyền</p></div><div class="gcard_tag"><p>An toàn</p></div><div class="gcard_tag"><p>Thu hồi</p></div><div class="gcard_tag"><p>Dọn dẹp</p></div><div class="gcard_tag"><p>Chuyển quyền</p></div><div class="gcard_tag"><p>An toàn</p></div></div></div></div></div><div data-anim="card-reveal" class="scard"><div class="scard_inner"><div data-anim="fade-up" class="scard_top-bar"><div class="scard_avatars"><div class="scard_avatar"><img loading="lazy" src="assets/69a75e5565c3bf792b02b457_profile.avif" alt="" class="img"></div><div class="scard_avatar"><img loading="lazy" src="assets/69a75e550a52d15c30221b24_profile-1.avif" alt="" class="img"></div><div class="scard_avatar"><img loading="lazy" src="assets/69a75e55f95a0278fc6041e4_profile-2.avif" alt="" class="img"></div></div><p class="pcard_text-muted">Dùng chung cho cả nhóm</p></div><div data-anim="stagger-text" class="scard_text-wrap"><p class="text-muted-40">Nhanh.</p><p class="text-muted-40">Gọn.</p><p class="ecard_text">An toàn.</p></div></div></div></div></div></div></div><div class="expertis_card"><div class="expertis_card-img"><div class="expertis_wrap"><div class="visual_wrap-fouth"><div data-anim="orbit-reveal" class="ocard"><div class="ocard_ring"><div class="ocard_ring"><div class="ocard_ring is-inner"><div data-anim="fade-up" class="ocard_center"><div class="ocard_logo-wrap"><img loading="lazy" src="assets/69a76463bf217fd7cf33872b_Logo.svg" alt="" class="img"></div></div></div></div></div><div data-anim="pill-float" class="ocard_pill is-pos-1"><div class="ocard_pill-inner"><div class="ocard_pill-user"><div class="ocard_pill-avatar"><img loading="lazy" src="assets/69a75e55f95a0278fc6041e4_profile-2.avif" alt="" class="img"></div><p class="ocard_pill-name">Minh Anh</p></div><div class="gcard_badge"><p>Chủ sở hữu</p></div></div></div><div data-anim="pill-float" class="ocard_pill is-pos-2"><div class="ocard_pill-inner"><div class="ocard_pill-user"><div class="ocard_pill-avatar"><img loading="lazy" src="assets/69a75e5565c3bf792b02b457_profile.avif" alt="" class="img"></div><p class="ocard_pill-name">Quốc Bảo</p></div><div class="gcard_badge"><p>Chỉnh sửa</p></div></div></div><div data-anim="pill-float" class="ocard_pill is-pos-3"><div class="ocard_pill-inner"><div class="ocard_pill-user"><div class="ocard_pill-avatar"><img loading="lazy" src="assets/69a75e550a52d15c30221b24_profile-1.avif" alt="" class="img"></div><p class="ocard_pill-name">Thu Hà</p></div><div class="gcard_badge"><p>Chỉ xem</p></div></div></div></div></div></div></div><div id="w-node-f42d925f-944e-6503-a80b-f51e2b157733-7fc84249" class="card-padding-medium"><div><div class="container-icon bg-green"><svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 24 24" fill="none" class="icon-1x1-medium"><path fill-rule="evenodd" clip-rule="evenodd" d="M12.0007 18.4988L7.32866 20.9548C7.16351 21.0416 6.97737 21.0805 6.79127 21.0671C6.60517 21.0536 6.42655 20.9884 6.27559 20.8787C6.12463 20.7691 6.00736 20.6194 5.93704 20.4466C5.86672 20.2737 5.84615 20.0847 5.87766 19.9008L6.76966 14.6988L2.98966 11.0138C2.85594 10.8835 2.76136 10.7184 2.71663 10.5371C2.6719 10.3559 2.6788 10.1657 2.73656 9.98816C2.79431 9.81063 2.90062 9.6528 3.04343 9.53256C3.18625 9.41231 3.35988 9.33445 3.54466 9.30778L8.76766 8.54878L11.1037 3.81578C11.1862 3.64832 11.3139 3.5073 11.4725 3.40869C11.631 3.31008 11.814 3.25781 12.0007 3.25781C12.1874 3.25781 12.3703 3.31008 12.5289 3.40869C12.6874 3.5073 12.8151 3.64832 12.8977 3.81578L15.2337 8.54878L20.4567 9.30878C20.6412 9.33559 20.8146 9.41348 20.9573 9.53366C21.0999 9.65384 21.2061 9.81152 21.2638 9.98887C21.3216 10.1662 21.3285 10.3562 21.284 10.5373C21.2394 10.7184 21.1451 10.8835 21.0117 11.0138L17.2307 14.6988L18.1227 19.9008C18.154 20.0845 18.1334 20.2734 18.0631 20.4461C17.9928 20.6188 17.8757 20.7684 17.7249 20.878C17.5741 20.9876 17.3957 21.0529 17.2097 21.0664C17.0238 21.08 16.8378 21.0413 16.6727 20.9548L12.0007 18.4988Z" fill="currentColor"></path></svg></div><div class="spacer-xlarge"></div><h3 class="text-2xl">Quản lý quyền truy cập</h3><div class="spacer-xsmall"></div><div class="text-base text-color-secondary">Xem ai đang truy cập file nào, hạ quyền hoặc gỡ người không còn liên quan — tất cả trong một màn hình.</div></div></div></div></div></div></div><div class="padding-section-large"></div></section><section class="section_pricin"><div class="padding-section-large"></div><div class="padding-global"><div class="container-large"><div class="pricin_grid"><div><div animation="right" data-wf--tag-section--variant="base" class="tag"><div class="dot-square"></div><div>Bảng giá</div></div><div class="spacer-large"></div><h2 class="scroll-right">Bắt đầu miễn phí, <br>nâng cấp khi bạn cần</h2><div class="spacer-large"></div><div class="max-width-medium scroll-right"><div class="text-base text-color-secondary">Dùng thử để biết Drive của bạn đang có gì. Trả phí khi bạn cần quét sâu hơn, xử lý hàng loạt và tự động hoá.</div></div><div class="spacer-large"></div><div class="button_wrapper"><a animation="right" data-w-id="8c5ec456-1c73-d6c5-99ee-21e82c7c817b" href="pricing.html" class="button-arrow is-black w-inline-block"><div class="button-arrow_wrap"><div class="button-arrow_text"><div class="text_button">Quét Drive của tôi</div></div><div class="button_container-arrow is-black"><svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 20 20" fill="none" class="icon-1x1-main"><path d="M13.0457 8.13128L5.8733 15.3037L4.69479 14.1252L11.8672 6.95277L5.54568 6.95277L5.54568 5.28636H14.7121V14.4528L13.0457 14.4528V8.13128Z" fill="currentColor"></path></svg></div><div class="button-arrow_bg is-black"></div></div></a></div></div><div animation="opacity" class="pricin_cards"><div class="pricin_card"><div class="pricin_top"><div class="horizontal-center is-gap-small"><div class="container-icon bg-green"><svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 24 24" fill="none" class="icon-1x1-medium"><path d="M6.62453 20.1407C6.3552 20.2487 6.10353 20.222 5.86953 20.0607C5.63553 19.8994 5.51887 19.6757 5.51953 19.3897V15.4587C5.51953 15.1894 5.58253 14.9334 5.70853 14.6907C5.83453 14.4487 6.01353 14.2554 6.24553 14.1107L7.44153 13.3277C7.5582 14.485 7.70853 15.4914 7.89253 16.3467C8.07653 17.202 8.37953 18.1777 8.80153 19.2737L6.62453 20.1407ZM10.1845 18.8067C9.9892 18.8067 9.82753 18.7414 9.69953 18.6107C9.57153 18.48 9.4722 18.3254 9.40153 18.1467C9.04153 17.1254 8.76887 16.1814 8.58353 15.3147C8.39953 14.4487 8.30753 13.472 8.30753 12.3847C8.30753 10.762 8.55753 9.26535 9.05753 7.89469C9.55753 6.52402 10.3442 5.28102 11.4175 4.16569C11.4909 4.07902 11.5795 4.01802 11.6835 3.98269C11.7869 3.94735 11.8922 3.92969 11.9995 3.92969C12.1069 3.92969 12.2122 3.94735 12.3155 3.98269C12.4189 4.01802 12.5079 4.07902 12.5825 4.16569C13.6559 5.28035 14.4425 6.52302 14.9425 7.89369C15.4425 9.26435 15.6925 10.7617 15.6925 12.3857C15.6925 13.489 15.6032 14.4664 15.4245 15.3177C15.2459 16.169 14.9702 17.112 14.5975 18.1467C14.5269 18.3254 14.4275 18.48 14.2995 18.6107C14.1715 18.7414 14.0102 18.8067 13.8155 18.8067H10.1845ZM11.9995 12.4987C12.4215 12.4987 12.7769 12.354 13.0655 12.0647C13.3549 11.776 13.4995 11.4207 13.4995 10.9987C13.4995 10.5767 13.3549 10.2214 13.0655 9.93269C12.7762 9.64402 12.4209 9.49935 11.9995 9.49869C11.5782 9.49802 11.2229 9.64269 10.9335 9.93269C10.6442 10.2214 10.4995 10.5767 10.4995 10.9987C10.4995 11.4207 10.6442 11.776 10.9335 12.0647C11.2229 12.3534 11.5782 12.498 11.9995 12.4987ZM17.3555 20.1607L15.1785 19.2927C15.6005 18.1967 15.9035 17.218 16.0875 16.3567C16.2715 15.4954 16.4215 14.4854 16.5375 13.3267L17.7345 14.1297C17.9665 14.2744 18.1455 14.4677 18.2715 14.7097C18.3982 14.9524 18.4615 15.2084 18.4615 15.4777V19.4077C18.4615 19.6944 18.3445 19.9184 18.1105 20.0797C17.8765 20.241 17.6249 20.2677 17.3555 20.1597" fill="currentColor"></path></svg></div><div class="text-weight-medium geistmono">Team</div></div><div class="horizontal-center is-gap-small"><div class="text-2xl">0đ</div><div class="text-base text-color-secondary">/tháng</div></div></div><div class="spacer-large"></div><div class="text-base text-color-secondary">Dành cho cá nhân muốn thử quét và dọn Drive lần đầu.</div><div class="spacer-large"></div><a animation="" data-wf--button--variant="bg-black" href="pricing.html" class="button w-variant-e7c0edd3-8276-a3ba-3d91-2abb3afb4c44 w-inline-block"><div class="text-button-wrap"><div>Quét ngay</div></div></a></div><div class="pricin_card is-green"><div class="pricin_top"><div class="horizontal-center is-gap-small"><div class="container-icon bg-black"><svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 24 24" fill="none" class="icon-1x1-medium"><path d="M12.0003 17.2742L7.85033 19.7742C7.667 19.8909 7.47533 19.9409 7.27533 19.9242C7.07533 19.9076 6.90033 19.8409 6.75033 19.7242C6.60033 19.6076 6.48366 19.4619 6.40033 19.2872C6.317 19.1126 6.30033 18.9166 6.35033 18.6992L7.45033 13.9742L3.77533 10.7992C3.60866 10.6492 3.50466 10.4782 3.46333 10.2862C3.422 10.0942 3.43433 9.90689 3.50033 9.72422C3.56633 9.54155 3.66633 9.39155 3.80033 9.27422C3.93433 9.15689 4.11766 9.08189 4.35033 9.04922L9.20033 8.62422L11.0753 4.17422C11.1587 3.97422 11.288 3.82422 11.4633 3.72422C11.6387 3.62422 11.8177 3.57422 12.0003 3.57422C12.183 3.57422 12.362 3.62422 12.5373 3.72422C12.7127 3.82422 12.842 3.97422 12.9253 4.17422L14.8003 8.62422L19.6503 9.04922C19.8837 9.08255 20.067 9.15755 20.2003 9.27422C20.3337 9.39089 20.4337 9.54089 20.5003 9.72422C20.567 9.90755 20.5797 10.0952 20.5383 10.2872C20.497 10.4792 20.3927 10.6499 20.2253 10.7992L16.5503 13.9742L17.6503 18.6992C17.7003 18.9159 17.6837 19.1119 17.6003 19.2872C17.517 19.4626 17.4003 19.6082 17.2503 19.7242C17.1003 19.8402 16.9253 19.9069 16.7253 19.9242C16.5253 19.9416 16.3337 19.8916 16.1503 19.7742L12.0003 17.2742Z" fill="#d6fd70"></path></svg></div><div class="text-weight-medium geistmono">Pro</div></div><div class="horizontal-center is-gap-small"><div class="text-2xl">99.000đ</div><div class="text-base text-color-secondary">/tháng</div></div></div><div class="spacer-large"></div><div class="text-base text-color-secondary">Dành cho người dùng thường xuyên chia sẻ file và cần kiểm soát chặt.</div><div class="spacer-large"></div><a animation="" data-wf--button--variant="bg-black" href="pricing.html" class="button w-variant-e7c0edd3-8276-a3ba-3d91-2abb3afb4c44 w-inline-block"><div class="text-button-wrap"><div>Quét ngay</div></div></a></div><div class="pricin_card"><div class="pricin_top"><div class="horizontal-center is-gap-small"><div class="container-icon bg-green"><svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 24 24" fill="none" class="icon-1x1-medium"><path d="M11.9994 23C10.4965 22.9999 9.02836 22.5483 7.78527 21.7037C6.54217 20.8592 5.58146 19.6606 5.02771 18.2635C4.47395 16.8664 4.35269 15.3352 4.67964 13.8683C5.0066 12.4015 5.76669 11.0667 6.86136 10.037C8.20336 8.774 11.4994 6.5 10.9994 1.5C16.9994 5.5 19.9994 9.5 13.9994 15.5C14.9994 15.5 16.4994 15.5 18.9994 13.03C19.2694 13.803 19.4994 14.634 19.4994 15.5C19.4994 17.4891 18.7092 19.3968 17.3027 20.8033C15.8961 22.2098 13.9885 23 11.9994 23Z" fill="currentColor"></path></svg></div><div class="text-weight-medium geistmono">Free</div></div><div class="horizontal-center is-gap-small"><div class="text-2xl">249.000đ</div><div class="text-base text-color-secondary">/tháng</div></div></div><div class="spacer-large"></div><div class="text-base text-color-secondary">Dành cho đội nhóm và doanh nghiệp dùng Google Workspace.</div><div class="spacer-large"></div><a animation="" data-wf--button--variant="bg-black" href="pricing.html" class="button w-variant-e7c0edd3-8276-a3ba-3d91-2abb3afb4c44 w-inline-block"><div class="text-button-wrap"><div>Quét ngay</div></div></a></div></div></div></div></div><div class="padding-section-large"></div></section><section class="section_testimonia"><div class="padding-section-medium"></div><div class="padding-global"><div class="container-large"><div class="vertical-center"><div animation="scroll" data-wf--tag-section--variant="base" class="tag"><div class="dot-square"></div><div>Người dùng nói gì</div></div><div class="spacer-large"></div><h2 animation="scroll">Wistorix giúp được gì cho bạn?</h2><div class="spacer-large"></div><div animation="scroll" class="text-color-secondary">Nội dung mẫu trong giai đoạn beta — sẽ thay bằng phản hồi thật của người dùng sau khi ra mắt.</div></div><div class="spacer-section-medium"></div><div data-delay="4000" data-animation="cross" class="slider_two w-slider" animation="opacity" data-autoplay="false" data-easing="ease" data-hide-arrows="false" data-disable-swipe="false" data-autoplay-limit="0" data-nav-spacing="3" data-duration="500" data-infinite="true"><div class="slider_mask w-slider-mask"><div class="slide w-slide"><div class="testimonia_card"><div class="testimonia_card-content"><div><div class="container-big-icon"><img loading="lazy" src="assets/6933f620f0662f52c2298a3d_ai-big-quote.svg" alt="" class="icon-1x1-xlarge"></div><div class="spacer-xxhuge"></div><div class="text-xl text-style-3lines">“Chỉ một lần quét là biết những file nào trong Drive đang mở công khai.”</div><div class="spacer-small"></div><div class="text-base">— Nội dung mẫu, chờ phản hồi beta</div></div></div><div class="testimonia_card-img"><img loading="lazy" src="assets/699378fba7a266d5d8fa8313_testi-card-1.avif" alt="" class="img"></div></div></div><div class="slide w-slide"><div class="testimonia_card"><div class="testimonia_card-content"><div><div class="container-big-icon bg-green"><img loading="lazy" src="assets/6933f620f0662f52c2298a3d_ai-big-quote.svg" alt="" class="icon-1x1-xlarge"></div><div class="spacer-xxhuge"></div><div class="text-xl text-style-3lines">“Thu hồi quyền chia sẻ hàng loạt, thay vì mở từng file một để sửa.”</div><div class="spacer-small"></div><div class="text-base">— Nội dung mẫu, chờ phản hồi beta</div></div></div><div class="testimonia_card-img"><img loading="lazy" src="assets/699378fb71254fe8743a8f6b_testi-card-2.avif" alt="" class="img"></div></div></div><div class="slide w-slide"><div class="testimonia_card"><div class="testimonia_card-content"><div><div class="container-big-icon bg-green"><img loading="lazy" src="assets/6933f620f0662f52c2298a3d_ai-big-quote.svg" alt="" class="icon-1x1-xlarge"></div><div class="spacer-xxhuge"></div><div class="text-xl text-style-3lines">“Biết chính xác file nào rỗng, file nào trùng lặp trước khi bấm xoá.”</div><div class="spacer-small"></div><div class="text-base">— Nội dung mẫu, chờ phản hồi beta</div></div></div><div class="testimonia_card-img"><img loading="lazy" src="assets/699378fb5356d704752522da_testi-card-3.avif" alt="" class="img"></div></div></div><div class="slide w-slide"><div class="testimonia_card"><div class="testimonia_card-content"><div><div class="container-big-icon bg-green"><img loading="lazy" src="assets/6933f620f0662f52c2298a3d_ai-big-quote.svg" alt="" class="icon-1x1-xlarge"></div><div class="spacer-xxhuge"></div><div class="text-xl text-style-3lines">“Chuyển quyền sở hữu tài liệu khi có người nghỉ việc mà không mất dữ liệu.”</div><div class="spacer-small"></div><div class="text-base">— Nội dung mẫu, chờ phản hồi beta</div></div></div><div class="testimonia_card-img"><img loading="lazy" src="assets/699378fb91a357a8f34de8a0_testi-card-4.avif" alt="" class="img"></div></div></div></div><div class="testimonial_arrow w-slider-arrow-left"><div class="container-arrow bg-black"><svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 24 24" fill="none" class="icon-1x1-medium"><path d="M7.828 13.0007L20 13.0007L20 11.0007L7.828 11.0007L13.192 5.63666L11.778 4.22266L4 12.0007L11.778 19.7787L13.192 18.3647L7.828 13.0007Z" fill="currentColor"></path></svg></div></div><div class="testimonial_arrow is-right w-slider-arrow-right"><div class="container-arrow bg-black"><svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 24 24" fill="none" class="icon-1x1-medium"><path d="M16.172 13.0007L4 13.0007L4 11.0007L16.172 11.0007L10.808 5.63666L12.222 4.22266L20 12.0007L12.222 19.7787L10.808 18.3647L16.172 13.0007Z" fill="currentColor"></path></svg></div></div><div class="hide w-slider-nav w-round w-num"></div></div></div></div><div class="padding-section-medium"></div></section><section class="section_call-to"><div class="container-large"><div class="grid-two-col"><div animation="opacity" class="call-to_card bg-black"><div class="vertical-center"><div class="text-lg text-color-on-primary">Miễn phí lần quét đầu tiên</div><div class="spacer-medium"></div><div data-w-id="925601e9-b294-c708-c1a9-54b3bec173b5" class="avatars-wrap"><div id="w-node-_925601e9-b294-c708-c1a9-54b3bec173b6-bec173ac" class="avatar-item is-first"><img loading="lazy" src="assets/692a5717d933cf4874e317d1_hero_icon_one.webp" alt="" class="img"></div><div id="w-node-_925601e9-b294-c708-c1a9-54b3bec173b8-bec173ac" class="avatar-item is-second"><img sizes="100vw" srcset="assets/692a5717d933cf4874e317d6_section-1.webp 500w, assets/692a5717d933cf4874e317d6_section-1.webp 800w, assets/692a5717d933cf4874e317d6_section-1.webp 1080w, assets/692a5717d933cf4874e317d6_section-1.webp 1128w" alt="" src="assets/692a5717d933cf4874e317d6_section-1.webp" loading="lazy" class="img"></div><div id="w-node-_925601e9-b294-c708-c1a9-54b3bec173ba-bec173ac" class="avatar-item is-third"><img loading="lazy" src="assets/692a5717d933cf4874e317ce_hero_icon_three.webp" alt="" class="img"></div></div><div class="spacer-huge"></div><div class="max-width-small is-25rem"><div class="text-base text-align-center text-color-on-secondary">Cài Wistorix vào Chrome, đăng nhập Google và quét Drive chỉ trong vài phút.</div></div><div class="spacer-huge"></div><a animation="" data-w-id="53498126-dd01-7a2b-d835-864e4ace85ed" href="contact-us__contact-us.html" class="button-arrow w-inline-block"><div class="button-arrow_wrap"><div class="button-arrow_text"><div class="text_button">Quét ngay</div></div><div class="button_container-arrow"><svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 20 20" fill="none" class="icon-1x1-main"><path d="M13.0457 8.13128L5.8733 15.3037L4.69479 14.1252L11.8672 6.95277L5.54568 6.95277L5.54568 5.28636H14.7121V14.4528L13.0457 14.4528V8.13128Z" fill="currentColor"></path></svg></div><div class="button-arrow_bg"></div></div></a></div></div><div animation="opacity" class="call-to_card"><div class="vertical-center"><div animation="" data-wf--tag-section--variant="secondary" class="tag w-variant-7b425a13-c1ef-9b9e-7459-1b9139e491bd"><div class="dot-square w-variant-7b425a13-c1ef-9b9e-7459-1b9139e491bd"></div><div>Quét ngay</div></div><div class="spacer-medium"></div><div class="max-width-small is-25rem"><div class="text-4xl text-align-center text-color-on-primary">Drive của bạn đang công khai những gì?</div></div></div><div class="overlay"></div></div></div></div></section><section class="section_faqq"><div class="padding-section-large"></div><div class="padding-global"><div class="container-large"><div class="faqq_wrap"><div class="faqq_header"><div><div animation="right" data-wf--tag-section--variant="base" class="tag"><div class="dot-square"></div><div>Câu hỏi thường gặp</div></div><div class="spacer-large"></div><h2 class="scroll-right">Câu hỏi thường gặp</h2><div class="spacer-large"></div><div class="text-base text-color-secondary scroll-right">Những điều bạn cần biết về Wistorix — từ quyền truy cập, bảo mật đến cách dọn dẹp Google Drive.</div></div><div class="faq_float scroll-right"><div class="text-xl text-color-on-primary">Vẫn còn thắc mắc?</div><div class="spacer-huge"></div><div class="button_wrapper"><a animation="" data-w-id="53498126-dd01-7a2b-d835-864e4ace85ed" href="contact-us__contact-us.html" class="button-arrow w-inline-block"><div class="button-arrow_wrap"><div class="button-arrow_text"><div class="text_button">Liên hệ với chúng tôi</div></div><div class="button_container-arrow"><svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 20 20" fill="none" class="icon-1x1-main"><path d="M13.0457 8.13128L5.8733 15.3037L4.69479 14.1252L11.8672 6.95277L5.54568 6.95277L5.54568 5.28636H14.7121V14.4528L13.0457 14.4528V8.13128Z" fill="currentColor"></path></svg></div><div class="button-arrow_bg"></div></div></a></div></div></div><div class="faq_items"><div data-w-id="44c2e0ac-0ee4-1def-fc4e-2ffc555aacf8" class="faq_item scroll-right"><div class="faq_top"><div class="text-xl">Wistorix dùng được cho ai?</div><div class="container-icon bg-default"><svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 24 24" fill="none" class="icon-1x1-medium"><path d="M18 12.9961H6C5.73478 12.9961 5.48043 12.8907 5.29289 12.7032C5.10536 12.5157 5 12.2613 5 11.9961C5 11.7309 5.10536 11.4765 5.29289 11.289C5.48043 11.1015 5.73478 10.9961 6 10.9961H18C18.2652 10.9961 18.5196 11.1015 18.7071 11.289C18.8946 11.4765 19 11.7309 19 11.9961C19 12.2613 18.8946 12.5157 18.7071 12.7032C18.5196 12.8907 18.2652 12.9961 18 12.9961Z" fill="currentColor"></path></svg><svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 24 24" fill="none" class="icon-1x1-medium is-animated"><path d="M18 12.9961H6C5.73478 12.9961 5.48043 12.8907 5.29289 12.7032C5.10536 12.5157 5 12.2613 5 11.9961C5 11.7309 5.10536 11.4765 5.29289 11.289C5.48043 11.1015 5.73478 10.9961 6 10.9961H18C18.2652 10.9961 18.5196 11.1015 18.7071 11.289C18.8946 11.4765 19 11.7309 19 11.9961C19 12.2613 18.8946 12.5157 18.7071 12.7032C18.5196 12.8907 18.2652 12.9961 18 12.9961Z" fill="currentColor"></path></svg></div></div><div class="faq_bottom"><div class="text-base text-color-secondary">Wistorix phù hợp với cá nhân, freelancer, đội nhóm nhỏ và doanh nghiệp dùng Google Drive hoặc Google Workspace — bất kỳ ai có nhiều file và cần biết mình đang chia sẻ những gì với ai. Our approach is flexible and tailored to fit your business model and growth stag</div><div class="spacer-large"></div></div></div><div data-w-id="44c2e0ac-0ee4-1def-fc4e-2ffc555aacf8" class="faq_item scroll-right"><div class="faq_top"><div class="text-xl">Wistorix hoạt động như thế nào?</div><div class="container-icon bg-default"><svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 24 24" fill="none" class="icon-1x1-medium"><path d="M18 12.9961H6C5.73478 12.9961 5.48043 12.8907 5.29289 12.7032C5.10536 12.5157 5 12.2613 5 11.9961C5 11.7309 5.10536 11.4765 5.29289 11.289C5.48043 11.1015 5.73478 10.9961 6 10.9961H18C18.2652 10.9961 18.5196 11.1015 18.7071 11.289C18.8946 11.4765 19 11.7309 19 11.9961C19 12.2613 18.8946 12.5157 18.7071 12.7032C18.5196 12.8907 18.2652 12.9961 18 12.9961Z" fill="currentColor"></path></svg><svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 24 24" fill="none" class="icon-1x1-medium is-animated"><path d="M18 12.9961H6C5.73478 12.9961 5.48043 12.8907 5.29289 12.7032C5.10536 12.5157 5 12.2613 5 11.9961C5 11.7309 5.10536 11.4765 5.29289 11.289C5.48043 11.1015 5.73478 10.9961 6 10.9961H18C18.2652 10.9961 18.5196 11.1015 18.7071 11.289C18.8946 11.4765 19 11.7309 19 11.9961C19 12.2613 18.8946 12.5157 18.7071 12.7032C18.5196 12.8907 18.2652 12.9961 18 12.9961Z" fill="currentColor"></path></svg></div></div><div class="faq_bottom"><div class="text-base text-color-secondary">Bạn cài tiện ích vào Chrome, đăng nhập tài khoản Google và cấp quyền cho Wistorix đọc danh sách file. Wistorix quét toàn bộ Drive, phân loại theo trạng thái (công khai, rỗng, trùng lặp, ít dùng, mồ côi) rồi hiển thị thành bảng để bạn xử lý từng file hoặc hàng loạt.</div><div class="spacer-large"></div></div></div><div data-w-id="44c2e0ac-0ee4-1def-fc4e-2ffc555aacf8" class="faq_item scroll-right"><div class="faq_top"><div class="text-xl">Wistorix có đọc nội dung file của tôi không?</div><div class="container-icon bg-default"><svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 24 24" fill="none" class="icon-1x1-medium"><path d="M18 12.9961H6C5.73478 12.9961 5.48043 12.8907 5.29289 12.7032C5.10536 12.5157 5 12.2613 5 11.9961C5 11.7309 5.10536 11.4765 5.29289 11.289C5.48043 11.1015 5.73478 10.9961 6 10.9961H18C18.2652 10.9961 18.5196 11.1015 18.7071 11.289C18.8946 11.4765 19 11.7309 19 11.9961C19 12.2613 18.8946 12.5157 18.7071 12.7032C18.5196 12.8907 18.2652 12.9961 18 12.9961Z" fill="currentColor"></path></svg><svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 24 24" fill="none" class="icon-1x1-medium is-animated"><path d="M18 12.9961H6C5.73478 12.9961 5.48043 12.8907 5.29289 12.7032C5.10536 12.5157 5 12.2613 5 11.9961C5 11.7309 5.10536 11.4765 5.29289 11.289C5.48043 11.1015 5.73478 10.9961 6 10.9961H18C18.2652 10.9961 18.5196 11.1015 18.7071 11.289C18.8946 11.4765 19 11.7309 19 11.9961C19 12.2613 18.8946 12.5157 18.7071 12.7032C18.5196 12.8907 18.2652 12.9961 18 12.9961Z" fill="currentColor"></path></svg></div></div><div class="faq_bottom"><div class="text-base text-color-secondary">Không. Wistorix chỉ đọc thông tin quản trị của file qua Google Drive API: tên file, dung lượng, chủ sở hữu, quyền chia sẻ và thời gian sửa đổi. Nội dung bên trong file không được tải về, không được lưu lại trên máy chủ của chúng tôi.</div><div class="spacer-large"></div></div></div><div data-w-id="44c2e0ac-0ee4-1def-fc4e-2ffc555aacf8" class="faq_item scroll-right"><div class="faq_top"><div class="text-xl">Tôi có cần biết kỹ thuật không?</div><div class="container-icon bg-default"><svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 24 24" fill="none" class="icon-1x1-medium"><path d="M18 12.9961H6C5.73478 12.9961 5.48043 12.8907 5.29289 12.7032C5.10536 12.5157 5 12.2613 5 11.9961C5 11.7309 5.10536 11.4765 5.29289 11.289C5.48043 11.1015 5.73478 10.9961 6 10.9961H18C18.2652 10.9961 18.5196 11.1015 18.7071 11.289C18.8946 11.4765 19 11.7309 19 11.9961C19 12.2613 18.8946 12.5157 18.7071 12.7032C18.5196 12.8907 18.2652 12.9961 18 12.9961Z" fill="currentColor"></path></svg><svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 24 24" fill="none" class="icon-1x1-medium is-animated"><path d="M18 12.9961H6C5.73478 12.9961 5.48043 12.8907 5.29289 12.7032C5.10536 12.5157 5 12.2613 5 11.9961C5 11.7309 5.10536 11.4765 5.29289 11.289C5.48043 11.1015 5.73478 10.9961 6 10.9961H18C18.2652 10.9961 18.5196 11.1015 18.7071 11.289C18.8946 11.4765 19 11.7309 19 11.9961C19 12.2613 18.8946 12.5157 18.7071 12.7032C18.5196 12.8907 18.2652 12.9961 18 12.9961Z" fill="currentColor"></path></svg></div></div><div class="faq_bottom"><div class="text-base text-color-secondary">Không cần. Wistorix hiển thị sẵn khuyến nghị cho từng file — nên thu hồi, nên dọn hay giữ lại. Bạn chỉ cần đọc và bấm, không phải mò trong phần cài đặt chia sẻ của Google Drive.</div><div class="spacer-large"></div></div></div><div data-w-id="44c2e0ac-0ee4-1def-fc4e-2ffc555aacf8" class="faq_item scroll-right"><div class="faq_top"><div class="text-xl">Quét một lần mất bao lâu?</div><div class="container-icon bg-default"><svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 24 24" fill="none" class="icon-1x1-medium"><path d="M18 12.9961H6C5.73478 12.9961 5.48043 12.8907 5.29289 12.7032C5.10536 12.5157 5 12.2613 5 11.9961C5 11.7309 5.10536 11.4765 5.29289 11.289C5.48043 11.1015 5.73478 10.9961 6 10.9961H18C18.2652 10.9961 18.5196 11.1015 18.7071 11.289C18.8946 11.4765 19 11.7309 19 11.9961C19 12.2613 18.8946 12.5157 18.7071 12.7032C18.5196 12.8907 18.2652 12.9961 18 12.9961Z" fill="currentColor"></path></svg><svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 24 24" fill="none" class="icon-1x1-medium is-animated"><path d="M18 12.9961H6C5.73478 12.9961 5.48043 12.8907 5.29289 12.7032C5.10536 12.5157 5 12.2613 5 11.9961C5 11.7309 5.10536 11.4765 5.29289 11.289C5.48043 11.1015 5.73478 10.9961 6 10.9961H18C18.2652 10.9961 18.5196 11.1015 18.7071 11.289C18.8946 11.4765 19 11.7309 19 11.9961C19 12.2613 18.8946 12.5157 18.7071 12.7032C18.5196 12.8907 18.2652 12.9961 18 12.9961Z" fill="currentColor"></path></svg></div></div><div class="faq_bottom"><div class="text-base text-color-secondary">Tuỳ số lượng file trong Drive. Với tài khoản cá nhân thông thường, lần quét đầu tiên mất vài phút; những lần sau nhanh hơn vì Wistorix chỉ kiểm tra phần thay đổi mới.</div><div class="spacer-large"></div></div></div></div></div></div></div><div class="padding-section-large"></div></section><footer animation="opacity" class="footer"><div class="padding-global is-footer"><div class="container-full"><div class="footer_wrap"><div class="footer_top"><div class="footer_content"><div class="footer_content-wrap"><a href="index.html" class="w-inline-block"><img src="assets/69bc6c8e343f8f1f1832309a_aeline-logo.svg" loading="lazy" alt="" class="footer_logo"></a><div>Wistorix là tiện ích Chrome giúp bạn quét, dọn dẹp và kiểm soát quyền chia sẻ trên Google Drive.</div></div><div class="footer_content-wrap"><div>Nhận mẹo dùng Drive hằng tháng</div><div class="form-block w-form"><form id="email-form" name="email-form" data-name="Email Form" method="get" class="footer-form" data-wf-page-id="6929c116366a14507fc84249" data-wf-element-id="d0f47cf0-bf82-d126-ac4e-db75935c933a"><input class="text-field w-input" maxlength="256" name="email" data-name="Email" placeholder="Nhập email của bạn" type="email" id="email" required=""><button data-w-id="ecad309e-9ea3-e334-3ef6-1742a2add748" type="submit" class="button-arrow"><div class="button-arrow_wrap"><div class="button-arrow_text hide-mobile-portrait"><div class="text_button">Đăng ký</div></div><div class="button_container-arrow"><svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 20 20" fill="none" class="icon-1x1-main"><path d="M13.0457 8.13128L5.8733 15.3037L4.69479 14.1252L11.8672 6.95277L5.54568 6.95277L5.54568 5.28636H14.7121V14.4528L13.0457 14.4528V8.13128Z" fill="currentColor"></path></svg></div><div class="button-arrow_bg"></div></div></button></form><div class="success-message w-form-done"><div>Cảm ơn bạn! Chúng tôi đã nhận được đăng ký.</div></div><div class="error-message w-form-fail"><div>Rất tiếc, gửi đăng ký chưa thành công. Bạn thử lại giúp nhé.</div></div></div></div></div><div class="footer_right"><div class="footer_links"><a href="home__home.html" class="footer_link w-inline-block"><div>Trang chủ</div></a><a href="home__home-v2.html" aria-current="page" class="footer_link w-inline-block w--current"><div>Cách hoạt động</div></a><a href="home__home-v3.html" class="footer_link w-inline-block"><div>Bảo mật dữ liệu</div></a><a href="services.html" class="footer_link w-inline-block"><div>Tính năng</div></a></div><div class="footer_links"><a href="contact-us__contact-us.html" class="footer_link w-inline-block"><div>Liên hệ</div></a><a href="contact-us__contact-us-2.html" class="footer_link w-inline-block"><div>Hỗ trợ</div></a><a href="contact-us__contact-us-3.html" class="footer_link w-inline-block"><div>Đặt lịch demo</div></a><a href="pricing.html" class="footer_link w-inline-block"><div>Bảng giá</div></a></div><div class="footer_links"><a href="about-us__about-us.html" class="footer_link w-inline-block"><div>Về Wistorix</div></a><a href="about-us__about-us-2.html" class="footer_link w-inline-block"><div>Câu chuyện sản phẩm</div></a><a href="about-us__about-us-3.html" class="footer_link w-inline-block"><div>Đội ngũ</div></a><a href="blog.html" class="footer_link w-inline-block"><div>Blog</div></a></div></div></div><div class="footer_bottom"><div class="footer_bottom-links"><a href="template__style-guide.html" class="footer_bottom-link w-inline-block"><div class="text-sm">Điều khoản sử dụng</div></a><a href="template__changelog.html" class="footer_bottom-link w-inline-block"><div class="text-sm">Nhật ký cập nhật</div></a><a href="template__licensing.html" class="footer_bottom-link w-inline-block"><div class="text-sm">Chính sách bảo mật</div></a></div><div class="text-color-on-secondary">© 2026 Wistorix. Bảo lưu mọi quyền.</div></div></div></div></div></footer></main><div class="temlis_component"><div class="gsap w-embed w-script"><script>
+window.addEventListener("DOMContentLoaded", () => {
+  /* Reduced motion */
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    gsap.set("[data-anim]", { visibility: "visible" });
+    return;
+  }
+  gsap.set("[data-anim]", { visibility: "visible" });
+
+  /* Smart trigger: load si visible, ScrollTrigger si below fold */
+  function smartPlay(el, tl, delay) {
+    var rect = el.getBoundingClientRect();
+    if (rect.top < window.innerHeight * 0.85) {
+      tl.delay(delay || 0.3).play();
+    } else {
+      ScrollTrigger.create({
+        trigger: el,
+        start: "top 85%",
+        onEnter: function () { tl.play(); },
+      });
+    }
+  }
+
+  /* ========== 1. CARD REVEAL ========== */
+  document.querySelectorAll('[data-anim="card-reveal"]').forEach(function (c) {
+    var tl = gsap.timeline({ paused: true });
+
+    tl.from(c, {
+      autoAlpha: 0, scale: 0.92,
+      duration: 0.55, ease: "power3.out",
+    });
+
+    /* fade-up labels */
+    var labels = c.querySelectorAll('[data-anim="fade-up"]');
+    if (labels.length) {
+      tl.from(labels, {
+        autoAlpha: 0, y: 10, duration: 0.4,
+        stagger: 0.1, ease: "power2.out",
+      }, "-=0.4");
+    }
+
+    /* progress bars */
+    var bars = c.querySelectorAll('[data-anim="progress"]');
+    bars.forEach(function (b) {
+      var f = b.firstElementChild;
+      if (f) {
+        var w = f.style.width || "49%";
+        gsap.set(f, { width: "0%" });
+        tl.to(f, { width: w, duration: 0.9, ease: "power2.inOut" }, "-=0.15");
+      }
+    });
+
+    /* stagger rows */
+    var rows = c.querySelectorAll('[data-anim="stagger-rows"]');
+    rows.forEach(function (r) {
+      tl.from(r.children, {
+        autoAlpha: 0, x: 20, duration: 0.4,
+        stagger: 0.1, ease: "power2.out",
+      }, "-=0.35");
+    });
+
+    /* bar chart grow */
+    var barChart = c.querySelector('[data-anim="bar-grow"]');
+    if (barChart) {
+      var barEls = barChart.querySelectorAll(".bcard_bar");
+      barEls.forEach(function (bar) {
+        gsap.set(bar, { scaleY: 0, transformOrigin: "bottom center" });
+      });
+      var yearLabels = barChart.querySelectorAll(".bcard_text-year");
+      tl.from(yearLabels, {
+        autoAlpha: 0, y: 6, duration: 0.25,
+        stagger: 0.05, ease: "power2.out",
+      }, "-=0.3");
+      tl.to(barEls, {
+        scaleY: 1, duration: 0.6,
+        stagger: 0.09, ease: "back.out(1.4)",
+      }, "-=0.1");
+    }
+
+    /* stagger text */
+    var staggerTexts = c.querySelectorAll('[data-anim="stagger-text"]');
+    staggerTexts.forEach(function (st) {
+      tl.from(st.children, {
+        autoAlpha: 0, y: 12, duration: 0.35,
+        stagger: 0.09, ease: "power2.out",
+      }, "-=0.35");
+    });
+
+    smartPlay(c, tl, 0.3);
+  });
+
+  /* ========== 2. ORBIT REVEAL ========== */
+  document.querySelectorAll('[data-anim="orbit-reveal"]').forEach(function (o) {
+    var tl = gsap.timeline({ paused: true });
+    var rings = o.querySelectorAll(".ocard_ring");
+
+    tl.from(o, { autoAlpha: 0, duration: 0.25 });
+    tl.from(rings, {
+      scale: 0, autoAlpha: 0, duration: 0.45, ease: "back.out(2)",
+    }, "-=0.15");
+
+    var center = o.querySelector('[data-anim="fade-up"]');
+    if (center) {
+      tl.from(center, {
+        scale: 0, autoAlpha: 0, duration: 0.45, ease: "back.out(2)",
+      }, "-=0.4");
+    }
+
+    var pills = o.querySelectorAll('[data-anim="pill-float"]');
+    pills.forEach(function (pill) {
+      tl.from(pill, {
+        autoAlpha: 0, scale: 0.7, duration: 0.5, ease: "back.out(1.5)",
+      }, "-=0.35");
+    });
+
+    /* Continuous orbit after reveal */
+    tl.call(function () {
+      var oRect = o.getBoundingClientRect();
+      var cx = oRect.left + oRect.width / 2;
+      var cy = oRect.top + oRect.height / 2;
+      var durations = [50, 60, 45];
+      pills.forEach(function (pill, i) {
+        var pRect = pill.getBoundingClientRect();
+        var px = pRect.left + pRect.width / 2;
+        var py = pRect.top + pRect.height / 2;
+        var dx = px - cx, dy = py - cy;
+        var radius = Math.sqrt(dx * dx + dy * dy);
+        var startAngle = Math.atan2(dy, dx);
+        var origX = Math.cos(startAngle) * radius;
+        var origY = Math.sin(startAngle) * radius;
+        var speed = (2 * Math.PI) / (durations[i] || 50);
+        var angle = startAngle;
+        gsap.ticker.add(function () {
+          angle += speed * gsap.ticker.deltaRatio(60) / 60;
+          gsap.set(pill, {
+            x: Math.cos(angle) * radius - origX,
+            y: Math.sin(angle) * radius - origY,
+          });
+        });
+      });
+    });
+
+    smartPlay(o, tl, 0.3);
+  });
+
+  /* ========== 3. STANDALONE FADE-UP ========== */
+  document.querySelectorAll('[data-anim="fade-up"]').forEach(function (el) {
+    if (el.closest('[data-anim="card-reveal"]') || el.closest('[data-anim="orbit-reveal"]')) return;
+    var tl = gsap.timeline({ paused: true });
+    tl.from(el, {
+      autoAlpha: 0, y: 40, duration: 0.7, ease: "power2.out",
+    });
+    smartPlay(el, tl, 0.2);
+  });
+
+  /* ========== 4. MARQUEE ========== */
+  function initMarquee(selector, direction, speed) {
+    document.querySelectorAll(selector).forEach(function (row) {
+      var items = gsap.utils.toArray(row.children);
+      if (!items.length) return;
+      var half = items.length / 2;
+      var totalWidth = 0;
+      for (var i = 0; i < half; i++) {
+        totalWidth += items[i].offsetWidth + parseFloat(getComputedStyle(row).gap || 0);
+      }
+      var duration = totalWidth / speed;
+      if (direction === "left") {
+        gsap.set(row, { x: 0 });
+        gsap.to(row, {
+          x: -totalWidth, duration: duration, ease: "none", repeat: -1,
+          modifiers: {
+            x: gsap.utils.unitize(function (x) { return parseFloat(x) % totalWidth; }),
+          },
+        });
+      } else {
+        gsap.set(row, { x: -totalWidth });
+        gsap.to(row, {
+          x: 0, duration: duration, ease: "none", repeat: -1,
+          modifiers: {
+            x: gsap.utils.unitize(function (x) {
+              return -totalWidth + ((parseFloat(x) + totalWidth) % totalWidth);
+            }),
+          },
+        });
+      }
+    });
+  }
+  initMarquee('[data-anim="marquee-right"]', "left", 35);
+  initMarquee('[data-anim="marquee-left"]', "right", 35);
+});
+</script></div><div><div class="swipper w-embed w-script"><script src="assets/swiper-bundle.min.js"></script>
+
+<script>
+  setTimeout(() => {
+    $(".section_testimonials").each(function () {
+      const $section = $(this);
+
+      const swiper = new Swiper($section.find(".swiper")[0], {
+        speed: 700,
+        loop: false,
+        slidesPerView: 1, // Por defecto: móvil portrait
+        spaceBetween: 16, // Landscape y móviles
+
+        mousewheel: { forceToAxis: true },
+        keyboard: { enabled: true, onlyInViewport: true },
+
+        breakpoints: {
+          // Tablet (y landscape)
+          768: {
+            slidesPerView: 2,
+            spaceBetween: 24,
+          },
+          // Desktop
+          992: {
+            slidesPerView: 3,
+            spaceBetween: 24,
+          },
+        },
+      });
+
+      // Flechas personalizadas
+      $section.find(".slide_prev").on("click", function () {
+        swiper.slidePrev();
+      });
+
+      $section.find(".slide_next").on("click", function () {
+        swiper.slideNext();
+      });
+    });
+  }, 1000); // Espera 1 segundo antes de inicializar
+</script></div><div class="load w-embed w-script"><style>
+  [data-anim] { visibility: hidden; }
+</style>
+
+<script defer="" src="assets/numbercount.js"></script></div><div class="marquee-embed w-embed"><style>
+@keyframes scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(-200% - (var(--gap) * 2)));
+  }
+}
+
+/* Gap por defecto (Desktop ≥992px) */
+.scroll {
+  --gap: 1.5rem;
+  animation: scroll 120s linear infinite;
+}
+
+.reverse {
+  animation-direction: reverse;
+}
+
+.marquee-image {
+  -webkit-transform: translateZ(0);
+}
+
+/* Tablet (≤991px) */
+@media screen and (max-width: 991px) {
+  .scroll {
+    --gap: 1rem;
+  }
+}
+
+/* Móvil horizontal (≤767px) */
+@media screen and (max-width: 767px) {
+  .scroll {
+    --gap: 0.75rem;
+  }
+}
+</style></div></div></div></div><script src="assets/jquery-3.5.1.min.dc5e7f18c8.js" type="text/javascript"></script><script src="assets/webflow.schunk.36b8fb49256177c8.js" type="text/javascript"></script><script src="assets/webflow.schunk.7fa942c6f9da5827.js" type="text/javascript"></script><script src="assets/webflow.schunk.4ed80055bdae3496.js" type="text/javascript"></script><script src="assets/webflow.120da492.a3195f64575e40e5.js" type="text/javascript"></script><script src="assets/gsap.min.js" type="text/javascript"></script><script src="assets/ScrollTrigger.min.js" type="text/javascript"></script><script src="assets/SplitText.min.js" type="text/javascript"></script><script type="text/javascript">gsap.registerPlugin(ScrollTrigger,SplitText);</script></body></html>

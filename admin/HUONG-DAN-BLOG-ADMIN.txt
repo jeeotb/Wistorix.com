@@ -1,0 +1,219 @@
+================================================================
+  QRANTY BLOG ADMIN — Dashboard quản lý tin tức & blog
+================================================================
+
+Công cụ chạy hoàn toàn trên máy bạn (localhost), ghi thẳng ra các
+file .html của website qranty-landing. Không gửi dữ liệu đi đâu.
+
+----------------------------------------------------------------
+1. MỞ DASHBOARD
+----------------------------------------------------------------
+Bấm đúp file:   start-blog-admin.bat
+
+Trình duyệt tự mở. Nếu không, vào:
+    http://localhost:8899/blog-admin.html
+
+Lần chạy đầu tiên, công cụ tự quét toàn bộ file qranty-blog-*.html
+đang có và tạo file blog-posts.json (kho dữ liệu bài viết).
+
+Tắt: quay lại cửa sổ đen, nhấn Ctrl + C.
+
+Lưu ý: cổng 8899 khác với Site Editor cũ (8787), nên có thể chạy
+cả hai cùng lúc.
+
+----------------------------------------------------------------
+2. BỐN MÀN HÌNH
+----------------------------------------------------------------
+DANH SÁCH BÀI VIẾT
+  Bảng tất cả bài: ảnh bìa, tiêu đề, chuyên mục, ngày đăng, trạng
+  thái, điểm SEO. Tìm kiếm, lọc theo trạng thái/chuyên mục, sắp xếp.
+  Mỗi dòng có: Sửa · Xem · Nhân bản · Xóa.
+
+SOẠN BÀI (chia đôi màn hình)
+  Bên trái: toàn bộ trường dữ liệu + ô nhập HTML nội dung.
+  Bên phải: hai tab
+     - "Xem trước": dựng bằng chính template thật của website,
+       cập nhật sau mỗi lần bạn ngừng gõ ~0,7 giây.
+     - "Chấm điểm SEO": 18 tiêu chí theo checklist Rank Math của
+       skill /qranty-blog-seo, mỗi tiêu chí ghi rõ con số cụ thể
+       (số từ, mật độ từ khóa, số H2 chứa từ khóa, ảnh thiếu alt…).
+
+LINK TRÊN WEBSITE
+  Bảng mọi thẻ <a> của mọi trang .html: chữ hiển thị, loại link,
+  ô sửa đích đến tại chỗ. Kèm công cụ gắn link vào đoạn chữ chưa
+  có link và đổi đích đến hàng loạt. Xem mục 6.
+
+CÀI ĐẶT
+  Địa chỉ website (dùng cho canonical / og:url / schema), hậu tố
+  tiêu đề, tiền tố tên file, kích thước ảnh, tác giả và chuyên mục
+  mặc định.
+
+----------------------------------------------------------------
+3. ĐĂNG MỘT BÀI TỪ SKILL /qranty-blog-seo
+----------------------------------------------------------------
+Cách A — có file trong thư mục _inbox (nhanh nhất):
+  Khi Claude viết bài xong, file .html được đặt vào thư mục
+  _inbox/ ngay trong thư mục website này.
+  Vào dashboard > "Nhập từ file skill" > bấm vào tên file đang chờ
+  > toàn bộ SEO title, meta description, slug, focus keyword, từ
+  khóa phụ, chuyên mục, ảnh đại diện và nội dung tự điền vào form.
+  Kiểm tra lại, bấm "Đăng bài". File trong _inbox tự chuyển sang
+  _inbox/_da-nhap/.
+
+Cách B — dán tay:
+  "Nhập từ file skill" > dán toàn bộ nội dung file (giữ nguyên cả
+  khối comment <!-- SEO META --> ở đầu) > "Nhập & mở trình soạn thảo".
+
+Cách C — tự viết:
+  "Soạn bài mới" rồi điền từng trường. Các nút ở cuối ô nội dung
+  chèn sẵn khối CTA giữa bài, CTA cuối bài, ảnh, bảng so sánh,
+  quote, khối "Xem thêm".
+
+----------------------------------------------------------------
+4. LƯU NHÁP vs ĐĂNG BÀI
+----------------------------------------------------------------
+"Lưu nháp"  : chỉ ghi vào blog-posts.json. KHÔNG sinh file .html,
+              KHÔNG hiện trên trang Cẩm Nang.
+"Đăng bài"  : sinh file qranty-blog-<slug>.html và cập nhật lưới
+              bài viết trong qranty-blog.html.
+
+Đổi slug của bài đã đăng: file cũ được chuyển vào
+_blog_backup/renamed/ chứ không xóa.
+
+Xóa bài: file chuyển vào _blog_backup/deleted/.
+
+----------------------------------------------------------------
+5. KÍCH THƯỚC ẢNH — CHỖ NÀO ĐỔI ĐƯỢC
+----------------------------------------------------------------
+Không có kích thước nào bị khóa cứng. Có 4 nhóm ảnh:
+
+a) ẢNH BÌA TRONG TRANG BÀI VIẾT
+   MẶC ĐỊNH KHÔNG CÓ KHUNG. Ảnh hiện đúng kích thước thật của
+   file: không bị cắt cụt phần dưới, cũng không bị phóng to cho
+   đầy cột (phóng to là nguyên nhân ảnh nhòe). Ảnh rộng hơn cột
+   746px thì tự thu lại vừa cột.
+
+   Muốn ép khác, mục "Ảnh đại diện" trong màn hình soạn bài:
+     - Giới hạn chiều cao (px) — để trống là không giới hạn
+     - Kiểu hiển thị:
+         Đúng kích thước ảnh  = không cắt, không phóng to (mặc định)
+         Kéo đủ bề ngang cột  = ảnh nhỏ sẽ bị phóng to, giữ tỉ lệ
+         Thu vừa chiều cao    = bó vào chiều cao đã điền, không cắt
+         Cắt lấp đầy chiều cao= bó vào chiều cao đã điền, có cắt
+   Đặt riêng từng bài. Đổi cho tất cả: Cài đặt > mục Kích thước ảnh
+   rồi bấm "Dựng lại toàn bộ".
+
+b) ẢNH BÊN TRONG NỘI DUNG BÀI
+   Cũng không có khung mặc định: ảnh hiện đúng kích thước thật,
+   chỉ bị chặn không vượt bề ngang cột (746px).
+
+   Ô chọn cỡ nằm ngay dưới khung soạn HTML:
+     Không đặt khung (mặc định) · Toàn bề ngang cột · Lớn 820px ·
+     Vừa 560px · Nhỏ 360px · Nổi trái · Nổi phải
+   Chọn cỡ rồi bấm "Tải ảnh & chèn" hoặc "＋ Khối ảnh trống".
+   Nút "Áp cỡ này cho mọi ảnh trong bài" đổi hàng loạt một lần.
+
+   Trong HTML, cỡ ảnh chính là class của thẻ <figure>:
+     qr-img-full  qr-img-lg  qr-img-md  qr-img-sm
+     qr-img-left  qr-img-right
+   Không có class nào = kích thước thật. Sửa tay class cũng được.
+   Muốn đổi con số 820/560/360: sửa css/qranty-blog-content.css,
+   phần "Cỡ ảnh đặt được cho từng khối figure".
+
+c) ẢNH TRÊN THẺ BÀI Ở TRANG CẨM NANG
+   Cài đặt > "Ảnh trên thẻ bài" (px). Để trống = mỗi ảnh giữ tỉ lệ
+   riêng (các ô trong lưới sẽ cao thấp khác nhau). Điền một số,
+   ví dụ 220, thì mọi ô cao bằng nhau. Lưu xong bấm "Dựng lại
+   toàn bộ".
+
+d) ẢNH TRONG KHỐI "BÀI VIẾT LIÊN QUAN"
+   Cài đặt > "Ảnh khối Bài viết liên quan" (px). Trống = 158px
+   theo CSS gốc của website.
+
+----------------------------------------------------------------
+6. CHÈN LINK
+----------------------------------------------------------------
+a) TRONG BÀI BLOG
+   Bôi đen từ khóa trong ô nội dung HTML rồi bấm "🔗 Chèn link".
+   Cửa sổ hiện ra cho chọn đích đến từ danh sách trang có sẵn của
+   website (mọi trang landing + mọi bài blog + #waitlist +
+   app.qranty.com/register), hoặc dán URL khác.
+   Tùy chọn: mở tab mới, rel="nofollow", và kiểu hiển thị
+   "Nút bấm trong bài" (biến từ khóa thành nút bo tròn màu thương hiệu).
+
+   Nhắc theo checklist SEO: mỗi bài cần 2–4 link nội bộ và 1–2 link
+   ra ngoài có nofollow, và KHÔNG đặt link trong đoạn sapo.
+
+b) TRÊN CÁC TRANG LANDING — mục "Link trên website" ở thanh trái
+   Liệt kê TOÀN BỘ thẻ <a> của mọi trang .html trong thư mục:
+   chữ hiển thị, class, loại link, và ô sửa đích đến ngay tại chỗ.
+
+   - Chọn một trang ở ô đầu, hoặc để "Tất cả các trang".
+   - Lọc "⚠ Chỉ link cần xử lý" để thấy link rỗng hoặc trỏ tới file
+     không tồn tại. Các nút giao diện của Webflow (giỏ hàng ẩn,
+     accordion FAQ) được đánh dấu "Giao diện" và không bị tính là hỏng.
+   - Sửa ô đích đến rồi bấm "Lưu" — ghi thẳng vào file .html.
+   - "Gỡ link" bỏ thẻ <a> nhưng giữ nguyên chữ.
+
+   Nút "＋ Gắn link vào đoạn chữ": dùng khi một từ khóa trên trang
+   CHƯA phải link. Nhập đúng đoạn chữ đang hiển thị, chọn đích đến,
+   hệ thống bọc thẻ <a> quanh đúng đoạn đó. Nếu đoạn chữ xuất hiện
+   nhiều lần, bạn được xem ngữ cảnh từng vị trí và chọn đúng chỗ.
+   Ô "Class CSS" cho phép biến nó thành nút bấm theo style của site
+   (ví dụ nhập: inner-button).
+
+   Nút "⇄ Đổi hàng loạt": mọi link đang trỏ tới A đổi sang B trên
+   toàn bộ website cùng lúc. Ví dụ đổi hết
+   https://app.qranty.com/register thành #waitlist.
+
+   Mọi thao tác đều sao lưu file gốc vào _blog_backup/ trước lần
+   ghi đè đầu tiên.
+
+----------------------------------------------------------------
+7. NHỮNG GÌ ĐƯỢC SINH RA TRONG MỖI TRANG BÀI VIẾT
+----------------------------------------------------------------
+- title, meta description, og:title/description/image, twitter card
+- link rel="canonical"
+- schema.org BlogPosting (JSON-LD) — Google hiểu ngày đăng, tác giả
+- css/qranty-blog-content.css: style cho H2, danh sách, bảng so
+  sánh, figcaption, quote và hai khối CTA mà template gốc chưa có
+- khối "Bài viết liên quan" tự chọn 2 bài cùng chuyên mục
+
+----------------------------------------------------------------
+8. AN TOÀN
+----------------------------------------------------------------
+- Trước khi ghi đè lần đầu, mọi file gốc được sao lưu vào
+  _blog_backup/. Muốn khôi phục: chép ngược ra đè lại.
+- Các bài cũ của website được đánh dấu "bài gốc" và KHÔNG bị ghi
+  đè cho tới khi bạn tự mở ra sửa, hoặc bấm "Dựng lại toàn bộ".
+- Nút "Dựng lại toàn bộ" sinh lại mọi bài đã đăng từ template
+  chung — dùng khi muốn bổ sung canonical/schema cho cả bài cũ.
+- File không dùng template blog của website (ví dụ trang thiết kế
+  riêng qranty-blog-kich-ban-cskh-shop-laptop.html) được bỏ qua,
+  dashboard không bao giờ đụng vào.
+- Ảnh tải lên lưu vào images/ kèm mốc thời gian, không ghi đè
+  ảnh cũ.
+
+----------------------------------------------------------------
+9. ĐƯA LÊN WEB
+----------------------------------------------------------------
+Dashboard chỉ sửa file trên máy. Sau khi đăng xong, deploy như
+bình thường (thư mục này đã liên kết sẵn với Vercel project
+"qranty-landing"):
+    vercel --prod
+hoặc đẩy lên Git nếu bạn đã nối repo với Vercel.
+
+----------------------------------------------------------------
+10. FILE CỦA CÔNG CỤ
+----------------------------------------------------------------
+blog-admin.html          giao diện dashboard
+blog-server.js           server cục bộ + API
+blog-post-template.html  khung trang bài viết (sinh từ chính
+                         markup thật của website — sửa file này
+                         nếu muốn đổi bố cục mọi bài)
+blog-posts.json          kho dữ liệu bài viết (tự tạo)
+css/qranty-blog-content.css  style nội dung bài
+start-blog-admin.bat     nút khởi động
+_inbox/                  nơi nhận bài mới do Claude viết
+_blog_backup/            bản sao lưu file gốc
+================================================================
