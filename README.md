@@ -90,3 +90,29 @@ Toàn bộ số liệu bảng giá trên website nằm trong **một file duy nh
 - Ảnh giao diện thật chụp từ prototype v5: `assets/wistorix-screen-{dashboard,explorer,audit}.webp`, đang dùng ở services.html và 3 trang services__*.
 - Domain trong canonical/sitemap/og là `https://wistorix.com`. Nếu deploy domain khác: tìm-thay chuỗi này trong toàn bộ `Public/`.
 - Quy tắc nội dung: không dùng "—" trong câu tiếng Việt (dùng phẩy, `·`, `:`); mọi con số phải lấy từ README ver1 hoặc app v5, không tự bịa.
+
+## Git & Deploy (cập nhật 22/08/2026)
+
+### Repo GitHub
+- Repo chính thức: **https://github.com/jeeotb/wistorix-website** · branch `main`.
+- Remote của thư mục này phải là `https://github.com/jeeotb/wistorix-website.git`. Kiểm tra bằng `git remote -v`; nếu sai thì sửa bằng:
+  `git remote set-url origin https://github.com/jeeotb/wistorix-website.git`
+- Chỉ đẩy lên GitHub: `Public/` + `README.md` + `.gitignore`. Mọi thứ khác (tools/, admin/, các folder `_backup_*`, `_archive_pages`, `_blog_backup`, `_editor_backup`, `Public/_aeline_en`, `Public/_to_delete`, desktop.ini) đã bị chặn trong `.gitignore`.
+
+### Quy trình push chuẩn (mỗi lần sửa web)
+```
+cd /d "M:\My Drive\01_Wistorix\09_UX_UI\Wistorix\Wistorix"
+git add .
+git commit -m "mo ta thay doi"
+git push
+```
+
+### Các lỗi đã gặp và cách xử lý
+1. **`bad ref refs/tags/desktop.ini`** · Google Drive tự chèn `desktop.ini` vào trong `.git\refs\`. Xử lý: chạy `del /s /q /a "desktop.ini"` ở thư mục gốc dự án rồi push lại. Lỗi này có thể tái diễn vì dự án nằm trong Google Drive; giải pháp lâu dài là chuyển bản làm việc git ra ngoài Drive (vd `C:\dev\`).
+2. **`Repository not found ... TEN_TAI_KHOAN`** · remote từng bị lưu bằng địa chỉ mẫu chưa thay username. Xử lý bằng `git remote set-url` như trên.
+3. **KHÔNG dùng `git revert` trên các commit nội dung** trừ khi hiểu rõ: revert sẽ ghi đè file trên ổ đĩa về bản cũ. Muốn bỏ commit lỡ tạo mà giữ nguyên file, dùng `git reset --soft HEAD~1`.
+
+### Deploy Vercel
+- vercel.com/new → Import repo `wistorix-website` → **Root Directory = `Public`** → Framework Preset = Other → Deploy. Không có bước build.
+- Domain: canonical/sitemap/og trong code đang trỏ `https://wistorix.com`. Gắn đúng domain này; nếu đổi domain thì tìm-thay chuỗi `https://wistorix.com` trong toàn bộ `Public/`.
+- Sau deploy lần đầu: vào Google Search Console, xác minh domain và submit `https://wistorix.com/sitemap.xml`.
