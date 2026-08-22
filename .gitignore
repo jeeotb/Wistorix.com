@@ -31,3 +31,18 @@ desktop.ini
 .vscode/
 .idea/
 *.swp
+
+# ─────────────────────────────────────────────
+# Backup / archive cục bộ · KHÔNG đưa lên GitHub (thêm 18/08/2026)
+# ─────────────────────────────────────────────
+_archive_pages/
+_backup_*/
+_blog_backup/
+_editor_backup/
+_to_delete/
+Public/_aeline_en/
+Public/_backup_*/
+Public/_to_delete/
+
+# Công cụ blog admin chạy local (xoá dòng dưới nếu muốn version cả admin)
+admin/
