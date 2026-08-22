@@ -73,3 +73,20 @@ Không có bước build. Hosting chỉ cần serve file tĩnh.
 - **Font** · site load Inter và Plus Jakarta Sans từ Google Fonts qua `WebFont.load`. Hai thẻ `preconnect` tới `fonts.googleapis.com` và `fonts.gstatic.com` là cần thiết, đừng xoá.
 - **og:image** · các thẻ trỏ ảnh preview của template cũ đã gỡ. Muốn có ảnh preview khi share link, thêm thẻ `og:image` trỏ ảnh của Wistorix vào `<head>` từng trang.
 - **Nút CTA** · phần chữ trên nút vẫn còn của template gốc ("Buy Template", "View Demo"), đích đã trỏ về `wistorix.com`. Sửa chữ trực tiếp trong editor.
+
+## Bảng giá · sửa một chỗ là xong (18/08/2026)
+
+Toàn bộ số liệu bảng giá trên website nằm trong **một file duy nhất**: `Public/assets/wistorix-pricing.js` (object `window.WISTORIX_PRICING`). Hai trang `index.html` và `pricing.html` đều gắn các phần tử `data-wx="..."` và script này tự điền tên gói, mô tả, giá, đơn vị, bullet, CTA, khối mua lẻ theo lượt và banner Multi-Wistorix khi trang load.
+
+- **Đổi giá / tên gói / bullet** · chỉ sửa `wistorix-pricing.js`, cả hai trang tự cập nhật.
+- **Thiết kế khu giá (18/08, bản Option C)** · markup nằm trong `<section class="wxp-sec">` của cả 2 trang: 3 card gói (One-Wistorix nổi bật, badge Phổ biến nhất) + panel nền đen "Mua theo lượt quét" có chọn pack 1/5/10/tuỳ ý, stepper và tổng tiền tự tính theo bậc thang (hàm `rate()` trong JS), gộp luôn dòng Multi-Wistorix. Nội dung và giá lấy từ module Thanh toán của app v5.7 (pack 5 lượt 180.000đ tiết kiệm 10%, 10 lượt 320.000đ tiết kiệm 20%).
+- **Ngoại lệ (SEO)** · nếu đổi GIÁ, sửa thêm 2 chỗ tĩnh trong `<head>`: khối JSON-LD `offers` của `pricing.html` và `index.html`, và meta description của `pricing.html`. Crawler không chạy JS sẽ đọc phần tĩnh này.
+- Cấu trúc gói hiện tại (theo README ver1 + app v5.7): Free 0đ (xử lý tối đa 100 file) · Standard 59.000đ/tháng · One-Wistorix 69.000đ/Drive/tháng · Mua lẻ theo lượt quét (1–4 lượt 40.000đ · 5–9 lượt 36.000đ · từ 10 lượt 32.000đ, không hết hạn) · Multi-Wistorix liên hệ. Nguồn giá theo lượt: module Thanh toán trong `09_UX_UI/ver1/wistorix-dashboard-v5.html` (v5.7 pay-per-scan).
+
+## SEO & nội dung (đợt 18/08/2026)
+
+- Mỗi trang đã có: canonical, og:url/site_name/locale, og:image (`assets/wistorix-og.png`), twitter:image, alt tiếng Việt cho ảnh nội dung. Root có `robots.txt` + `sitemap.xml` (25 URL). Đã gỡ meta generator Webflow.
+- JSON-LD: SoftwareApplication + Organization (index) · FAQPage + offers (pricing) · BlogPosting (6 bài blog).
+- Ảnh giao diện thật chụp từ prototype v5: `assets/wistorix-screen-{dashboard,explorer,audit}.webp`, đang dùng ở services.html và 3 trang services__*.
+- Domain trong canonical/sitemap/og là `https://wistorix.com`. Nếu deploy domain khác: tìm-thay chuỗi này trong toàn bộ `Public/`.
+- Quy tắc nội dung: không dùng "—" trong câu tiếng Việt (dùng phẩy, `·`, `:`); mọi con số phải lấy từ README ver1 hoặc app v5, không tự bịa.
