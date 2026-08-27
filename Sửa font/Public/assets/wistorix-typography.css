@@ -1,0 +1,178 @@
+/* ==========================================================================
+   WISTORIX — TYPOGRAPHY SYSTEM
+   Nguồn: 01_Brand_Asset/Guidelines/Wistorix_Color_Typography_Guidelines_v2.pdf
+
+   Font chính thức theo guideline: TT Supermolot Neue Trl Variable
+   (TypeType Foundry — font thương mại có bản quyền).
+   Bản đang dùng: Manrope Variable, self-host, đúng hệ weight 300–700
+   và type scale trong guideline.
+
+   ►► KHI CÓ FILE FONT BẢN QUYỀN:
+      1. Đặt TTSupermolotNeue-Variable.woff2 vào assets/fonts/
+      2. Bỏ comment khối @font-face "TT Supermolot Neue Trl" bên dưới
+      3. Đổi --wx-font-brand thành: 'TT Supermolot Neue Trl', 'Manrope', sans-serif
+      Không cần sửa bất kỳ file HTML nào khác.
+
+   File này nạp SAU aeline.webflow.shared.css để ghi đè biến typography
+   của template Webflow.
+   ========================================================================== */
+
+/* ---------- 1. FONT FILE (self-host) ---------- */
+
+@font-face {
+  font-family: 'Manrope';
+  src: url('fonts/Manrope-Variable.woff2') format('woff2-variations'),
+       url('fonts/Manrope-Variable.woff2') format('woff2');
+  font-weight: 200 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+/*
+@font-face {
+  font-family: 'TT Supermolot Neue Trl';
+  src: url('fonts/TTSupermolotNeue-Variable.woff2') format('woff2-variations'),
+       url('fonts/TTSupermolotNeue-Variable.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+*/
+
+/* ---------- 2. TOKEN THƯƠNG HIỆU ---------- */
+
+:root,
+body {
+  /* Đổi 1 dòng này là toàn site đổi font */
+  --wx-font-brand: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+                   Roboto, Helvetica, Arial, sans-serif;
+
+  /* Weight scale — guideline: Light 300 / Regular 400 / Medium 500 /
+     SemiBold 600 / Bold 700 */
+  --wx-w-light: 300;
+  --wx-w-regular: 400;
+  --wx-w-medium: 500;
+  --wx-w-semibold: 600;
+  --wx-w-bold: 700;
+
+  /* Tracking — guideline: H1 −1%, H2 −0.5%, body 0, caption +4% */
+  --wx-ls-display: -0.01em;
+  --wx-ls-h2: -0.005em;
+  --wx-ls-body: 0em;
+  --wx-ls-caption: 0.04em;
+}
+
+/* ---------- 3. GHI ĐÈ BIẾN TYPOGRAPHY CỦA WEBFLOW ---------- */
+/* Template gốc dùng Plus Jakarta Sans (body + headers) và Geistmono
+   (alternate: nút, eyebrow, số liệu). Guideline Wistorix chỉ có MỘT
+   typeface, nên cả ba khe đều trỏ về font thương hiệu. */
+
+:root,
+body {
+  --_typography---font-family--body: var(--wx-font-brand);
+  --_typography---font-family--headers: var(--wx-font-brand);
+  --_typography---font-family--alternate: var(--wx-font-brand);
+
+  --_typography---h1--font-family: var(--wx-font-brand);
+  --_typography---h2--font-family: var(--wx-font-brand);
+  --_typography---h3--font-family: var(--wx-font-brand);
+  --_typography---h4--font-family: var(--wx-font-brand);
+  --_typography---h5--font-family: var(--wx-font-brand);
+  --_typography---h6--font-family: var(--wx-font-brand);
+  --_typography---button--font-family: var(--wx-font-brand);
+
+  /* Tracking theo guideline — thay cho −.04em/−.06em của template.
+     Manrope rộng hơn Plus Jakarta Sans nên tracking chặt sẽ dính chữ. */
+  --_typography---5xl--letter-spacing: var(--wx-ls-display);  /* Display */
+  --_typography---4xl--letter-spacing: var(--wx-ls-display);  /* H1 */
+  --_typography---3xl--letter-spacing: var(--wx-ls-h2);       /* H2 */
+  --_typography---2xl--letter-spacing: var(--wx-ls-h2);
+  --_typography---xl--letter-spacing: -0.005em;               /* H3 */
+  --_typography---lg--letter-spacing: var(--wx-ls-body);
+  --_typography---base--letter-spacing: var(--wx-ls-body);    /* Body */
+  --_typography---sm--letter-spacing: var(--wx-ls-body);
+  --_typography---xs--letter-spacing: var(--wx-ls-caption);   /* Caption */
+
+  /* Weight — guideline: Display/H1/H2 Bold, H3 SemiBold, body Regular */
+  --_typography---5xl--font-weight: var(--wx-w-bold);
+  --_typography---4xl--font-weight: var(--wx-w-bold);
+  --_typography---3xl--font-weight: var(--wx-w-bold);
+  --_typography---2xl--font-weight: var(--wx-w-semibold);
+  --_typography---xl--font-weight: var(--wx-w-semibold);
+  --_typography---lg--font-weight: var(--wx-w-medium);
+
+  /* Nút: guideline caption = Medium, tracking +4% (template để .12em) */
+  --_typography---button--font-weight: var(--wx-w-medium);
+  --_typography---button--letter-spacing: var(--wx-ls-caption);
+
+  /* Class .h1–.h6 của Webflow đọc bộ biến riêng — template để tất cả là
+     Medium 500 với tracking −.06em/−.04em; đưa về đúng guideline. */
+  --_typography---h1--font-weight: var(--wx-w-bold);
+  --_typography---h1--letter-spacing: var(--wx-ls-display);
+  --_typography---h1--line-height: 1.15;
+
+  --_typography---h2--font-weight: var(--wx-w-bold);
+  --_typography---h2--letter-spacing: var(--wx-ls-h2);
+  --_typography---h2--line-height: 1.22;
+
+  --_typography---h3--font-weight: var(--wx-w-semibold);
+  --_typography---h3--letter-spacing: -0.005em;
+  --_typography---h3--line-height: 1.35;
+
+  --_typography---h4--font-weight: var(--wx-w-semibold);
+  --_typography---h4--letter-spacing: 0em;
+
+  --_typography---h5--font-weight: var(--wx-w-medium);
+  --_typography---h6--font-weight: var(--wx-w-medium);
+}
+
+/* ---------- 4. NỀN CHUNG ---------- */
+
+body {
+  font-family: var(--wx-font-brand);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: 'kern' 1, 'liga' 1;
+}
+
+/* Chặn mọi font sót lại của template (Inter, Arial, Helvetica Neue,
+   Plus Jakarta Sans, Geistmono) — trừ bộ icon của Webflow. */
+h1, h2, h3, h4, h5, h6,
+p, a, li, span, div, label, legend, blockquote, figcaption, td, th,
+button, input, select, textarea, optgroup {
+  font-family: var(--wx-font-brand);
+}
+
+[class*='w-icon'], .w-icon-nav-menu, .w-icon-dropdown-toggle,
+.w-icon-slider-left, .w-icon-slider-right, .w-icon-file-upload-remove {
+  font-family: webflow-icons !important;
+}
+
+/* ---------- 5. PHÂN CẤP THEO GUIDELINE ---------- */
+
+/* h*[class] có specificity cao hơn các class tiện ích .text-4xl/.h2… của
+   template, nên trọng lượng brand luôn thắng dù thẻ mang class cỡ chữ nào. */
+h1, h1[class] { font-weight: var(--wx-w-bold);     letter-spacing: var(--wx-ls-display); line-height: 1.15; }
+h2, h2[class] { font-weight: var(--wx-w-bold);     letter-spacing: var(--wx-ls-h2);      line-height: 1.22; }
+h3, h3[class] { font-weight: var(--wx-w-semibold); letter-spacing: -0.005em;             line-height: 1.35; }
+h4, h4[class], h5, h5[class], h6, h6[class] { font-weight: var(--wx-w-semibold); letter-spacing: 0; }
+
+p, li { font-weight: var(--wx-w-regular); line-height: 1.5; }
+
+/* Số liệu canh cột đều — bảng giá, thống kê */
+table, .w-tab-content [class*='number'], [class*='counter'], [class*='stat'] {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+}
+
+/* ---------- 6. TIỆN ÍCH ---------- */
+
+.wx-display  { font-weight: 800; letter-spacing: var(--wx-ls-display); line-height: 1.12; }
+.wx-caption,
+.wx-eyebrow  { font-weight: var(--wx-w-medium); letter-spacing: var(--wx-ls-caption);
+               text-transform: uppercase; font-size: 0.8125rem; line-height: 1.4; }
+.wx-light    { font-weight: var(--wx-w-light); }
+.wx-regular  { font-weight: var(--wx-w-regular); }
+.wx-medium   { font-weight: var(--wx-w-medium); }
+.wx-semibold { font-weight: var(--wx-w-semibold); }
+.wx-bold     { font-weight: var(--wx-w-bold); }
