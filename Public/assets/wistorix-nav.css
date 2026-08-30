@@ -1,0 +1,35 @@
+/* Wistorix · thanh nav dùng chung cho mọi trang
+   Nền trắng như các trang phụ, dính trên đầu khi cuộn,
+   vuốt xuống thì ẩn, vuốt lên thì hiện lại.
+   Cặp đôi: assets/wistorix-nav.js */
+
+.navbar{
+  position:sticky;top:0;z-index:999;
+  background-color:var(--bg-color--bg-white,#fff);
+  border-bottom:1px solid #ebe9e5;
+  padding-top:0;padding-bottom:0;
+  transition:transform .35s cubic-bezier(.4,0,.2,1);
+  will-change:transform;
+}
+.navbar.wx-nav-up{transform:translateY(-100%)}
+@media (prefers-reduced-motion:reduce){.navbar{transition:none}}
+
+/* hàng nav: logo, menu, nút CTA cùng nằm trên một trục giữa */
+.navbar .padding-global.is-navbar{padding-top:.5rem;padding-bottom:.5rem}
+.navbar .navbar_content{position:relative;align-items:center;min-height:3.25rem}
+
+/* logo: hộp ôm sát ảnh, căn giữa theo trục dọc, cỡ cân với chữ menu */
+.navbar .navbar_logo-link{width:auto;height:auto;min-height:0;flex:0 0 auto;padding:0;display:flex;align-items:center;justify-content:flex-start}
+.navbar .navbar_logo{height:2rem;max-height:2rem;width:auto}
+
+/* menu căn giữa tuyệt đối theo thanh nav, không lệch theo bề rộng logo hay nút CTA */
+@media screen and (min-width:992px){
+  .navbar .nav_wrap{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);display:flex;justify-content:center;pointer-events:none}
+  .navbar .nav_wrap>*{pointer-events:auto}
+}
+
+@media screen and (max-width:767px){
+  .navbar .padding-global.is-navbar{padding-top:.4rem;padding-bottom:.4rem}
+  .navbar .navbar_content{min-height:2.75rem}
+  .navbar .navbar_logo{height:1.65rem;max-height:1.65rem}
+}
