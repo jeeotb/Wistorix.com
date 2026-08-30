@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <!-- ══ WISTORIX CLONE — mock runtime (chỉ có ở bản clone offline) ══ -->
+    <script src="__mock/mock-data.js"></script>
+    <script src="__mock/wistorix-mock.js"></script>
+    <script src="__mock/dev-toolbar.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wistorix — Email được chia sẻ</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="assets/icons/wistorix-icon-128.png">
+    <link rel="stylesheet" href="dashboard.css">
+    <style>
+        /* ── Page Layout ──────────────────────────────── */
+        #view-email-shared .wix-tab-panel { padding: 20px 24px; max-width: 1000px; margin: 0 auto; }
+
+        /* ── Header Buttons ──────────────────────────── */
+        .page-header-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .btn-light {
+            background: #fff;
+            border: 1.5px solid var(--line, #e2e5ea);
+            color: var(--text-primary, #041335);
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 12px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.18s ease;
+            font-family: 'Manrope', sans-serif;
+        }
+        .btn-light:hover { border-color: var(--primary, #0052CD); color: var(--primary, #0052CD); }
+        .btn-primary {
+            background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+            color: white;
+            padding: 8px 14px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            font-size: 12px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 4px 12px rgba(59,130,246,0.3);
+            transition: all 0.18s ease;
+            font-family: 'Manrope', sans-serif;
+        }
+        .btn-primary:hover { opacity: 0.92; transform: translateY(-1px); }
+
+        /* ── Shared Info Bar ──────────────────────────── */
+        .shared-info-bar {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 12px 16px;
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            color: #1e40af;
+            font-size: 13px;
+            line-height: 1.5;
+            margin-bottom: 16px;
+        }
+        .shared-info-bar i { font-size: 16px; margin-top: 1px; flex-shrink: 0; }
+        .shared-info-bar strong { color: #1e40af; }
+
+        /* ── Hero Card ────────────────────────────────── */
+        .shared-hero {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 24px;
+            background: linear-gradient(135deg, #0b2a5c, #123b7a);
+            border-radius: 10px;
+            color: white;
+            margin-bottom: 0;
+        }
+        .shared-hero__left {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 10px;
+            padding: 12px 16px;
+            min-width: 80px;
+        }
+        .shared-hero__big-number { font-size: 28px; font-weight: 800; line-height: 1.2; }
+        .shared-hero__big-label { font-size: 9px; font-weight: 700; letter-spacing: 0.5px; color: rgba(255,255,255,0.6); text-align: center; text-transform: uppercase; }
+        .shared-hero__center { flex: 1; }
+        .shared-hero__title { font-size: 18px; font-weight: 700; margin: 0 0 4px; }
+        .shared-hero__sub { font-size: 12px; color: rgba(255,255,255,0.65); line-height: 1.5; margin: 0; }
+        .shared-hero__right { flex-shrink: 0; }
+        .btn-hero-revoke {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 18px;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+            box-shadow: 0 4px 14px rgba(239,68,68,0.35);
+            font-family: 'Manrope', sans-serif;
+            white-space: nowrap;
+        }
+        .btn-hero-revoke:hover { background: #dc2626; }
+
+        /* ── Stats Row ────────────────────────────────── */
+        .shared-stats-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            background: white;
+            border: 1px solid #e6ecf5;
+            border-top: none;
+            border-radius: 0 0 10px 10px;
+            margin-bottom: 20px;
+        }
+        .shared-stat-box {
+            padding: 16px 20px;
+            text-align: center;
+            border-right: 1px solid #e6ecf5;
+        }
+        .shared-stat-box:last-child { border-right: none; }
+        .shared-stat-box__value { font-size: 22px; font-weight: 800; color: #041335; }
+        .shared-stat-box__label { font-size: 11px; color: #94a3b0; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; margin-top: 2px; }
+
+        /* ── Section Title ────────────────────────────── */
+        .shared-section-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #041335;
+            margin: 20px 0 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .shared-section-title i { color: #94a3b0; font-size: 14px; }
+
+        /* ── Email Card ───────────────────────────────── */
+        .email-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            border-radius: 12px;
+            background: white;
+            margin-bottom: 10px;
+            border: 1px solid #f1f5f9;
+            transition: box-shadow 0.15s;
+        }
+        .email-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .email-left { display: flex; align-items: center; gap: 14px; flex: 1; min-width: 0; }
+        .avatar {
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+            color: white;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 13px; font-weight: 700;
+            flex-shrink: 0;
+        }
+        .avatar--globe {
+            background: linear-gradient(135deg, #ef4444, #f87171);
+            font-size: 18px;
+        }
+        .email-info { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+        .email-name { font-size: 14px; font-weight: 700; color: #111827; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .email-meta { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+        .email-meta > span { font-size: 12px; color: #6b7280; }
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .badge.edit { background: #fef3c7; color: #92400e; }
+        .badge.view { background: #dcfce7; color: #166534; }
+        .badge.external { background: #fde68a; color: #78350f; }
+        .email-actions { display: flex; gap: 8px; flex-shrink: 0; }
+        .btn-view {
+            padding: 7px 14px;
+            border-radius: 8px;
+            border: 1px solid #d1d5db;
+            background: white;
+            font-size: 12px;
+            font-weight: 600;
+            color: #374151;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-family: 'Manrope', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .btn-view:hover { border-color: #2563eb; color: #2563eb; }
+        .btn-revoke {
+            padding: 7px 14px;
+            border-radius: 8px;
+            border: none;
+            background: #fee2e2;
+            color: #dc2626;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-family: 'Manrope', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .btn-revoke:hover { background: #fecaca; }
+
+        /* ── Side Panel ───────────────────────────────── */
+        .file-sidebar {
+            position: fixed;
+            top: 0; right: 0;
+            width: 440px;
+            max-width: 100vw;
+            height: 100vh;
+            background: white;
+            border-left: 1px solid #e6ecf5;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            transform: translateX(100%);
+            transition: transform 0.25s ease;
+            box-shadow: -4px 0 24px rgba(0,0,0,0.08);
+        }
+        .file-sidebar.active { transform: translateX(0); }
+        .file-sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            border-bottom: 1px solid #e6ecf5;
+            min-height: 72px;
+            flex-shrink: 0;
+        }
+        .file-sidebar-header-left { display: flex; align-items: center; gap: 12px; min-width: 0; }
+        .file-sidebar-header-icon {
+            width: 36px; height: 36px;
+            border-radius: 8px;
+            background: #eff6ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #2563eb;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+        .file-sidebar-header-text { min-width: 0; }
+        .file-sidebar-header-title { font-size: 13px; font-weight: 700; color: #041335; }
+        .file-sidebar-header-email { font-size: 12px; color: #6b7280; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .file-sidebar-close {
+            width: 32px; height: 32px;
+            border-radius: 8px;
+            border: none;
+            background: #f3f4f6;
+            color: #6b7280;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .file-sidebar-close:hover { background: #e5e7eb; }
+        .file-sidebar-select-all {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 20px;
+            border-bottom: 1px solid #f3f4f6;
+            flex-shrink: 0;
+            font-size: 13px;
+            color: #374151;
+        }
+        .file-sidebar-select-all input[type="checkbox"] {
+            width: 16px; height: 16px;
+            cursor: pointer;
+            accent-color: #2563eb;
+        }
+        .file-sidebar-select-all label { cursor: pointer; font-weight: 500; }
+        .sidebar-selected-count { margin-left: auto; font-size: 12px; color: #6b7280; }
+        .file-sidebar-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px 20px;
+        }
+        .file-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border: 1px solid #f1f5f9;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            background: white;
+            transition: background 0.1s;
+        }
+        .file-item:hover { background: #fafbfc; }
+        .file-item input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; accent-color: #2563eb; flex-shrink: 0; }
+        .file-icon-box { width: 28px; font-size: 18px; text-align: center; flex-shrink: 0; }
+        .file-info { flex: 1; min-width: 0; }
+        .file-name { font-size: 13px; font-weight: 600; color: #111827; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .file-meta { font-size: 11px; color: #94a3b0; margin-top: 2px; display: flex; gap: 4px; }
+        .file-meta span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .file-role-badge {
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 10px;
+            font-weight: 700;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .file-role-badge.badge--edit { background: #fef3c7; color: #92400e; }
+        .file-role-badge.badge--view { background: #dcfce7; color: #166534; }
+        .file-actions { display: flex; gap: 4px; flex-shrink: 0; }
+        .file-action-btn {
+            padding: 4px 10px;
+            border-radius: 6px;
+            border: 1px solid #d1d5db;
+            background: white;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-family: 'Manrope', sans-serif;
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .file-action-btn--danger { color: #dc2626; border-color: #fecaca; }
+        .file-action-btn--danger:hover { background: #fee2e2; border-color: #dc2626; }
+        .file-sidebar-footer {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 20px;
+            border-top: 1px solid #e6ecf5;
+            flex-shrink: 0;
+            background: white;
+        }
+        .file-sidebar-footer .email-btn { flex: 1; }
+        .email-btn {
+            padding: 9px 18px;
+            border-radius: 8px;
+            border: none;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-family: 'Manrope', sans-serif;
+        }
+        .email-btn--danger { background: #ef4444; color: white; }
+        .email-btn--danger:hover { background: #dc2626; }
+        .email-btn--ghost { background: transparent; color: #374151; border: 1px solid #d1d5db; }
+        .email-btn--ghost:hover { background: #f3f4f6; }
+        .email-btn--primary { background: #2563eb; color: white; }
+        .email-btn--primary:hover { background: #1d4ed8; }
+        .email-btn--primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* ── Bulk Revoke Modal ───────────────────────── */
+        #bulkRevokeModal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 99999;
+        }
+        #bulkRevokeModal.hidden { display: none; }
+        #bulkRevokeModal .modal-content {
+            width: 560px;
+            max-width: calc(100vw - 32px);
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 20px 56px rgba(4,19,53,.22);
+        }
+        #bulkRevokeModal .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+            padding: 22px 24px;
+            border-bottom: 1px solid #e2e5ea;
+        }
+        #bulkRevokeModal .modal-heading { display: flex; gap: 12px; min-width: 0; }
+        #bulkRevokeModal .modal-heading-icon { width: 42px; height: 42px; display: grid; place-items: center; flex: 0 0 auto; border-radius: 12px; background: #fff1ed; color: #e8753a; font-size: 18px; }
+        #bulkRevokeModal .modal-title-copy h3 { font-size: 18px; line-height: 1.3; font-weight: 800; margin: 0; color: #041335; }
+        #bulkRevokeModal .modal-title-copy p { font-size: 12px; line-height: 1.55; color: #6b7280; margin: 4px 0 0; }
+        #bulkRevokeModal .bulk-modal-close { width: 32px; height: 32px; display: grid; place-items: center; flex: 0 0 auto; background: #fff; border: 1px solid #e2e5ea; border-radius: 8px; font-size: 21px; cursor: pointer; color: #64748b; line-height: 1; }
+        #bulkRevokeModal .bulk-modal-close:hover { background: #f8fafc; color: #041335; }
+        #bulkRevokeModal .modal-body { padding: 20px 24px; }
+        #bulkRevokeModal .modal-section-label { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; color: #64748b; margin: 0 0 10px; }
+        #bulkRevokeModal .option {
+            display: flex; align-items: flex-start; gap: 12px; border: 1px solid #e2e5ea; padding: 14px;
+            border-radius: 12px; margin-top: 10px; cursor: pointer; transition: .15s ease;
+        }
+        #bulkRevokeModal .option:hover, #bulkRevokeModal .option.is-selected { border-color: #0052cd; background: #ebf2ff; }
+        #bulkRevokeModal .option input[type="radio"] { margin: 5px 0 0; accent-color: #0052cd; }
+        #bulkRevokeModal .option-icon { width: 30px; height: 30px; display: grid; place-items: center; flex: 0 0 auto; border-radius: 8px; color: #0052cd; background: #f1f5ff; font-size: 14px; }
+        #bulkRevokeModal .option-icon--folder { color: #c98311; background: #fff7df; }
+        #bulkRevokeModal .option-copy { flex: 1; min-width: 0; }
+        #bulkRevokeModal .option b { display:block; font-size: 13px; color: #041335; }
+        #bulkRevokeModal .option p { font-size: 12px; line-height: 1.45; color: #6b7280; margin: 3px 0 0; }
+        #bulkRevokeModal .scope-fields { margin-top: 18px; }
+        #bulkRevokeModal .folder-selector { position: relative; }
+        #bulkRevokeModal .folder-selector-button { width: 100%; min-height: 46px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 11px 13px; border: 1px solid #dce3ec; border-radius: 10px; background: #f7f9fc; color: #041335; font: inherit; font-size: 13px; text-align: left; cursor: pointer; }
+        #bulkRevokeModal .folder-selector-button:disabled { color: #94a3b8; cursor: not-allowed; }
+        #bulkRevokeModal .folder-selector-button .fa-chevron-down { color: #64748b; font-size: 11px; }
+        #bulkRevokeModal .folder-selector-menu { position: absolute; z-index: 2; top: calc(100% + 6px); left: 0; right: 0; max-height: 220px; overflow: auto; padding: 6px; border: 1px solid #dce3ec; border-radius: 10px; background: #fff; box-shadow: 0 12px 28px rgba(4,19,53,.14); }
+        #bulkRevokeModal .folder-selector-option { width: 100%; display:block; padding: 9px 10px; border: 0; border-radius: 7px; background: transparent; color: #041335; font: inherit; font-size: 12px; text-align:left; cursor:pointer; }
+        #bulkRevokeModal .folder-selector-option:hover, #bulkRevokeModal .folder-selector-option[aria-selected="true"] { background: #ebf2ff; color: #0052cd; }
+        #bulkRevokeModal .email-scope-input { width:100%; min-height: 116px; resize: vertical; box-sizing: border-box; padding: 12px; border: 1px solid #dce3ec; border-radius: 10px; background:#f7f9fc; color:#041335; font: inherit; font-size:13px; line-height:1.55; }
+        #bulkRevokeModal .email-scope-input:focus, #bulkRevokeModal .folder-selector-button:focus { outline: 2px solid rgba(0,82,205,.2); border-color:#0052cd; }
+        #bulkRevokeModal .scope-validation { margin: 7px 0 0; color:#c0392b; font-size:12px; }
+        #bulkRevokeModal .warning-box { display:flex; gap:9px; align-items:flex-start; margin-top: 18px; padding: 12px; background: #f7f9fc; border-radius: 10px; color: #475569; font-size: 12px; line-height:1.5; border: 1px solid #e2e8f0; }
+        #bulkRevokeModal .warning-box i { color:#d99115; margin-top:2px; }
+        #bulkRevokeModal .modal-footer { display: flex; justify-content: flex-end; gap: 10px; padding: 16px 24px; border-top: 1px solid #e2e5ea; }
+        #bulkRevokeModal .modal-footer button {
+            padding: 9px 20px; border-radius: 8px; font-weight: 600; font-size: 13px;
+            cursor: pointer; border: none; font-family: 'Manrope', sans-serif;
+        }
+        #bulkRevokeModal .modal-footer .btn-cancel { background: #fff; border: 1px solid #d5dce5; color: #041335; }
+        #bulkRevokeModal .modal-footer .btn-cancel:hover { background:#f8fafc; }
+        #bulkRevokeModal .modal-footer .btn-danger { background: #e5484d; color: white; box-shadow: 0 3px 8px rgba(229,72,77,.22); }
+        #bulkRevokeModal .modal-footer .btn-danger:hover:not(:disabled) { background: #cc3940; }
+        #bulkRevokeModal .modal-footer button:disabled { opacity:.5; cursor:not-allowed; box-shadow:none; }
+        @media (max-width: 520px) { #bulkRevokeModal .modal-header, #bulkRevokeModal .modal-body, #bulkRevokeModal .modal-footer { padding-left:16px; padding-right:16px; } }
+
+        /* ── Toast ────────────────────────────────────── */
+        .wix-toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 10px;
+            background: #065f46;
+            color: white;
+            font-size: 13px;
+            font-weight: 600;
+            z-index: 99999;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+            animation: toastIn 0.3s ease;
+            font-family: 'Manrope', sans-serif;
+            max-width: 400px;
+        }
+        @keyframes toastIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* ── Anyone Section ──────────────────────────── */
+        .shared-anyone-section .shared-anyone-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            border: 1px solid #fee2e2;
+            border-radius: 8px;
+            margin-bottom: 6px;
+            background: #fef2f2;
+        }
+    </style>
+</head>
+<body id="page-top">
+
+<div id="wrapper">
+
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <aside class="wix-sidebar" id="accordionSidebar">
+        <div class="sidebar__brand">
+            <div class="sidebar__brand-left">
+                <div class="sidebar__brand-icon">
+                    <img src="assets/icons/wistorix-icon-white-128.png" alt="Wistorix Logo" />
+                </div>
+                <div class="sidebar__brand-info">
+                    <span class="sidebar__brand-text">Wistorix</span>
+                    <span class="sidebar__brand-sub">Chrome Extension v2.0</span>
+                </div>
+            </div>
+            <button class="sb-toggle" id="sidebarCollapseBtn">‹</button>
+        </div>
+
+        <nav class="sidebar__nav">
+            <div class="sidebar__nav-label">MENU</div>
+            <a class="sidebar__nav-item" href="dashboard.html">
+                <span class="sidebar__nav-icon"><i class="fas fa-th-large"></i></span>
+                <span class="sidebar__nav-text">Dashboard</span>
+            </a>
+            <a class="sidebar__nav-item" href="mydrive.html">
+                <span class="sidebar__nav-icon"><i class="fas fa-folder"></i></span>
+                <span class="sidebar__nav-text">My Drive</span>
+            </a>
+            <a class="sidebar__nav-item sidebar__nav-item--active" href="email-shared.html">
+                <span class="sidebar__nav-icon"><i class="fas fa-envelope"></i></span>
+                <span class="sidebar__nav-text">Email được chia sẻ</span>
+            </a>
+            <a class="sidebar__nav-item" href="settings.html">
+                <span class="sidebar__nav-icon"><i class="fas fa-cog"></i></span>
+                <span class="sidebar__nav-text">Cài đặt</span>
+            </a>
+        </nav>
+
+        <div class="sidebar__bottom">
+            <a href="cleanup.html" class="sidebar__card" style="display:block;text-decoration:none;">
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <div class="sidebar__card-title">Lượt dọn dẹp</div>
+                    <div class="sidebar__card-sub" style="margin:0;"></div>
+                </div>
+                <div class="sidebar__progress">
+                    <div class="sidebar__progress-bar" style="width:0%;"></div>
+                </div>
+                <div class="sidebar__card-footnote"></div>
+            </a>
+            <a href="invite.html" class="sidebar__card sidebar__card--row" style="text-decoration:none;">
+                <div>
+                    <div class="sidebar__card-title">Mời bạn bè</div>
+                    <div class="sidebar__card-sub">Nhận 24 giờ dọn dẹp miễn phí</div>
+                </div>
+                <i class="fas fa-gift sidebar__card-icon"></i>
+            </a>
+            <a href="upgrade.html" class="sidebar__card sidebar__card--row" style="text-decoration:none;">
+                <div>
+                    <div class="sidebar__card-title">Nâng cấp Pro</div>
+                    <div class="sidebar__card-sub">Quét không giới hạn</div>
+                </div>
+                <i class="fas fa-bolt sidebar__card-icon"></i>
+            </a>
+            <div class="sidebar__profile" id="sidebar-profile">
+                <div class="sidebar__profile-avatar"></div>
+                <div class="sidebar__profile-info">
+                    <div class="sidebar__profile-name"></div>
+                    <div class="sidebar__profile-id"></div>
+                </div>
+                <span class="sidebar__profile-badge"></span>
+                <i class="fas fa-cog sidebar__profile-settings"></i>
+            </div>
+        </div>
+    </aside>
+
+    <div id="content-wrapper" class="wix-content-wrapper">
+        <div id="content">
+
+            <div class="wix-view" id="view-email-shared">
+
+                <header class="dash-header flex-shrink-0">
+                    <div class="dash-header__top">
+                        <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Menu">
+                            <i class="fas fa-bars"></i>
+                        </button>
+                        <div class="dash-header__left">
+                            <h1 class="dash-header__title">Email được chia sẻ</h1>
+                            <p class="dash-header__sub">Ai đang có quyền với tệp của bạn — rà soát & thu hồi quyền chia sẻ</p>
+                        </div>
+                        <div class="page-header-actions">
+                            <button class="btn btn-light" id="btnExportReport">
+                                <i class="fas fa-file-export"></i> Xuất báo cáo
+                            </button>
+                            <button class="btn btn-primary" id="btnBulkRevoke">
+                                <i class="fas fa-ban"></i> Thu hồi hàng loạt
+                            </button>
+                        </div>
+                    </div>
+                </header>
+
+                <div class="wix-tab-panel wix-tab-panel--active" style="padding-top:20px;">
+
+                    <div class="shared-info-bar">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Ai đang có quyền với tệp của bạn. Thu hồi toàn bộ quyền của một email, hoặc bấm Xem tệp để thu hồi trên từng tệp cụ thể (tích nhiều tệp và thu hồi cùng lúc).</span>
+                    </div>
+
+                    <div class="shared-hero">
+                        <div class="shared-hero__left">
+                            <div class="shared-hero__big-number" id="shared-hero-count">—</div>
+                            <div class="shared-hero__big-label">EMAIL CÓ QUYỀN</div>
+                        </div>
+                        <div class="shared-hero__center">
+                            <div class="shared-hero__title">Rà soát quyền chia sẻ</div>
+                            <div class="shared-hero__sub" id="shared-hero-sub">Đang tải dữ liệu...</div>
+                        </div>
+                        <div class="shared-hero__right">
+                            <button class="btn-hero-revoke" id="btnHeroRevoke">
+                                <i class="fas fa-ban"></i> Thu hồi hàng loạt
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="shared-stats-row">
+                        <div class="shared-stat-box">
+                            <div class="shared-stat-box__value" id="stat-emails">—</div>
+                            <div class="shared-stat-box__label">Email có quyền</div>
+                        </div>
+                        <div class="shared-stat-box">
+                            <div class="shared-stat-box__value" id="stat-external">—</div>
+                            <div class="shared-stat-box__label" id="stat-external-label">Email ngoài tổ chức</div>
+                        </div>
+                        <div class="shared-stat-box">
+                            <div class="shared-stat-box__value" id="stat-shares">—</div>
+                            <div class="shared-stat-box__label">Tổng lượt chia sẻ</div>
+                        </div>
+                    </div>
+
+                    <div class="shared-anyone-section" id="shared-anyone-section" style="display:none;">
+                        <div class="shared-section-title">Công khai — Anyone with link</div>
+                        <div class="shared-anyone-list" id="shared-anyone-list"></div>
+                    </div>
+
+                    <div class="shared-section-title">Email đang có quyền truy cập tệp của bạn</div>
+                    <div class="wix-search-wrap">
+                        <i class="fas fa-search wix-search-icon"></i>
+                        <label for="shared-email-search" class="sr-only">Tìm kiếm email</label>
+                        <input type="search" id="shared-email-search" class="wix-search-input" placeholder="Tìm kiếm email..." autocomplete="off">
+                    </div>
+                    <div id="shared-email-list"></div>
+
+                    <div id="shared-empty" class="wix-empty-state" style="display:none;">
+                        <div style="padding:60px 20px;text-align:center;color:var(--text-muted);">
+                            <i class="fas fa-envelope-open-text" style="font-size:48px;display:block;margin-bottom:12px;"></i>
+                            <strong>Chưa có dữ liệu</strong><br>
+                            <span style="font-size:13px;">Dữ liệu sẽ được tải tự động. Bấm làm mới trang nếu cần kiểm tra lại.</span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- ══ FILE SIDEBAR (right panel) ════════════════════════ -->
+<div id="fileSidebar" class="file-sidebar">
+    <div class="file-sidebar-header">
+        <div class="file-sidebar-header-left">
+            <div class="file-sidebar-header-icon"><i class="fas fa-link"></i></div>
+            <div class="file-sidebar-header-text">
+                <div class="file-sidebar-header-title">Tệp đang chia sẻ với</div>
+                <div class="file-sidebar-header-email" id="sidebarEmailTitle">—</div>
+            </div>
+        </div>
+        <button class="file-sidebar-close" id="sidebarClose">&times;</button>
+    </div>
+    <div class="file-sidebar-select-all">
+        <input type="checkbox" id="sidebarCheckAll">
+        <label for="sidebarCheckAll">Chọn tất cả</label>
+        <span class="sidebar-selected-count" id="sidebarSelectedCount">0 đã chọn</span>
+    </div>
+    <div class="file-sidebar-body" id="sidebarFileList"></div>
+    <div class="file-sidebar-footer">
+        <button class="email-btn email-btn--danger" id="sidebarRevokeAll">Thu hồi toàn bộ</button>
+        <button class="email-btn email-btn--ghost" id="sidebarCloseBtn">Đóng</button>
+        <button class="email-btn email-btn--primary" id="sidebarRevokeSelected">Thu hồi 0 tệp</button>
+    </div>
+</div>
+
+<!-- BULK REVOKE MODAL -->
+<div id="bulkRevokeModal" class="modal-overlay hidden">
+    <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="bulkModalTitle">
+        <div class="modal-header">
+            <div class="modal-heading"><div class="modal-heading-icon"><i class="fas fa-lock"></i></div><div class="modal-title-copy"><h3 id="bulkModalTitle">Thu hồi quyền hàng loạt</h3><p>Chọn phạm vi cần gỡ quyền chia sẻ. Chỉ áp dụng cho file bạn sở hữu.</p></div></div>
+            <button class="bulk-modal-close" id="bulkModalClose" type="button" aria-label="Đóng">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p class="modal-section-label">Phạm vi</p>
+            <label class="option is-selected">
+                <input type="radio" name="scope" value="all" checked>
+                <span class="option-icon"><i class="fas fa-hard-drive"></i></span><span class="option-copy">
+                    <b>Toàn bộ Drive</b>
+                    <p id="allScopeDescription">Thu hồi mọi liên kết công khai trên toàn Drive (0 file).</p>
+                </span>
+            </label>
+            <label class="option">
+                <input type="radio" name="scope" value="folder">
+                <span class="option-icon option-icon--folder"><i class="fas fa-folder"></i></span><span class="option-copy">
+                    <b>Theo thư mục cụ thể</b>
+                    <p>Chỉ thu hồi trong thư mục bạn chọn</p>
+                </span>
+            </label>
+            <div id="folderScopeFields" class="scope-fields hidden"><p class="modal-section-label">Chọn thư mục</p><div class="folder-selector"><button id="folderScopeSelect" class="folder-selector-button" type="button" aria-expanded="false" data-folder-id=""><span>Chọn thư mục</span><i class="fas fa-chevron-down"></i></button><div id="folderScopeMenu" class="folder-selector-menu hidden" role="listbox"></div></div><p id="folderScopeValidation" class="scope-validation hidden"></p></div>
+            <label class="option">
+                <input type="radio" name="scope" value="email">
+                <span class="option-icon"><i class="fas fa-envelope"></i></span><span class="option-copy">
+                    <b>Theo danh sách email</b>
+                    <p>Gỡ quyền của những email cụ thể khỏi tất cả file.</p>
+                </span>
+            </label>
+            <div id="emailScopeFields" class="scope-fields hidden"><p class="modal-section-label">Danh sách email (mỗi dòng 1 email)</p><textarea id="emailScopeInput" class="email-scope-input" placeholder="external.client@gmail.com&#10;partner@abc.vn" autocomplete="off"></textarea><p id="emailScopeValidation" class="scope-validation hidden"></p></div>
+            <div class="warning-box"><i class="fas fa-triangle-exclamation"></i><span>File sẽ chuyển về riêng tư. Người đang có liên kết sẽ mất quyền truy cập ngay lập tức.</span></div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel" id="bulkModalCancel">Hủy</button>
+            <button class="btn-danger" id="btnConfirmRevoke">Thu hồi quyền</button>
+        </div>
+    </div>
+</div>
+
+<div class="profile-dropdown" id="profileMenu">
+    <div class="profile-header">
+        <div class="avatar"></div>
+        <div class="info">
+            <div class="name"></div>
+            <div class="email"></div>
+            <div class="meta"></div>
+        </div>
+    </div>
+    <hr>
+    <div class="account-list"></div>
+    <hr>
+    <div class="menu-actions">
+        <div class="menu-item" data-profile-action="add-account">&#10133; Th&#234;m t&#224;i khoản kh&#225;c</div>
+        <div class="menu-item" data-profile-action="settings">&#9881; C&#224;i đặt t&#224;i khoản</div>
+        <div class="menu-item" data-profile-action="billing">&#128176; Thanh to&#225;n &amp; g&#243;i</div>
+        <div class="menu-item logout">&#128682; Đăng xuất</div>
+    </div>
+</div>
+<script type="module" src="email-shared.js"></script>
+<script src="sidebar-toggle.js"></script>
+
+</body>
+</html>

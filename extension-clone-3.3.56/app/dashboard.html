@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <!-- ══ WISTORIX CLONE — mock runtime (chỉ có ở bản clone offline) ══ -->
+    <script src="__mock/mock-data.js"></script>
+    <script src="__mock/wistorix-mock.js"></script>
+    <script src="__mock/dev-toolbar.js"></script>
+    <script src="__mock/cta-demo.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wistorix</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="assets/icons/wistorix-icon-128.png">
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+
+<body id="page-top">
+
+<!-- ══ VIEW AUTH — Full-page overlay (no sidebar) ══════════════ -->
+<div id="view-auth" class="auth-overlay" style="display:none;">
+
+    <!-- Auth Header -->
+    <header class="auth-header">
+        <div class="auth-header__brand">
+            <div class="auth-header__icon">
+                <img src="assets/icons/wistorix-icon-white-128.png" alt="Wistorix logo" />
+            </div>
+            <div class="auth-header__text">
+                <span class="auth-header__name">Wistorix</span>
+                <span class="auth-header__tagline">WISDOM × STORAGE</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Auth Card -->
+    <main class="auth-main">
+        <div class="auth-card">
+            <div class="auth-card__icon-wrap">
+                <div class="auth-card__icon">
+                    <i class="fas fa-hdd"></i>
+                </div>
+            </div>
+
+            <h1 class="auth-card__title">
+                Quản lý Drive<br>
+                <span class="auth-card__title-accent">thông minh hơn</span>
+            </h1>
+
+            <p class="auth-card__desc">
+                Phát hiện file rủi ro, trùng lặp và dung lượng lãng phí
+                trong Google Drive — chỉ trong 60 giây.
+            </p>
+
+            <div class="auth-card__features">
+                <span class="auth-feature"><i class="fas fa-search"></i> Quét toàn bộ Drive</span>
+                <span class="auth-feature"><i class="fas fa-shield-alt"></i> Phát hiện rủi ro</span>
+                <span class="auth-feature"><i class="fas fa-bolt"></i> Xử lý 1 click</span>
+                <span class="auth-feature"><i class="fas fa-lock"></i> Không đọc nội dung</span>
+            </div>
+
+            <button class="auth-card__btn" id="btn-google-auth">
+                <svg class="auth-card__google-icon" viewBox="0 0 24 24" width="20" height="20">
+                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
+                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                </svg>
+                <span>Tiếp tục với Google</span>
+            </button>
+
+            <p class="auth-card__privacy">
+                Chỉ đọc metadata · Không lưu nội dung · <a href="#" class="auth-card__link">Chính sách bảo mật</a>
+            </p>
+        </div>
+    </main>
+
+    <!-- Auth Footer -->
+    <footer class="auth-footer">
+        <span class="auth-footer__copy">© 2026 Wistorix · v3.3</span>
+        <div class="auth-footer__links">
+            <a href="#" class="auth-footer__link">Chính sách bảo mật</a>
+            <a href="#" class="auth-footer__link">Hỗ trợ</a>
+        </div>
+    </footer>
+</div>
+
+<div id="wrapper">
+
+    <!-- ══ SIDEBAR OVERLAY (mobile) ══ -->
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <!-- ══ SIDEBAR ══════════════════════════════════════════════ -->
+    <aside class="wix-sidebar" id="accordionSidebar">
+
+        <div class="sidebar__brand">
+            <div class="sidebar__brand-left">
+                <div class="sidebar__brand-icon">
+                    <img src="assets/icons/wistorix-icon-white-128.png" alt="Wistorix Logo" />
+                </div>
+                <div class="sidebar__brand-info">
+                    <span class="sidebar__brand-text">Wistorix</span>
+                    <span class="sidebar__brand-sub">Chrome Extension v2.0</span>
+                </div>
+            </div>
+            <button class="sb-toggle" id="sidebarCollapseBtn">‹</button>
+        </div>
+
+        <nav class="sidebar__nav">
+            <div class="sidebar__nav-label">MENU</div>
+
+            <a class="sidebar__nav-item sidebar__nav-item--active" href="#/dashboard" data-route="/dashboard">
+                <span class="sidebar__nav-icon"><i class="fas fa-th-large"></i></span>
+                <span class="sidebar__nav-text" data-i18n="nav.dashboard">Dashboard</span>
+            </a>
+
+            <a class="sidebar__nav-item" href="#/mydrive" data-route="/mydrive">
+                <span class="sidebar__nav-icon"><i class="fas fa-folder"></i></span>
+                <span class="sidebar__nav-text">My Drive</span>
+            </a>
+
+            <a class="sidebar__nav-item" href="#/email-shared" data-route="/email-shared">
+                <span class="sidebar__nav-icon"><i class="fas fa-envelope"></i></span>
+                <span class="sidebar__nav-text">Email được chia sẻ</span>
+            </a>
+
+            <a class="sidebar__nav-item" href="#/settings" data-route="/settings">
+                <span class="sidebar__nav-icon"><i class="fas fa-cog"></i></span>
+                <span class="sidebar__nav-text" data-i18n="nav.settings">Cài đặt</span>
+            </a>
+
+        </nav>
+
+        <div class="sidebar__bottom">
+            <a href="#/cleanup" class="sidebar__card" style="display:block;text-decoration:none;" data-route="/cleanup">
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <div class="sidebar__card-title">Lượt dọn dẹp</div>
+                    <div class="sidebar__card-sub" style="margin:0;"></div>
+                </div>
+                <div class="sidebar__progress">
+                    <div class="sidebar__progress-bar" style="width:0%;"></div>
+                </div>
+                <div class="sidebar__card-footnote"></div>
+            </a>
+
+            <a href="#/invite" class="sidebar__card sidebar__card--row" style="text-decoration:none;" data-route="/invite">
+                <div>
+                    <div class="sidebar__card-title">Mời bạn bè</div>
+                    <div class="sidebar__card-sub">Nhận 24 giờ dọn dẹp miễn phí</div>
+                </div>
+                <i class="fas fa-gift sidebar__card-icon"></i>
+            </a>
+
+            <a href="#/upgrade" class="sidebar__card sidebar__card--row" style="text-decoration:none;" data-route="/upgrade">
+                <div>
+                    <div class="sidebar__card-title">Nâng cấp Pro</div>
+                    <div class="sidebar__card-sub">Quét không giới hạn</div>
+                </div>
+                <i class="fas fa-bolt sidebar__card-icon"></i>
+            </a>
+
+            <div class="sidebar__profile">
+                <div class="sidebar__profile-avatar"></div>
+                <div class="sidebar__profile-info">
+                    <div class="sidebar__profile-name"></div>
+                    <div class="sidebar__profile-id"></div>
+                </div>
+                <span class="sidebar__profile-badge"></span>
+                <i class="fas fa-cog sidebar__profile-settings"></i>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ══ CONTENT WRAPPER ══════════════════════════════════════ -->
+    <div id="content-wrapper" class="wix-content-wrapper">
+        <div id="content">
+
+            <!-- ══ VIEW SCAN-START ═══════════════════════════════ -->
+            <div class="wix-view scan-dark-view" id="view-scan-start" style="display:none;">
+                <div class="scan-dark-bg">
+                    <div class="scan-start__content">
+                        <p class="scan-start__subtitle">Kết nối thành công — sẵn sàng quét Drive của bạn</p>
+                        <button class="scan-start__btn" id="btn-scan-start">
+                            <span class="scan-start__btn-glow"></span>
+                            <span class="scan-start__btn-inner">
+                                <i class="fas fa-search scan-start__icon"></i>
+                                <span class="scan-start__btn-text">QUÉT DỮ LIỆU NGAY</span>
+                                <span class="scan-start__btn-meta">~60 giây · An toàn</span>
+                            </span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ══ VIEW SCAN-PROGRESS ════════════════════════════ -->
+            <div class="wix-view scan-dark-view" id="view-scan-progress" style="display:none;">
+                <div class="scan-dark-bg">
+                    <div class="scan-progress__content">
+                        <p class="scan-progress__title">Đang phân tích Google Drive của bạn...</p>
+
+                        <!-- Progress Ring -->
+                        <div class="scan-progress__ring-wrap">
+                            <svg class="scan-progress__ring" viewBox="0 0 200 200">
+                                <circle class="scan-progress__ring-bg" cx="100" cy="100" r="88" />
+                                <circle class="scan-progress__ring-fill" cx="100" cy="100" r="88"
+                                        id="scan-ring-fill" />
+                            </svg>
+                            <div class="scan-progress__ring-label">
+                                <span class="scan-progress__pct" id="scan-pct">0</span>
+                                <span class="scan-progress__pct-unit">% HOÀN THÀNH</span>
+                            </div>
+                        </div>
+
+                        <!-- Statistics Bar -->
+                        <div class="scan-progress__stats">
+                            <div class="scan-stat-card scan-stat-card--red">
+                                <span class="scan-stat-card__value" id="scan-stat-public">0</span>
+                                <span class="scan-stat-card__label">File công khai <i class="fas fa-info-circle" style="opacity:.5;font-size:10px;"></i></span>
+                            </div>
+                            <div class="scan-stat-card scan-stat-card--amber">
+                                <span class="scan-stat-card__value" id="scan-stat-stale">0</span>
+                                <span class="scan-stat-card__label">File 180+ ngày</span>
+                            </div>
+                            <div class="scan-stat-card scan-stat-card--purple">
+                                <span class="scan-stat-card__value" id="scan-stat-dupes">0</span>
+                                <span class="scan-stat-card__label">File trùng lặp</span>
+                            </div>
+                        </div>
+
+                        <!-- File Processing Panel -->
+                        <div class="scan-progress__panel" id="scan-file-panel">
+                            <div class="scan-progress__panel-header">
+                                <span class="scan-progress__panel-dot"></span>
+                                <span>Đang quét metadata...</span>
+                                <span class="scan-progress__counter" id="scan-counter">0 / 0</span>
+                            </div>
+                            <div class="scan-progress__file-list" id="scan-file-list">
+                                <!-- Files will be injected here -->
+                            </div>
+                        </div>
+
+                        <!-- Bottom hint -->
+                        <p class="scan-progress__hint" id="scan-hint"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ══ VIEW SCAN-RESULT ══════════════════════════════ -->
+            <div class="wix-view scan-dark-view" id="view-scan-result" style="display:none;">
+                <div class="scan-dark-bg">
+                    <div class="scan-result__content">
+                        <p class="scan-result__title">Kết quả phân tích · <span id="result-file-count">0</span> files</p>
+
+                        <!-- Risk Ring -->
+                        <div class="scan-result__ring-wrap">
+                            <svg class="scan-result__ring" viewBox="0 0 200 200">
+                                <circle class="scan-result__ring-bg" cx="100" cy="100" r="88" />
+                                <circle class="scan-result__ring-fill" cx="100" cy="100" r="88"
+                                        id="result-ring-fill" />
+                            </svg>
+                            <div class="scan-result__ring-label">
+                                <span class="scan-result__score" id="result-score">—</span>
+                                <span class="scan-result__score-label">RISK SCORE</span>
+                                <span class="scan-result__risk-text" id="result-risk-text">—</span>
+                            </div>
+                        </div>
+
+                        <!-- Summary Badges -->
+                        <div class="scan-result__badges">
+                            <div class="scan-result__badge scan-result__badge--red">
+                                <span class="scan-result__badge-icon"><i class="fas fa-globe"></i></span>
+                                <span class="scan-result__badge-val" id="result-public">0</span>
+                                <span class="scan-result__badge-label">công khai</span>
+                            </div>
+                            <div class="scan-result__badge scan-result__badge--amber">
+                                <span class="scan-result__badge-icon"><i class="fas fa-clock"></i></span>
+                                <span class="scan-result__badge-val" id="result-stale">0</span>
+                                <span class="scan-result__badge-label" id="result-stale-label">cũ 180+ ngày</span>
+                            </div>
+                            <div class="scan-result__badge scan-result__badge--purple">
+                                <span class="scan-result__badge-icon"><i class="fas fa-copy"></i></span>
+                                <span class="scan-result__badge-val" id="result-dupes">0</span>
+                                <span class="scan-result__badge-label">trùng lặp</span>
+                            </div>
+                        </div>
+
+                        <!-- Action Button -->
+                        <button class="scan-result__action" id="btn-view-dashboard">
+                            Xem Dashboard để xử lý →
+                        </button>
+
+                        <p class="scan-result__footer-text">Xử lý xong có thể đạt Risk Score 100 🏆</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ══ VIEW DASHBOARD ════════════════════════════════ -->
+            <div class="wix-view" id="view-dashboard">
+
+                <!-- ── Page Header ── -->
+                <header class="dash-header flex-shrink-0">
+
+                    <div class="dash-header__top">
+                        <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Menu">
+                            <i class="fas fa-bars"></i>
+                        </button>
+                        <div class="dash-header__left">
+                            <h1 class="dash-header__title" data-i18n-html="header.title">Quản lý &amp; Bảo mật Drive</h1>
+                            <p class="dash-header__sub" data-i18n="header.sub">Phân tích và giám sát toàn bộ tệp Google Drive</p>
+                        </div>
+                        <div class="dash-header__actions">
+                            <div class="scan-time-badge" id="scan-time-badge" style="display:none;">
+                                <i class="fas fa-clock"></i>
+                                <span id="scan-time-text" data-i18n="scan.label">Quét lần cuối:</span>
+                                <span id="scan-time-value"></span>
+                                <span class="scan-time-dot">·</span>
+                                <a class="scan-time-rescan" id="btn-rescan" data-i18n="scan.rescan">Quét lại</a>
+                            </div>
+                            <button id="btn-export" class="dash-btn dash-btn--ghost">
+                                <i class="fas fa-chart-bar"></i> <span data-i18n="btn.export">Xuất báo cáo</span>
+                            </button>
+                            <button id="btn-refresh" class="dash-btn dash-btn--primary">
+                                <i class="fas fa-search"></i> <span data-i18n="btn.analyze">Phân tích Drive</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <nav class="dash-header__tabs" id="wix-tabs">
+                        <button class="wix-tab wix-tab--active" data-tab="overview" data-i18n="tab.overview">Tổng quan</button>
+                        <button class="wix-tab" data-tab="filelist" data-i18n="tab.filelist">Phân tích chi tiết</button>
+                    </nav>
+
+                </header>
+
+                <!-- ════════════════════════════════════════════════
+                     TAB 1: TỔNG QUAN
+                     ════════════════════════════════════════════════ -->
+                <div class="wix-tab-panel wix-tab-panel--active" id="tab-overview">
+
+                    <!-- Security Score Card -->
+                    <div class="security-score-card" id="security-score" style="display:none;">
+                        <div class="security-score-inner">
+                            <!-- Left column - main score -->
+                            <div class="security-score-left">
+                                <div class="score-header">
+                                    <i class="fas fa-shield-alt"></i>
+                                    <span>ĐIỂM BẢO MẬT DRIVE</span>
+                                </div>
+                                <div class="score-body">
+                                    <div class="score-value">
+                                        <span class="score-number" id="security-score-value">0</span>
+                                        <span class="score-max">/100</span>
+                                    </div>
+                                    <span class="score-status" id="security-score-status">—</span>
+                                </div>
+                                <div class="score-bar">
+                                    <div class="score-bar-track">
+                                        <div class="score-bar-fill" id="security-meter-fill" style="width:0%"></div>
+                                        <div class="score-bar-dot" id="security-meter-dot" style="left:0%"></div>
+                                    </div>
+                                    <div class="score-bar-labels">
+                                        <span>0 · Rủi ro cao</span>
+                                        <span>50</span>
+                                        <span>100 · An toàn</span>
+                                    </div>
+                                </div>
+                                <p class="score-desc" id="security-score-desc"></p>
+                                <button class="score-link" id="security-score-how">Cách tính điểm này →</button>
+                            </div>
+                            <!-- Right column - deductions -->
+                            <div class="security-score-right">
+                                <div class="deductions-header">ĐIỂM ĐANG BỊ TRỪ</div>
+                                <div class="deductions-list" id="deductions-list">
+                                    <div class="deduction-item">
+                                        <span class="deduction-dot deduction-dot--red"></span>
+                                        <span class="deduction-label">Công khai</span>
+                                        <span class="deduction-points" id="deduction-public">0</span>
+                                    </div>
+                                    <div class="deduction-item">
+                                        <span class="deduction-dot deduction-dot--cyan"></span>
+                                        <span class="deduction-label">Chia sẻ ngoài tổ chức</span>
+                                        <span class="deduction-points" id="deduction-external">0</span>
+                                    </div>
+                                    <div class="deduction-item">
+                                        <span class="deduction-dot deduction-dot--orange"></span>
+                                        <span class="deduction-label">Cũ 180+ ngày</span>
+                                        <span class="deduction-points" id="deduction-stale">0</span>
+                                    </div>
+                                    <div class="deduction-item">
+                                        <span class="deduction-dot deduction-dot--gray"></span>
+                                        <span class="deduction-label">Rác · mồ côi · ngoài thư mục</span>
+                                        <span class="deduction-points" id="deduction-other">0</span>
+                                    </div>
+                                    <div class="deduction-item">
+                                        <span class="deduction-dot deduction-dot--purple"></span>
+                                        <span class="deduction-label">Trùng lặp</span>
+                                        <span class="deduction-points" id="deduction-dupes">0</span>
+                                    </div>
+                                </div>
+                                <button class="deductions-btn" id="deductions-fix-btn">
+                                    <i class="fas fa-bolt"></i> Xử lý hết → +<span id="deductions-total">28</span> điểm
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CẦN XỬ LÝ — Section Label -->
+                    <div class="section-label">
+                        <div class="section-dot section-dot--red"></div>
+                        <strong>CẦN XỬ LÝ</strong>
+                        <span class="section-label__count" id="risk-issue-summary"></span>
+                    </div>
+
+                    <!-- Issue Cards ×3 -->
+                    <div class="issue-cards" id="risk-cards">
+                        <!-- Public -->
+                        <div class="issue-card" id="risk-card-public" data-panel-type="public">
+                            <div class="issue-card-top">
+                                <div class="issue-card-icon issue-card-icon--red"><i class="fas fa-globe"></i></div>
+                                <span class="issue-card-badge issue-card-badge--red" id="risk-badge-public">
+                                    <i class="fas fa-exclamation-triangle"></i> <span>Rủi ro cao</span>
+                                </span>
+                            </div>
+                            <div class="issue-card-main">
+                                <div class="issue-card-value issue-card-value--red" id="risk-val-public">0</div>
+                                <div class="issue-card-label" id="risk-label-public">Công khai</div>
+                            </div>
+                            <div class="issue-card-progress">
+                                <div class="issue-progress-circle" id="progress-public">
+                                    <svg viewBox="0 0 36 36">
+                                        <path class="progress-circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                                        <path class="progress-circle-fill progress-circle-fill--red" id="progress-public-fill" stroke-dasharray="78, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                                        <text x="18" y="20.5" class="progress-circle-text" id="progress-public-text">78%</text>
+                                    </svg>
+                                </div>
+                            </div>
+                            <button class="issue-card-btn issue-card-btn--red risk-action-btn" data-action-type="public">
+                                <i class="fas fa-shield-alt"></i> Thu hồi quyền
+                            </button>
+                        </div>
+                        <!-- Stale -->
+                        <div class="issue-card" id="risk-card-stale" data-panel-type="stale">
+                            <div class="issue-card-top">
+                                <div class="issue-card-icon issue-card-icon--orange"><i class="fas fa-clock"></i></div>
+                                <span class="issue-card-badge issue-card-badge--orange" id="risk-badge-stale">
+                                    <i class="fas fa-exclamation-triangle"></i> <span>Cần xem lại</span>
+                                </span>
+                            </div>
+                            <div class="issue-card-main">
+                                <div class="issue-card-value issue-card-value--orange" id="risk-val-stale">0</div>
+                                <div class="issue-card-label" id="risk-label-stale">Cũ 180+ ngày</div>
+                            </div>
+                            <div class="issue-card-progress">
+                                <div class="issue-progress-circle" id="progress-stale">
+                                    <svg viewBox="0 0 36 36">
+                                        <path class="progress-circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                                        <path class="progress-circle-fill progress-circle-fill--orange" id="progress-stale-fill" stroke-dasharray="47, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                                        <text x="18" y="20.5" class="progress-circle-text" id="progress-stale-text">47%</text>
+                                    </svg>
+                                </div>
+                            </div>
+                            <button class="issue-card-btn issue-card-btn--orange risk-action-btn" data-action-type="stale">
+                                <i class="fas fa-broom"></i> Dọn dẹp
+                            </button>
+                        </div>
+                        <!-- Dupes -->
+                        <div class="issue-card" id="risk-card-dupes" data-panel-type="dupes">
+                            <div class="issue-card-top">
+                                <div class="issue-card-icon issue-card-icon--purple"><i class="fas fa-copy"></i></div>
+                                <span class="issue-card-badge issue-card-badge--purple" id="risk-badge-dupes">
+                                    <i class="fas fa-exclamation-triangle"></i> <span>Lãng phí</span>
+                                </span>
+                            </div>
+                            <div class="issue-card-main">
+                                <div class="issue-card-value issue-card-value--purple" id="risk-val-dupes">0</div>
+                                <div class="issue-card-label" id="risk-label-dupes">Trùng lặp</div>
+                            </div>
+                            <div class="issue-card-progress">
+                                <div class="issue-progress-circle" id="progress-dupes">
+                                    <svg viewBox="0 0 36 36">
+                                        <path class="progress-circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                                        <path class="progress-circle-fill progress-circle-fill--purple" id="progress-dupes-fill" stroke-dasharray="16, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                                        <text x="18" y="20.5" class="progress-circle-text" id="progress-dupes-text">16%</text>
+                                    </svg>
+                                </div>
+                            </div>
+                            <button class="issue-card-btn issue-card-btn--purple risk-action-btn" data-action-type="dupes">
+                                <i class="fas fa-trash"></i> Xóa bản sao
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- THÔNG TIN DRIVE — Section Label -->
+                    <div class="section-label section-label--blue">
+                        <i class="fas fa-chart-pie"></i>
+                        <strong>THÔNG TIN DRIVE</strong>
+                    </div>
+
+                    <!-- Row 1 -->
+                    <div class="info-cards" id="drive-info-grid">
+                        <!-- Total files -->
+                        <div class="info-card" data-panel-type="all">
+                            <div class="info-card-icon info-card-icon--blue"><i class="fas fa-copy"></i></div>
+                            <span class="info-card-badge info-card-badge--green" id="info-badge-total">
+                                <i class="fas fa-check"></i> <span>Bình thường</span>
+                            </span>
+                            <div class="info-card-value info-card-value--blue" id="stat-total-files">0</div>
+                            <div class="info-card-label">Tổng số files</div>
+                            <div class="info-card-desc">Tổng số file hiện có trong Google Drive</div>
+                        </div>
+                        <!-- Storage -->
+                        <div class="info-card" data-panel-type="storage">
+                            <div class="info-card-icon info-card-icon--purple"><i class="fas fa-database"></i></div>
+                            <div class="info-card-value" id="stat-potential-save">—</div>
+                            <div class="info-card-label">Dung lượng đã dùng</div>
+                            <div class="storage-bar-wrap" id="storage-bar-wrap">
+                                <div class="storage-bar-bg"><div class="storage-bar-fill" id="storage-bar-fill"></div></div>
+                            </div>
+                            <div id="storage-text" class="info-card-desc"></div>
+                        </div>
+                        <!-- Files ngoài thư mục -->
+                        <div class="info-card" data-panel-type="issues">
+                            <div class="info-card-icon info-card-icon--orange"><i class="fas fa-folder-open"></i></div>
+                            <div class="info-card-value info-card-value--orange" id="stat-issues-count">0</div>
+                            <div class="info-card-label">Files ngoài thư mục</div>
+                            <div class="info-card-desc">Các files dữ liệu đơn lẻ chưa được sắp xếp vào bất kỳ thư mục nào.</div>
+                        </div>
+                    </div>
+
+                    <!-- Row 2 -->
+                    <div class="info-cards" id="drive-info-grid-2">
+                        <!-- Empty files/folders -->
+                        <div class="info-card" data-panel-type="empty">
+                            <div class="info-card-icon info-card-icon--blue2"><i class="fas fa-file-alt"></i></div>
+                            <div class="info-card-value info-card-value--blue" id="stat-empty-folders">0</div>
+                            <div class="info-card-label">Files / Folder rỗng</div>
+                            <div class="info-card-desc">Không chứa dữ liệu hoặc kích thước 0 byte</div>
+                        </div>
+                        <!-- Orphan -->
+                        <div class="info-card" data-panel-type="orphan">
+                            <div class="info-card-icon info-card-icon--orange2"><i class="fas fa-exclamation-triangle"></i></div>
+                            <span class="info-card-badge info-card-badge--green" id="info-badge-orphan" style="display:none;">
+                                <i class="fas fa-check"></i> <span>Ổn</span>
+                            </span>
+                            <div class="info-card-value info-card-value--red" id="stat-orphan-files">0</div>
+                            <div class="info-card-label">Files mồ côi</div>
+                            <div class="info-card-desc">là files tin mồ côi (orphaned file) do thư mục gốc bị xóa. Chúng không hiển thị ở giao diện chính hay thùng rác nhưng vẫn chiếm dung lượng.</div>
+                            <span class="info-card-no-data" id="orphan-no-data" style="display:none;">Không có dữ liệu</span>
+                        </div>
+                        <!-- Trash -->
+                        <div class="info-card" data-panel-type="trash">
+                            <div class="info-card-icon info-card-icon--red"><i class="fas fa-trash-alt"></i></div>
+                            <span class="info-card-badge info-card-badge--green" id="info-badge-trash" style="display:none;">
+                                <i class="fas fa-check"></i> <span>Ổn</span>
+                            </span>
+                            <div class="info-card-value info-card-value--red" id="stat-trash-files">0</div>
+                            <div class="info-card-label">Files trong thùng rác</div>
+                            <div class="info-card-desc">Có thể xóa vĩnh viễn để giải phóng dung lượng</div>
+                            <span class="info-card-no-data" id="trash-no-data" style="display:none;">Không có dữ liệu</span>
+                        </div>
+                    </div>
+
+                    <!-- PHÂN TÍCH — Section Label -->
+                    <div class="section-label section-label--blue">
+                        <i class="fas fa-chart-bar"></i>
+                        <strong>PHÂN TÍCH</strong>
+                        <span class="section-label__sub">Cơ cấu file & dung lượng Drive</span>
+                    </div>
+
+                    <!-- Chart Grid -->
+                    <div class="chart-grid" id="chart-grid">
+                        <!-- Chart 1: By count -->
+                        <div class="chart-card">
+                            <div class="chart-card-header">Phân loại theo số lượng</div>
+                            <div class="chart-card-body">
+                                <div class="chart-donut-wrap">
+                                    <canvas id="chart-count" width="160" height="160"></canvas>
+                                    <div class="chart-donut-center">
+                                        <span class="chart-donut-center-value" id="chart-count-total">104</span>
+                                        <span class="chart-donut-center-label">Tổng file</span>
+                                    </div>
+                                </div>
+                                <div class="chart-legend" id="legend-count"></div>
+                            </div>
+                        </div>
+                        <!-- Chart 2: By size -->
+                        <div class="chart-card">
+                            <div class="chart-card-header">Phân loại theo dung lượng</div>
+                            <div class="chart-card-body">
+                                <div class="chart-donut-wrap">
+                                    <canvas id="chart-size" width="160" height="160"></canvas>
+                                    <div class="chart-donut-center">
+                                        <span class="chart-donut-center-value" id="chart-size-total">21.95</span>
+                                        <span class="chart-donut-center-label">GB đã dùng</span>
+                                    </div>
+                                </div>
+                                <div class="chart-legend" id="legend-size"></div>
+                            </div>
+                        </div>
+                        <!-- Chart 3: My vs Shared -->
+                        <div class="chart-card">
+                            <div class="chart-card-header">
+                                Dung lượng: của tôi vs của người khác chia sẻ
+                                <i class="fas fa-info-circle chart-info-icon" title="Dung lượng file bạn sở hữu vs file người khác chia sẻ"></i>
+                            </div>
+                            <div class="chart-card-body">
+                                <div class="chart-donut-wrap">
+                                    <canvas id="chart-ownership" width="160" height="160"></canvas>
+                                    <div class="chart-donut-center">
+                                        <span class="chart-donut-center-value" id="chart-ownership-total">21.95</span>
+                                        <span class="chart-donut-center-label">GB tổng</span>
+                                    </div>
+                                </div>
+                                <div class="chart-legend" id="legend-ownership"></div>
+                            </div>
+                        </div>
+                        <!-- Chart 4: By share type -->
+                        <div class="chart-card">
+                            <div class="chart-card-header">Phân loại theo kiểu chia sẻ (My Drive)</div>
+                            <div class="chart-card-body">
+                                <div class="chart-donut-wrap">
+                                    <canvas id="chart-sharing" width="160" height="160"></canvas>
+                                    <div class="chart-donut-center">
+                                        <span class="chart-donut-center-value" id="chart-sharing-total">104</span>
+                                        <span class="chart-donut-center-label">Tổng file</span>
+                                    </div>
+                                </div>
+                                <div class="chart-legend" id="legend-sharing"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <!-- ── END TAB TỔNG QUAN ── -->
+
+                <!-- ════════════════════════════════════════════════
+                     TAB 2: PHÂN TÍCH CHI TIẾT
+                     ════════════════════════════════════════════════ -->
+                <div class="wix-tab-panel" id="tab-filelist" style="display:none;">
+
+                    <div class="wix-filter-bar flex-shrink-0">
+                        <div class="wix-search-wrap">
+                            <i class="fas fa-search wix-search-icon"></i>
+                            <label for="search-input" class="sr-only">Tìm kiếm file</label>
+                            <input type="text" id="search-input" class="wix-search-input" placeholder="Tìm kiếm file theo tên, đường dẫn..." autocomplete="off">
+                        </div>
+                        <div class="wix-chip-groups" id="chip-groups">
+                            <div class="wix-chip-group">
+                                <span class="wix-chip-group__label">TRẠNG THÁI</span>
+                                <div class="wix-chip-row">
+                                    <button class="wix-chip" data-group="status" data-val="public">Công khai</button>
+                                    <button class="wix-chip" data-group="status" data-val="private">Riêng tư</button>
+                                    <button class="wix-chip" data-group="status" data-val="internal">Nội bộ</button>
+                                    <button class="wix-chip" data-group="status" data-val="shared">Shared</button>
+                                </div>
+                            </div>
+                            <div class="wix-chip-group">
+                                <span class="wix-chip-group__label">LOẠI FILE</span>
+                                <div class="wix-chip-row">
+                                    <button class="wix-chip" data-group="type" data-val="image">Ảnh</button>
+                                    <button class="wix-chip" data-group="type" data-val="video">Video</button>
+                                    <button class="wix-chip" data-group="type" data-val="pdf">PDF</button>
+                                    <button class="wix-chip" data-group="type" data-val="document">Docs</button>
+                                    <button class="wix-chip" data-group="type" data-val="zip">Zip</button>
+                                </div>
+                            </div>
+                            <div class="wix-chip-group">
+                                <span class="wix-chip-group__label">KÍCH THƯỚC</span>
+                                <div class="wix-chip-row">
+                                    <button class="wix-chip" data-group="size" data-val="lt10">&lt; 10MB</button>
+                                    <button class="wix-chip" data-group="size" data-val="10to100">10-100MB</button>
+                                    <button class="wix-chip" data-group="size" data-val="gt100">&gt; 100MB</button>
+                                </div>
+                            </div>
+                            <div class="wix-chip-group">
+                                <span class="wix-chip-group__label">FILE ÍT DÙNG</span>
+                                <div class="wix-chip-row">
+                                    <button class="wix-chip" data-group="time" data-val="90">90 ngày</button>
+                                    <button class="wix-chip" data-group="time" data-val="180">180 ngày</button>
+                                    <button class="wix-chip" data-group="time" data-val="365">1 năm</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="wix-card col-table-full">
+                        <div class="wix-card__header">
+                            <div class="wix-card__title-group">
+                                <h6 class="wix-card__title">Danh sách tệp tin</h6>
+                                <span id="list-status" class="wix-badge wix-badge--info">0 file</span>
+                            </div>
+                            <div class="wix-card__controls">
+                                <label for="file-type-filter" class="sr-only">Loại file</label>
+                                <select id="file-type-filter" class="wix-select">
+                                    <option value="">Tất cả loại</option>
+                                    <option value="image">Hình ảnh</option>
+                                    <option value="video">Video</option>
+                                    <option value="audio">Audio</option>
+                                    <option value="document">Tài liệu</option>
+                                    <option value="spreadsheet">Bảng tính</option>
+                                    <option value="presentation">Trình chiếu</option>
+                                    <option value="pdf">PDF</option>
+                                    <option value="zip">File nén</option>
+                                    <option value="folder">Thư mục</option>
+                                </select>
+                                <div class="quick-filter-control">
+                                    <button id="btn-reset-filters" class="wix-btn wix-btn--ghost wix-btn--sm" aria-expanded="false" aria-controls="quick-filter-menu">
+                                        <i class="fas fa-filter"></i> <span>Tất cả</span>
+                                    </button>
+                                    <div id="quick-filter-menu" class="quick-filter-menu" hidden>
+                                        <button type="button" data-quick-filter="">Tất cả</button>
+                                        <button type="button" data-quick-filter="public">Công khai</button>
+                                        <button type="button" data-quick-filter="private">Riêng tư</button>
+                                        <button type="button" data-quick-filter="internal">Nội bộ</button>
+                                        <button type="button" data-quick-filter="shared">Shared</button>
+                                        <button type="button" data-quick-filter="stale">File cũ</button>
+                                        <button type="button" data-quick-filter="dupes">File trùng lặp</button>
+                                        <button type="button" data-quick-filter="empty">File rỗng</button>
+                                        <button type="button" data-quick-filter="trash">Thùng rác</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="wix-card__body wix-card__body--table">
+                            <div class="table-responsive" id="table-wrapper">
+                                <table class="wix-table" id="issues-table" cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                            <th class="th-chk"><input type="checkbox" id="chk-all" class="wix-chk"></th>
+                                            <th class="th-name">TÊN FILE <i class="fas fa-sort sort-icon"></i></th>
+                                            <th class="th-path">ĐƯỜNG DẪN</th>
+                                            <th class="th-status">TRẠNG THÁI</th>
+                                            <th class="th-owner">CHỦ SỞ HỮU</th>
+                                            <th class="th-shared">CHIA SẺ</th>
+                                            <th class="th-size" data-analysis-sort="size">KÍCH THƯỚC <i class="fas fa-sort sort-icon"></i></th>
+                                            <th class="th-date" data-analysis-sort="createdTime">NGÀY TẠO <i class="fas fa-sort-down sort-icon sort-icon--active"></i></th>
+                                            <th class="th-date" data-analysis-sort="modifiedTime">NGÀY SỬA <i class="fas fa-sort sort-icon"></i></th>
+                                            <th class="th-actions">HÀNH ĐỘNG</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="issues-tbody"></tbody>
+                                </table>
+
+                                <div id="empty-state" class="wix-empty-state" style="display:none;">
+                                    <div id="empty-illustration" style="max-width:200px;margin:0 auto;"></div>
+                                    <img id="empty-img" style="width:180px;margin:auto;display:none;" />
+                                    <div id="empty-text" class="wix-empty-state__text">
+                                        Bấm <strong>Phân tích Drive</strong> để bắt đầu
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- ── END TAB PHÂN TÍCH CHI TIẾT ── -->
+
+            </div>
+            <!-- ══ END VIEW DASHBOARD ════════════════════════════ -->
+
+            <!-- ══ SIDE PANEL DRAWER ═════════════════════════════ -->
+            <div id="side-panel-overlay" class="side-panel-overlay" style="display:none;"></div>
+            <div id="side-panel" class="side-panel" aria-hidden="true" role="dialog" aria-modal="true" tabindex="-1">
+                <div class="side-panel__header">
+                    <div class="side-panel__header-left">
+                        <div class="panel-folder-icon" aria-hidden="true"><i class="fas fa-folder"></i></div>
+                        <div class="panel-header-text">
+                            <span class="side-panel__meta" data-i18n="panel.selected">Danh mục đã chọn</span>
+                            <h3 class="side-panel__title" id="panel-title">—</h3>
+                            <p class="side-panel__count" id="panel-count">0</p>
+                        </div>
+                    </div>
+                    <button class="side-panel__close" id="panel-close" aria-label="Đóng">&times;</button>
+                </div>
+
+                <div class="side-panel__body" id="panel-body">
+                    <!-- Category breakdown -->
+                    <div class="side-panel__section">
+                        <h4 class="side-panel__section-title" data-i18n="panel.breakdown">PHÂN LOẠI</h4>
+                        <div id="panel-breakdown" class="panel-hbar-list"></div>
+                    </div>
+
+                    <!-- Sample files -->
+                    <div class="side-panel__section">
+                        <h4 class="side-panel__section-title" data-i18n="panel.sampleFiles">FILE TIÊU BIỂU</h4>
+                        <div id="panel-sample-files" class="panel-sample-files"></div>
+                    </div>
+                </div>
+
+                <div class="side-panel__footer">
+                    <button class="side-panel__view-all" id="panel-view-all">
+                        <span data-i18n="panel.viewAll">Xem tất cả</span> <span id="panel-view-all-count"></span> →
+                    </button>
+                </div>
+            </div>
+
+            <!-- ══ APP CONTENT (Fragment Router mount point) ═════ -->
+            <div id="app-content" style="display:none;flex-direction:column;flex:1;min-height:0;overflow:hidden;"></div>
+
+        </div>
+    </div>
+</div>
+
+<!-- ══ DOWNLOAD MODAL ════════════════════════════════════════ -->
+<div id="download-modal" class="wix-modal-overlay" style="display:none;">
+    <div class="wix-modal">
+        <h4 class="wix-modal__title"><i class="fas fa-bolt" style="color:#1cc88a;"></i> <span data-i18n="dl.title">Tải an toàn</span></h4>
+        <p class="wix-modal__filename">File: <strong id="dl-filename">...</strong></p>
+        <div id="dl-status-text" class="wix-modal__status"></div>
+        <div class="wix-progress"><div id="dl-progress-bar" class="wix-progress__bar" style="width:0%;">0%</div></div>
+        <div class="wix-modal__meta">
+            <span><span data-i18n="dl.downloaded">Đã tải:</span> <strong id="dl-stats">0 / 0</strong></span>
+            <span><span data-i18n="dl.threads">Luồng:</span> <strong id="dl-threads">0</strong></span>
+        </div>
+        <div id="dl-error-msg" class="wix-modal__error"></div>
+        <div style="text-align:right; margin-top:16px;">
+            <button id="btn-cancel-download" class="wix-btn wix-btn--danger-ghost wix-btn--sm">
+                <i class="fas fa-times"></i> <span data-i18n="dl.cancel">Hủy tải</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ══ SHARE MODAL ═══════════════════════════════════════════ -->
+<div id="shareDetailModal" class="modal-overlay" style="display:none;">
+    <div class="wix-modal wix-modal--share">
+        <span class="close-modal" id="btnCloseModal">&times;</span>
+        <h3 id="modalFileName" class="wix-modal__share-title" data-i18n="modal.title.noFile">Tên file</h3>
+        <div id="modalRiskBadge"></div>
+        <div id="modalRiskAdvice"></div>
+        <hr class="wix-modal__divider">
+        <div id="ownerSection" style="margin-bottom:16px; display:none;">
+            <p class="wix-modal__section-label" data-i18n="modal.owner.label">👑 Chủ sở hữu:</p>
+            <div id="ownerInfo" style="display:flex; align-items:center; gap:10px;"></div>
+        </div>
+        <div id="sharedWithSection">
+            <p class="wix-modal__section-label">
+                <span data-i18n="modal.sharedWith">👥 Đang chia sẻ với</span>
+                (<span id="sharedCount">0</span> <span data-i18n="modal.sharedUnit">người/nhóm</span>):
+            </p>
+            <ul id="sharedList" class="wix-shared-list"></ul>
+        </div>
+    </div>
+</div>
+
+<!-- ══ CONFIRM MODAL ═════════════════════════════════════════ -->
+<div id="confirm-modal" class="wix-modal-overlay" style="display:none;">
+    <div class="wix-modal">
+        <h4 class="wix-modal__title">
+            <i class="fas fa-exclamation-triangle" style="color:#e74a3b;"></i>
+            <span data-i18n="confirm.title">Xác nhận hành động</span>
+        </h4>
+        <p id="confirm-message" class="wix-modal__confirm-msg" data-i18n="confirm.default">Bạn có chắc muốn thực hiện hành động này?</p>
+        <div style="text-align:right; margin-top:16px; display:flex; gap:8px; justify-content:flex-end;">
+            <button id="btn-confirm-cancel" class="wix-btn wix-btn--ghost wix-btn--sm" data-i18n="confirm.cancel">Hủy</button>
+            <button id="btn-confirm-ok" class="wix-btn wix-btn--danger wix-btn--sm" data-i18n="confirm.ok">Xác nhận</button>
+        </div>
+    </div>
+</div>
+
+<!-- ══ BULK ACTION BAR ════════════════════════════════════════ -->
+<div id="bulk-action-bar" class="bulk-bar" role="toolbar" aria-label="Bulk actions">
+    <span class="bulk-bar__count" id="bulk-count">0 file đã chọn</span>
+    <div class="bulk-bar__actions">
+        <button id="bulk-btn-download" class="bulk-bar__btn bulk-bar__btn--primary">
+            <i class="fas fa-download"></i> <span data-i18n="bulk.download">Tải xuống</span>
+        </button>
+        <button id="bulk-btn-revoke" class="bulk-bar__btn bulk-bar__btn--warning">
+            <i class="fas fa-shield-alt"></i> <span>Ngừng chia sẻ</span>
+        </button>
+        <button id="bulk-btn-transfer" class="bulk-bar__btn bulk-bar__btn--primary">
+            <i class="fas fa-exchange-alt"></i> <span>Chuyển sở hữu</span>
+        </button>
+        <button id="bulk-btn-request-ownership" class="bulk-bar__btn bulk-bar__btn--warning">
+            <i class="fas fa-hand-paper"></i> <span>Yêu cầu sở hữu</span>
+        </button>
+        <button id="bulk-btn-delete" class="bulk-bar__btn bulk-bar__btn--danger">
+            <i class="fas fa-trash"></i> <span>Vào thùng rác</span>
+        </button>
+        <button id="bulk-btn-deselect" class="bulk-bar__btn bulk-bar__btn--ghost">
+            <i class="fas fa-times"></i> <span data-i18n="bulk.deselect">Bỏ chọn</span>
+        </button>
+    </div>
+</div>
+
+<!-- ══ FILE PREVIEW SIDEBAR ═══════════════════════════════ -->
+<div id="filePreview" class="preview-sidebar">
+    <div class="preview-header">
+        <div class="preview-header-top">
+            <div class="preview-header-icon"><i class="fas fa-eye"></i></div>
+            <div class="preview-header-text">
+                <div class="preview-header-title">Xem trước tệp</div>
+                <div class="preview-header-name" id="previewFileName">—</div>
+            </div>
+            <button class="preview-close" id="previewClose">&times;</button>
+        </div>
+    </div>
+    <div class="preview-hero" id="previewArea" data-preview-state="idle">
+        <div class="preview-hero-icon" id="previewHeroIcon"><i class="fas fa-file"></i></div>
+        <div class="preview-hero-name" id="previewHeroName">—</div>
+        <span class="preview-hero-badge" id="previewHeroBadge">Loại tệp này chưa hỗ trợ xem nhanh</span>
+        <div class="quick-preview-content" id="previewContent" hidden></div>
+    </div>
+    <div class="preview-body">
+        <div class="preview-info">
+            <div class="preview-info-row">
+                <span class="preview-info-label">Đường dẫn</span>
+                <span class="preview-info-value" id="previewPath">—</span>
+            </div>
+            <div class="preview-info-row">
+                <span class="preview-info-label">Trạng thái</span>
+                <span class="preview-info-value" id="previewStatus">—</span>
+            </div>
+            <div class="preview-info-row">
+                <span class="preview-info-label">Chủ sở hữu</span>
+                <span class="preview-info-value" id="previewOwner">—</span>
+            </div>
+            <div class="preview-info-row">
+                <span class="preview-info-label">Chia sẻ với</span>
+                <span class="preview-info-value" id="previewShared">—</span>
+            </div>
+            <div class="preview-info-row">
+                <span class="preview-info-label">Kích thước</span>
+                <span class="preview-info-value" id="previewSize">—</span>
+            </div>
+            <div class="preview-info-row">
+                <span class="preview-info-label">Ngày sửa</span>
+                <span class="preview-info-value" id="previewCreated">—</span>
+            </div>
+            <div class="preview-info-row">
+                <span class="preview-info-label">Ngày tạo</span>
+                <span class="preview-info-value" id="previewModified">—</span>
+            </div>
+        </div>
+    </div>
+    <div class="preview-actions">
+        <button class="preview-btn preview-btn--primary" id="btnOpenDrive">
+            <i class="fas fa-external-link-alt"></i> Mở trên Drive
+        </button>
+        <button class="preview-btn preview-btn--danger" id="btnDeleteFile">
+            <i class="fas fa-trash"></i> Xóa tệp
+        </button>
+    </div>
+</div>
+<div id="previewOverlay" class="preview-overlay"></div>
+
+<!-- ══ SHARE DETAIL MODAL V2 ═══════════════════════════════════ -->
+<div id="shareDetailModalV2" class="wix-modal-overlay" style="display:none;">
+    <div class="wix-modal wix-modal--share-v2">
+        <div class="wix-modal__header">
+            <div class="wix-modal__header-left">
+                <div class="wix-modal__header-icon"><i class="fas fa-share-alt"></i></div>
+                <div>
+                    <h3 class="wix-modal__title">Đang chia sẻ với</h3>
+                    <p class="wix-modal__subtitle" id="share-modal-filename">—</p>
+                </div>
+            </div>
+            <button class="wix-modal__close" id="btnCloseShareModalV2">&times;</button>
+        </div>
+        <div class="wix-modal__body">
+            <div id="share-permissions-list"></div>
+        </div>
+        <div class="wix-modal__footer">
+            <button class="wix-btn wix-btn--ghost wix-btn--sm" id="btnCloseShareModalFooter">Đóng</button>
+            <button class="wix-btn wix-btn--danger wix-btn--sm" id="btnRevokeAllShare">
+                <i class="fas fa-lock"></i> Thu hồi tất cả
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ══ DUPLICATE MODAL ════════════════════════════════════════ -->
+<div id="duplicateModal" class="wix-modal-overlay" style="display:none;">
+    <div class="wix-modal wix-modal--duplicate">
+        <div class="wix-modal__header">
+            <div class="wix-modal__header-left">
+                <div class="wix-modal__header-icon wix-modal__header-icon--purple"><i class="fas fa-copy"></i></div>
+                <div>
+                    <h3 class="wix-modal__title">So sánh bản trùng</h3>
+                    <p class="wix-modal__subtitle" id="duplicate-modal-subtitle">—</p>
+                </div>
+            </div>
+            <button class="wix-modal__close" id="btnCloseDuplicateModal">&times;</button>
+        </div>
+        <div class="wix-modal__body">
+            <div class="duplicate-alert">
+                <i class="fas fa-info-circle"></i>
+                Đối chiếu theo nội dung & dung lượng (mã băm dữ liệu) — các bản dưới đây trùng khớp 100%, không xét tên file. Giữ 1 bản, xóa các bản còn lại để tiết kiệm dung lượng.
+            </div>
+            <div id="duplicate-cards-list"></div>
+            <div class="duplicate-footer-info">
+                <i class="fas fa-info-circle"></i>
+                Bản bị xóa sẽ chuyển vào Thùng rác của Google Drive — khôi phục được trong ~30 ngày, không xóa vĩnh viễn.
+            </div>
+        </div>
+        <div class="wix-modal__footer">
+            <span class="duplicate-remaining" id="duplicate-remaining">Còn 2 bản · xóa bản thừa, giữ lại bản bạn muốn</span>
+            <button class="wix-btn wix-btn--primary wix-btn--sm" id="btnCloseDuplicateFooter">Xong</button>
+        </div>
+    </div>
+</div>
+
+<script src="dashboard-init.js"></script>
+<div class="profile-dropdown" id="profileMenu">
+    <div class="profile-header">
+        <div class="avatar"></div>
+        <div class="info">
+            <div class="name"></div>
+            <div class="email"></div>
+            <div class="meta"></div>
+        </div>
+    </div>
+    <hr>
+    <div class="account-list"></div>
+    <hr>
+    <div class="menu-actions">
+        <div class="menu-item" data-profile-action="add-account">&#10133; Th&#234;m t&#224;i khoản kh&#225;c</div>
+        <div class="menu-item" data-profile-action="settings">&#9881; C&#224;i đặt t&#224;i khoản</div>
+        <div class="menu-item" data-profile-action="billing">&#128176; Thanh to&#225;n &amp; g&#243;i</div>
+        <div class="menu-item logout">&#128682; Đăng xuất</div>
+    </div>
+</div>
+<script src="sidebar-toggle.js"></script>
+<script src="libs/lottie.min.js"></script>
+<script src="libs/qrcode.min.js"></script>
+<script src="app-state.js"></script>
+<script src="app-router.js"></script>
+<script type="module" src="dashboard.js"></script>
+
+<!-- ══ SCORE HELP MODAL ════════════════════════════════════ -->
+<div class="score-help-overlay" id="scoreHelpOverlay">
+    <div class="score-help-modal" id="scoreHelpModal">
+        <div class="score-help-header">
+            <div class="score-help-header-left">
+                <div class="score-help-header-icon"><i class="fas fa-calculator"></i></div>
+                <div>
+                    <div class="score-help-header-title">Cách tính điểm bảo mật</div>
+                    <div class="score-help-header-sub">Bắt đầu từ 100, mỗi nhóm rủi ro trừ điểm theo trọng số × mức độ.</div>
+                </div>
+            </div>
+            <button class="score-help-close" id="scoreHelpClose">&times;</button>
+        </div>
+        <div class="score-help-body">
+            <div class="score-help-formula">Score = 100 − Σ (Trọng số × Mức độ)</div>
+
+            <!-- Visual bar -->
+            <div class="score-help-visual-bar" id="scoreHelpVisualBar">
+                <div class="svb-segment svb-segment--green" id="svb-remaining" style="flex:60">60</div>
+                <div class="svb-segment svb-segment--red" id="svb-public" style="flex:25">-25</div>
+                <div class="svb-segment svb-segment--orange" id="svb-stale" style="flex:8">-8</div>
+                <div class="svb-segment svb-segment--gray" id="svb-other" style="flex:4">-4</div>
+                <div class="svb-segment svb-segment--purple" id="svb-dupes" style="flex:3">-3</div>
+            </div>
+            <div class="svb-labels">
+                <span>Điểm giữ lại</span>
+                <span>Điểm bị trừ theo từng nhóm</span>
+            </div>
+
+            <!-- Risk table -->
+            <table class="score-help-table" id="scoreHelpTable">
+                <thead>
+                    <tr>
+                        <th>NHÓM RỦI RO</th>
+                        <th>TRỌNG SỐ</th>
+                        <th>MỨC ĐỘ</th>
+                        <th>ĐIỂM TRỪ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="sht-dot sht-dot--red"></span> File công khai<div class="sht-sub">GB công khai / tổng GB · ưu tiên file lớn &amp; quyền chỉnh sửa</div></td>
+                        <td class="sht-num">40</td>
+                        <td class="sht-num" id="sh-level-public">0.00</td>
+                        <td class="sht-num sht-num--red" id="sh-penalty-public">0</td>
+                    </tr>
+                    <tr>
+                        <td><span class="sht-dot sht-dot--cyan"></span> Chia sẻ ngoài tổ chức<div class="sht-sub">Email ngoài tổ chức / tổng lượt chia sẻ</div></td>
+                        <td class="sht-num">20</td>
+                        <td class="sht-num" id="sh-level-external">0.00</td>
+                        <td class="sht-num sht-num--red" id="sh-penalty-external">0</td>
+                    </tr>
+                    <tr>
+                        <td><span class="sht-dot sht-dot--orange"></span> File cũ 180+ ngày<div class="sht-sub">Số file cũ / tổng số file</div></td>
+                        <td class="sht-num">15</td>
+                        <td class="sht-num" id="sh-level-stale">0.00</td>
+                        <td class="sht-num sht-num--orange" id="sh-penalty-stale">0</td>
+                    </tr>
+                    <tr>
+                        <td><span class="sht-dot sht-dot--gray"></span> Rác · mồ côi · ngoài thư mục<div class="sht-sub">Tỉ lệ file rỗng/mồ côi/thùng rác</div></td>
+                        <td class="sht-num">15</td>
+                        <td class="sht-num" id="sh-level-other">0.00</td>
+                        <td class="sht-num sht-num--red" id="sh-penalty-other">0</td>
+                    </tr>
+                    <tr>
+                        <td><span class="sht-dot sht-dot--purple"></span> Trùng lặp<div class="sht-sub">GB lãng phí / tổng GB</div></td>
+                        <td class="sht-num">10</td>
+                        <td class="sht-num" id="sh-level-dupes">0.00</td>
+                        <td class="sht-num sht-num--purple" id="sh-penalty-dupes">0</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Score result -->
+            <div class="score-help-result">
+                <span class="shr-label">Điểm bảo mật Drive</span>
+                <span class="shr-value"><span class="shr-score" id="sh-score">72</span><span class="shr-max">/100</span></span>
+            </div>
+
+            <!-- Info box -->
+            <div class="score-help-info">
+                <i class="fas fa-info-circle"></i>
+                <span>Trọng số phản ánh mức nguy hiểm (công khai cao nhất). Mức độ = tỉ lệ phơi nhiễm đã áp dụng cơ chế giảm dần. File công khai cho phép sửa hoặc chứa nội dung nhạy cảm được nhân hệ số cao hơn. Xử lý xong nhóm nào, điểm tăng đúng phần bị trừ của nhóm đó.</span>
+            </div>
+        </div>
+        <div class="score-help-footer">
+            <button class="shf-btn shf-btn--secondary" id="scoreHelpCloseBtn">Đóng</button>
+            <button class="shf-btn shf-btn--primary" id="scoreHelpFixBtn"><i class="fas fa-bolt"></i> Xử lý để tăng điểm</button>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

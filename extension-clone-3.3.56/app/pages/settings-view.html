@@ -1,0 +1,152 @@
+<!-- settings view fragment -->
+<style>
+    @import url('settings.css');
+    @import url('upgrade.css');
+    .settings-container {
+        width: 100%;
+        padding: 20px 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    /* ── Grid 2 Column ─────────────────────────────── */
+    .grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+
+    .grid-2 .wix-card {
+        padding: 20px;
+    }
+
+    /* ── Save Wrapper ──────────────────────────────── */
+    .save-wrapper {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+    }
+
+    .save-wrapper button {
+        height: 42px;
+        padding: 0 28px;
+        background: linear-gradient(90deg, #0052CD, #0487F1);
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    .save-wrapper button:hover {
+        opacity: 0.92;
+    }
+
+    /* ── Responsive ────────────────────────────────── */
+    @media (max-width: 768px) {
+        .grid-2 {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+        <div class="wix-view" id="view-settings">
+
+            <header class="dash-header flex-shrink-0">
+                <div class="dash-header__top">
+                    <button type="button" class="sidebar-toggle" aria-label="Menu">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="dash-header__left">
+                        <h1 class="dash-header__title">Cài đặt Extension</h1>
+                        <p class="dash-header__sub">Tùy chỉnh hành vi quét và gói dịch vụ</p>
+                    </div>
+                </div>
+            </header>
+
+            <div class="settings-container">
+
+                <!-- TABS -->
+                <div class="settings-tabs" style="margin-bottom:16px;">
+                    <button type="button" class="tab-btn" data-href="upgrade.html">⚡ Thanh toán &amp; Gói dịch vụ</button>
+                    <button type="button" class="tab-btn active" data-href="settings.html">⚙️ Cấu hình chung</button>
+                </div>
+
+                <!-- GRID 2 COLUMNS -->
+                <div class="grid-2">
+                    <div class="wix-card settings-card">
+                        <div class="wix-card__header card-header-clean">
+                            <h6 class="wix-card__title">Cấu hình Quét &amp; Hiển thị</h6>
+                        </div>
+                        <div class="settings-card__body">
+                            <div class="settings-field">
+                                <label class="wix-label" for="select-recent-days-preset">Số ngày tính "Cập nhật gần đây":</label>
+                                <select class="wix-select wix-select--full" id="select-recent-days-preset">
+                                    <option value="30">30 ngày</option>
+                                    <option value="90">90 ngày</option>
+                                    <option value="180" selected>180 ngày</option>
+                                    <option value="365">1 năm</option>
+                                </select>
+                            </div>
+                            <div class="settings-field">
+                                <label class="wix-label" for="select-folder-sort">Sắp xếp cây thư mục theo:</label>
+                                <select class="wix-select wix-select--full" id="select-folder-sort">
+                                    <option value="alpha" selected>Tên (A→Z)</option>
+                                    <option value="size-desc">Dung lượng (Lớn → Nhỏ)</option>
+                                    <option value="size-asc">Dung lượng (Nhỏ → Lớn)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="wix-card settings-card">
+                        <div class="wix-card__header card-header-clean">
+                            <h6 class="wix-card__title">Tự động hóa</h6>
+                        </div>
+                        <div class="settings-card__body">
+                            <div class="wix-toggle-row settings-field">
+                                <div>
+                                    <p class="wix-label m-0">Phân tích Drive tự động</p>
+                                    <p class="settings-description m-0">Tự động quét và gửi cảnh báo</p>
+                                </div>
+                                <label class="wix-toggle">
+                                    <span class="sr-only">Bật phân tích Drive tự động</span>
+                                    <input type="checkbox" id="toggle-auto-scan">
+                                    <span class="wix-toggle__slider"></span>
+                                </label>
+                            </div>
+                            <div id="auto-scan-settings" class="settings-field hidden">
+                                <label class="wix-label" for="input-scan-value">Chu kỳ phân tích</label>
+                                <div class="wix-input-group">
+                                    <label for="input-scan-value" class="sr-only">Giá trị chu kỳ</label>
+                                    <input type="number" class="wix-input" id="input-scan-value" value="1" min="1">
+                                    <label for="select-scan-unit" class="sr-only">Đơn vị chu kỳ</label>
+                                    <select class="wix-select wix-select--attached" id="select-scan-unit">
+                                        <option value="60">Giờ</option>
+                                        <option value="1440">Ngày</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="auto-scan-info-box settings-field">
+                                <i class="fas fa-info-circle"></i>
+                                <span>Wistorix sẽ tự động phân tích Drive và gửi cảnh báo rủi ro bảo mật.</span>
+                            </div>
+                            <div class="settings-field settings-lang-field">
+                                <label class="wix-label" for="select-language">Ngôn ngữ hiển thị</label>
+                                <select class="wix-select wix-select--full" id="select-language">
+                                    <option value="vi">Tiếng Việt</option>
+                                    <option value="en">English</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SAVE BUTTON -->
+                <div class="save-wrapper">
+                    <button type="button" id="btn-save-settings"><i class="fas fa-save"></i> Lưu cấu hình</button>
+                </div>
+
+            </div>
+
+        </div>

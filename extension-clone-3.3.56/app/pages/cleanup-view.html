@@ -1,0 +1,34 @@
+<!-- cleanup view fragment -->
+<style>
+    @import url('invite.css');
+    .invite-container {
+        width: 100%;
+        padding: 20px 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+</style>
+        <div class="wix-view" id="view-cleanup">
+            <header class="dash-header flex-shrink-0">
+                <div class="dash-header__top">
+                    <button type="button" class="sidebar-toggle" aria-label="Menu"><i class="fas fa-bars"></i></button>
+                    <div class="dash-header__left">
+                        <h1 class="dash-header__title">Lượt dọn dẹp</h1>
+                        <p class="dash-header__sub">Quản lý lượt dọn dẹp Drive của bạn</p>
+                    </div>
+                </div>
+            </header>
+            <div class="wix-tab-panel wix-tab-panel--active" style="padding-top:20px;">
+                <div class="invite-container">
+                    <div id="invite-hero"></div>
+                    <div class="stats-grid" id="invite-stats"></div>
+                    <div id="invite-progress"></div>
+                    <div class="steps-grid" id="invite-steps"></div>
+                    <div class="invite-list">
+                        <div class="list-header" id="invite-people-header"></div>
+                        <div id="invite-people"></div>
+                    </div>
+                </div>
+            </div>
+        </div>

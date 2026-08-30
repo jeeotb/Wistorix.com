@@ -1,0 +1,140 @@
+/* Wistorix hero motion · hạt xếp thành wordmark + nền aurora
+   Gắn kèm: assets/wistorix-hero-motion.js · dùng trong index.html */
+
+/* Navbar luôn hiển thị khi cuộn: chuyển từ absolute sang fixed, thêm nền mờ cho dễ đọc.
+   Thu gọn: hạ chiều cao logo và padding để thanh nav mỏng như bản gốc */
+.navbar{position:fixed;top:0;left:0;right:0;background-color:rgba(4,15,42,.78);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);padding-top:0;padding-bottom:0}
+.navbar .padding-global.is-navbar{padding:.5rem 0;width:min(1280px,92vw);margin:0 auto}
+.navbar .navbar_content{position:relative;align-items:center;min-height:3.25rem}
+/* logo: hop om sat anh, can giua theo truc doc cua thanh nav, co can voi chu menu */
+.navbar .navbar_logo-link{width:auto;height:auto;min-height:0;flex:0 0 auto;padding:0;display:flex;align-items:center;justify-content:flex-start}
+.navbar .navbar_logo,.navbar img.navbar_logo{height:2rem;max-height:2rem;width:auto}
+/* menu can giua tuyet doi theo thanh nav, khong lech theo be rong logo hay nut CTA */
+@media screen and (min-width:992px){
+  .navbar .nav_wrap{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);display:flex;justify-content:center;pointer-events:none}
+  .navbar .nav_wrap>*{pointer-events:auto}
+}
+/* vuot xuong an nav, vuot len hien lai */
+.navbar{transition:transform .35s cubic-bezier(.4,0,.2,1)}
+.navbar.wx-nav-up{transform:translateY(-100%)}
+@media (prefers-reduced-motion:reduce){.navbar{transition:none}}
+
+/* Sticky của .wx-pin cần trục dọc visible, nhưng vẫn phải chặn tràn NGANG (marquee logo rộng hàng nghìn px
+   từng làm Chrome mobile phóng to viewport) → clip riêng trục ngang, trục dọc visible để sticky chạy */
+.page-wrapper{overflow-x:clip;overflow-y:visible}
+body{overflow-x:clip}
+
+/* Lớp nền động, phủ toàn hero, nằm trên ảnh nền SVG và dưới nội dung (.vertical-center có z-index:2) */
+.wx-aurora{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+/* Phủ tối nền để hạt trắng của logo WS nổi hơn: một lớp tối đều + một vùng tối sâu hơn ngay sau logo (cột phải) */
+.wx-aurora::before{content:"";position:absolute;inset:0;background:rgba(2,8,26,.42)}
+.wx-aurora::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse 46% 56% at 72% 46%,rgba(1,4,16,.55),transparent 72%)}
+.wx-blob{position:absolute;width:52vw;height:52vw;border-radius:50%;filter:blur(90px);opacity:.32;mix-blend-mode:screen}
+.wx-blob.is-1{background:radial-gradient(circle,#2f52f0,transparent 62%);top:-18%;left:-10%;animation:wx-d1 17s ease-in-out infinite alternate}
+.wx-blob.is-2{background:radial-gradient(circle,#7c3aed,transparent 62%);bottom:-24%;right:-8%;animation:wx-d2 21s ease-in-out infinite alternate}
+.wx-blob.is-3{background:radial-gradient(circle,#0ea5b7,transparent 62%);bottom:-6%;left:30%;width:32vw;height:32vw;animation:wx-d3 14s ease-in-out infinite alternate}
+@keyframes wx-d1{to{transform:translate(7vw,5vh) scale(1.08)}}
+@keyframes wx-d2{to{transform:translate(-6vw,-4vh) scale(.95)}}
+@keyframes wx-d3{to{transform:translate(4vw,-6vh) scale(1.12)}}
+.wx-dots{position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,.13) 1px,transparent 1.4px);background-size:26px 26px;-webkit-mask-image:radial-gradient(ellipse 72% 62% at 50% 42%,#000 26%,transparent 76%);mask-image:radial-gradient(ellipse 72% 62% at 50% 42%,#000 26%,transparent 76%)}
+#wx-pc{position:absolute;inset:0;width:100%;height:100%;z-index:1}
+
+/* Bố cục 2 cột: H1 + CTA bên trái · logo WS 3D hạt bên phải */
+.wx-cols{display:grid;grid-template-columns:1.14fr .86fr;gap:3vw;align-items:center;width:min(1280px,92vw);margin:0 auto}
+.wx-cols .padding-global.is-hero{width:100%;padding-left:0;padding-right:0}
+.wx-cols .vertical-center{align-items:flex-start;text-align:left}
+.wx-cols .text-align-center{text-align:left}
+.wx-cols .button_wrapper.is-hero{justify-content:flex-start}
+/* H1: giữ ngắt dòng cố định 2 dòng ("Bảo mật, kiểm soát và" ⏎ "dọn dẹp dữ liệu trên Google Drive") */
+.wx-cols h1{font-size:clamp(2.1rem,3vw,3.1rem);line-height:1.2;letter-spacing:-.01em;white-space:nowrap}
+.wx-cols h1 br{display:block}
+@media(max-width:1100px){.wx-cols h1{white-space:normal}}
+@media(max-width:600px){.wx-cols h1{font-size:1.95rem;line-height:1.28}}
+
+/* Nút "Xem demo": đổi từ đen mờ sang cyan sáng cho nổi trên nền navy */
+.wx-cols .button.w-variant-3876fb3c-f589-169e-8f41-073b5a3f3902{background-color:#2AD2FF;color:#04263B}
+.wx-cols .button.w-variant-3876fb3c-f589-169e-8f41-073b5a3f3902:hover{background-color:#5FDFFF}
+
+/* Footer đồng bộ tông navy với hero banner */
+.footer_wrap{background:linear-gradient(135deg,#021E6B,#041335 60%,#041335)}
+
+/* Dòng trust nằm ngay dưới cụm CTA (nguyên tắc proximity), chữ nhỏ và dịu hơn CTA */
+.wx-cols .rating{padding-top:1.25rem;padding-bottom:0;justify-content:flex-start;align-items:flex-start;text-align:left}
+.wx-cols .rating .text-color-on-primary{font-size:.875rem;opacity:.72}
+@media(max-width:860px){.wx-cols .rating{justify-content:center;align-items:center;text-align:center}}
+
+/* Hộp đích: hạt xếp thành bộ não 3D (tỉ lệ 1.147), dịch nhẹ sang trái cho đỡ sát lề phải */
+.wx-stage{position:relative;width:100%;max-width:520px;margin:0 auto;transform:translateX(-5%);pointer-events:none}
+.wx-stage::before{content:"";display:block;padding-top:87.2%}
+
+/* H1 trắng tinh: bỏ lớp mờ opacity-73 của template trong hero */
+.wx-cols h1 span.opacity-73{opacity:1;color:#fff}
+
+/* ==== MOBILE: hero tràn viền, hierarchy gọn: H1 > sub > CTA > trust > hình hạt ==== */
+@media(max-width:860px){
+  .wx-cols{grid-template-columns:1fr;gap:1.75rem}
+  .wx-cols .vertical-center{align-items:center;text-align:center}
+  .wx-cols .text-align-center{text-align:center}
+  .wx-cols .button_wrapper.is-hero{justify-content:center;gap:.6rem}
+  /* hạt căn giữa thật sự (bỏ dịch trái của desktop) */
+  .wx-stage{max-width:min(340px,76vw);transform:none;margin:0 auto}
+  /* hero tràn viền: bỏ margin + bo góc của template */
+  .wx-pin .section_hero{margin:0;border-radius:0;top:0;min-height:100svh}
+  .hero_wrap{padding-top:5.25rem;padding-bottom:2.5rem}
+  /* navbar gọn: logo nhỏ, burger viền mảnh trong suốt */
+  .navbar .padding-global.is-navbar{width:100%;padding:.4rem .9rem}
+  .navbar .navbar_logo,.navbar img.navbar_logo{height:1.65rem;max-height:1.65rem}
+  .navbar .navbar_content{min-height:2.75rem}
+  .navbar .menu-button{background-color:transparent}
+  .navbar .nav-button_component{background-color:transparent;border:1px solid rgba(255,255,255,.3);border-radius:.6rem}
+  .navbar .nav-button_line{background-color:#fff}
+  /* cấp chữ: sub và trust nhỏ, ngắt dòng cân bằng không rơi chữ mồ côi */
+  .wx-cols .max-width-medium{max-width:21rem;margin-left:auto;margin-right:auto}
+  .wx-cols .max-width-medium .text-base{font-size:.88rem;line-height:1.55;text-wrap:balance}
+  .wx-cols .rating .text-color-on-primary{font-size:.75rem;max-width:21rem;margin:0 auto;text-wrap:balance}
+  /* CTA nhỏ đúng cấp phụ, đứng chung một hàng */
+  .wx-cols .button_wrapper.is-hero{flex-wrap:nowrap;flex-direction:row}
+  .wx-cols .button{min-height:2.3rem;padding:.4rem 1.1rem;font-size:.78rem}
+  .wx-cols .button-arrow{padding:.28rem;grid-column-gap:.45rem}
+  .wx-cols .button-arrow .text_button{font-size:.78rem}
+  .wx-cols .button-arrow .button_container-arrow{width:2rem;height:2rem}
+  /* nén khoảng trống dọc giữa các khối */
+  .wx-cols .spacer-medium{height:.75rem}
+  .wx-cols .spacer-huge{height:1.4rem}
+  .wx-cols .rating{padding-top:.9rem}
+}
+
+/* Ghim hero khi cuộn: trang chỉ trôi tiếp sau khi chữ Wistorix xếp xong.
+   .wx-pin cao 210svh · section_hero dính ở đỉnh suốt quãng đó · hạt tụ theo tiến độ cuộn qua .wx-pin */
+.wx-pin{height:460svh}
+.wx-pin .section_hero{position:sticky;top:.75rem;min-height:calc(100svh - 1.5rem)}
+/* Nội dung sau hero trườn lên đè qua hero đang ghim (curtain reveal):
+   hero đứng yên tuyệt đối, phần dưới kéo margin âm 100svh và nổi lên trên với nền đặc */
+.wx-after{position:relative;z-index:2;margin-top:-70svh;background-color:#fff}
+
+/* Keyword trong H1 theo hồi: hồi nào thì đúng từ đó sáng cyan, TOÀN BỘ phần chữ còn lại mờ xuống
+   (kể cả "và", "trên Google Drive"). Kéo xem hết 3 hình (hồi 4) thì cả câu cùng bừng sáng một lúc
+   rồi nội dung bên dưới mới đẩy lên. */
+/* Gõ máy đánh chữ: ký tự chưa gõ thì ẩn, ký tự cuối có con trỏ nhấp nháy */
+.wx-cols h1 .wx-c.off{display:none}
+/* Logo Google Drive nằm trong dòng chữ, cũng "gõ" ra như một ký tự */
+.wx-cols h1 img.wx-gd{height:.85em;width:auto;display:inline-block;vertical-align:-.06em;margin:0 .06em}
+.wx-cols h1 .wx-cur{position:relative}
+.wx-cols h1 .wx-cur::after{content:"";display:inline-block;width:3px;height:.85em;background:#7FE3FF;margin-left:4px;vertical-align:-.06em;animation:wx-blink 1s steps(1) infinite}
+@keyframes wx-blink{50%{opacity:0}}
+
+/* Keyword đã gõ tới thì giữ màu cyan LUÔN, không đổi về trắng nữa (tích lũy theo hồi) */
+.wx-cols h1 .wx-k{transition:color .45s,text-shadow .45s}
+.wx-cols h1[data-wxp="1"] .wx-k1,.wx-cols h1[data-wxp="2"] .wx-k1,.wx-cols h1[data-wxp="3"] .wx-k1,.wx-cols h1[data-wxp="4"] .wx-k1,
+.wx-cols h1[data-wxp="2"] .wx-k2,.wx-cols h1[data-wxp="3"] .wx-k2,.wx-cols h1[data-wxp="4"] .wx-k2,
+.wx-cols h1[data-wxp="3"] .wx-k3,.wx-cols h1[data-wxp="4"] .wx-k3{color:#D6FD70;text-shadow:0 0 26px rgba(214,253,112,.45)}
+.hero_wrap{padding-bottom:5rem}
+@media (prefers-reduced-motion:reduce){
+  .wx-pin{height:auto}
+  .wx-pin .section_hero{position:relative;top:auto}
+  .wx-after{margin-top:0}
+}
+
+@media (prefers-reduced-motion:reduce){
+  .wx-blob{animation:none}
+}

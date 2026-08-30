@@ -1,0 +1,763 @@
+<!-- upgrade view fragment -->
+<style>
+    @import url('upgrade.css');
+
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(15,23,42,0.55);
+        z-index: 99999;
+        align-items: center;
+        justify-content: center;
+        animation: fadeIn 0.2s ease;
+    }
+    .modal-overlay.is-open {
+        display: flex;
+    }
+    .modal-upgrade {
+        background: #fff;
+        border-radius: 16px;
+        width: 560px;
+        max-width: 94vw;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+        animation: slideUp 0.25s ease;
+    }
+    .modal-upgrade .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 18px 24px;
+        border-bottom: 1px solid #E6ECF5;
+    }
+    .modal-upgrade .modal-header h3 {
+        font-size: 16px;
+        font-weight: 700;
+        color: #041335;
+        margin: 0;
+    }
+    .modal-upgrade .modal-header .close-btn {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        border: none;
+        background: #F3F4F6;
+        color: #6B7280;
+        font-size: 16px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .modal-upgrade .modal-header .close-btn:hover {
+        background: #E5E7EB;
+    }
+    .modal-upgrade .modal-body {
+        padding: 24px;
+    }
+    .modal-stepper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0;
+        margin-bottom: 24px;
+    }
+    .modal-stepper .step {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        opacity: 0.35;
+    }
+    .modal-stepper .step.active { opacity: 1; }
+    .modal-stepper .step.done { opacity: 0.65; }
+    .modal-stepper .step .num {
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        background: #E5E7EB;
+        color: #94A3B0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: 700;
+    }
+    .modal-stepper .step.active .num {
+        background: #0052CD;
+        color: #fff;
+    }
+    .modal-stepper .step.done .num {
+        background: #10b981;
+        color: #fff;
+    }
+    .modal-stepper .step .label {
+        font-size: 12px;
+        font-weight: 600;
+        color: #6B7280;
+    }
+    .modal-stepper .connector {
+        width: 32px;
+        height: 2px;
+        background: #E5E7EB;
+        margin: 0 6px;
+    }
+    .modal-stepper .connector.done {
+        background: #10b981;
+    }
+    .step-panel { display: none; }
+    .step-panel.active { display: block; }
+    .order-summary {
+        background: #F8FAFF;
+        border: 1px solid #E6ECF5;
+        border-radius: 10px;
+        padding: 16px;
+        margin-bottom: 20px;
+    }
+    .order-summary .row {
+        display: flex;
+        justify-content: space-between;
+        padding: 5px 0;
+        font-size: 13px;
+    }
+    .order-summary .row .lbl { color: #94A3B0; }
+    .order-summary .row .val { color: #041335; font-weight: 600; }
+    .order-summary .row.total {
+        border-top: 1px solid #E6ECF5;
+        margin-top: 4px;
+        padding-top: 10px;
+    }
+    .order-summary .row.total .val {
+        font-size: 16px;
+        font-weight: 800;
+        color: #0052CD;
+    }
+    .step-field { margin-bottom: 14px; }
+    .step-field label {
+        display: block;
+        font-size: 12px;
+        font-weight: 600;
+        color: #6B7280;
+        margin-bottom: 4px;
+    }
+    .step-field input[type="text"] {
+        width: 100%;
+        height: 40px;
+        border: 1px solid #DDE3EF;
+        border-radius: 6px;
+        padding: 0 12px;
+        font-size: 13px;
+        outline: none;
+        box-sizing: border-box;
+    }
+    .step-field input:focus { border-color: #0487F1; }
+    .step-field .chk-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        color: #6B7280;
+        cursor: pointer;
+    }
+    .step-field .chk-row input {
+        width: 16px;
+        height: 16px;
+        accent-color: #0487F1;
+    }
+    .modal-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+        margin-top: 20px;
+    }
+    .modal-actions .btn {
+        height: 40px;
+        padding: 0 22px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+    }
+    .modal-actions .btn-secondary {
+        background: #F3F4F6;
+        color: #6B7280;
+    }
+    .modal-actions .btn-secondary:hover { background: #E5E7EB; }
+    .modal-actions .btn-primary {
+        background: linear-gradient(90deg, #0052CD, #0487F1);
+        color: #fff;
+    }
+    .modal-actions .btn-primary:hover { opacity: 0.92; }
+    .pay-tabs {
+        display: flex;
+        gap: 0;
+        margin-bottom: 16px;
+        border: 1px solid #E6ECF5;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    .pay-tabs .pay-tab {
+        flex: 1;
+        padding: 10px;
+        text-align: center;
+        font-size: 12px;
+        font-weight: 600;
+        color: #94A3B0;
+        background: #F9FAFB;
+        border: none;
+        cursor: pointer;
+        border-right: 1px solid #E6ECF5;
+    }
+    .pay-tabs .pay-tab:last-child { border-right: none; }
+    .pay-tabs .pay-tab.active { background: #fff; color: #0487F1; }
+    .qr-area { text-align: center; }
+    .qr-area .qr-box {
+        display: inline-block;
+        background: #fff;
+        border: 1px solid #E6ECF5;
+        border-radius: 12px;
+        padding: 12px;
+        margin-bottom: 12px;
+    }
+    .qr-area .qr-box canvas { display: block; width: 180px; height: 180px; }
+    .bank-list {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+    .bank-list .bank-item {
+        padding: 6px 12px;
+        border: 1px solid #E6ECF5;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: 600;
+        color: #6B7280;
+        background: #fff;
+    }
+    .transfer-info {
+        background: #F8FAFF;
+        border: 1px solid #E6ECF5;
+        border-radius: 10px;
+        padding: 14px 16px;
+        margin-bottom: 12px;
+        text-align: left;
+    }
+    .transfer-info .ti-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 4px 0;
+        font-size: 12px;
+    }
+    .transfer-info .ti-row .ti-lbl { color: #94A3B0; }
+    .transfer-info .ti-row .ti-val {
+        font-weight: 700;
+        color: #041335;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .transfer-info .ti-row .ti-val .cp-btn {
+        font-size: 11px;
+        color: #0487F1;
+        cursor: pointer;
+        background: none;
+        border: none;
+        padding: 2px 4px;
+    }
+    .transfer-info .ti-row .ti-val .cp-btn:hover { text-decoration: underline; }
+    .poll-status {
+        margin-top: 12px;
+        padding: 10px;
+        border-radius: 8px;
+        font-size: 12px;
+        text-align: center;
+    }
+    .poll-status.info { background: #FFFBEB; color: #92400E; }
+    .poll-status.success { background: #ECFDF5; color: #065F46; }
+    .success-icon { text-align: center; margin-bottom: 20px; }
+    .success-icon i { font-size: 56px; color: #10b981; }
+    .success-icon h3 { font-size: 18px; font-weight: 700; color: #041335; margin: 10px 0 0; }
+    .info-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+    .info-table td { padding: 8px 12px; font-size: 13px; border-bottom: 1px solid #F3F4F6; }
+    .info-table td:first-child { color: #94A3B0; width: 120px; }
+    .info-table td:last-child { font-weight: 600; color: #041335; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    @media (max-width: 768px) {
+        .modal-upgrade { width: 100%; max-width: 100vw; max-height: 100vh; border-radius: 0; }
+    }
+
+    .id-modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(15,23,42,0.55);
+        z-index: 100000;
+        align-items: center;
+        justify-content: center;
+        animation: fadeIn 0.2s ease;
+    }
+    .id-modal-overlay.is-open { display: flex; }
+    .id-modal {
+        background: #fff;
+        border-radius: 16px;
+        width: 520px;
+        max-width: 94vw;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+        animation: slideUp 0.25s ease;
+    }
+    .id-modal .id-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 18px 24px;
+        border-bottom: 1px solid #E6ECF5;
+    }
+    .id-modal .id-header h3 {
+        font-size: 16px;
+        font-weight: 700;
+        color: #041335;
+        margin: 0;
+    }
+    .id-modal .id-header .id-sub {
+        font-size: 12px;
+        font-weight: 400;
+        color: #94A3B0;
+        margin: 2px 0 0;
+    }
+    .id-modal .id-header .close-btn {
+        width: 32px; height: 32px;
+        border-radius: 8px; border: none;
+        background: #F3F4F6; color: #6B7280;
+        font-size: 16px; cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+    }
+    .id-modal .id-header .close-btn:hover { background: #E5E7EB; }
+    .id-modal .id-body { padding: 20px 24px; }
+    .id-modal .id-body table { width: 100%; border-collapse: collapse; }
+    .id-modal .id-body td {
+        padding: 8px 12px;
+        font-size: 13px;
+        border-bottom: 1px solid #F3F4F6;
+        vertical-align: top;
+    }
+    .id-modal .id-body td:first-child {
+        color: #94A3B0;
+        width: 130px;
+        white-space: nowrap;
+    }
+    .id-modal .id-body td:last-child {
+        font-weight: 600;
+        color: #041335;
+    }
+    .id-modal .id-footer {
+        padding: 16px 24px;
+        border-top: 1px solid #E6ECF5;
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+    }
+    .id-modal .id-footer .btn {
+        height: 38px;
+        padding: 0 20px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+    }
+    .id-modal .id-footer .btn-secondary {
+        background: #F3F4F6;
+        color: #6B7280;
+    }
+    .id-modal .id-footer .btn-secondary:hover { background: #E5E7EB; }
+</style>
+        <div class="wix-view" id="view-upgrade">
+            <header class="dash-header flex-shrink-0">
+                <div class="dash-header__top">
+                    <button type="button" class="sidebar-toggle" aria-label="Menu"><i class="fas fa-bars"></i></button>
+                    <div class="dash-header__left">
+                        <h1 class="dash-header__title">Cài đặt Extension</h1>
+                        <p class="dash-header__sub">Tùy chỉnh hành vi quét và gói dịch vụ</p>
+                    </div>
+                </div>
+            </header>
+            <div class="wix-tab-panel wix-tab-panel--active">
+                <div class="upgrade-container">
+
+                    <!-- TABS -->
+                    <div class="settings-tabs">
+                        <button type="button" class="tab-btn active" data-href="upgrade.html">⚡ Thanh toán &amp; Gói dịch vụ</button>
+                        <button type="button" class="tab-btn" data-href="settings.html">⚙️ Cấu hình chung</button>
+                    </div>
+
+                    <!-- CURRENT PLAN -->
+                    <div class="current-plan">
+                        <div class="plan-left">
+                            <div class="plan-badge">GÓI HIỆN TẠI</div>
+                            <h2>Wistorix STANDARD</h2>
+                            <p class="plan-desc">Miễn phí — quét toàn bộ Drive — xử lý thủ công tối đa 100 file.</p>
+                            <div class="plan-progress">
+                                <div class="plan-progress-bar">
+                                    <div class="fill" style="width:0%;"></div>
+                                </div>
+                                <span class="plan-progress-label">Đang tải...</span>
+                            </div>
+                        </div>
+                        <div class="plan-right">
+                            <button type="button" class="btn-upgrade-plan" data-plan="one_wistorix_v3">Nâng cấp gói</button>
+                            <small>Không tự động gia hạn gói STANDARD</small>
+                        </div>
+                    </div>
+
+                    <!-- CYCLE TOGGLE -->
+                    <div class="cycle-toggle">
+                        <button type="button" class="cycle-btn active" data-cycle="monthly">Theo tháng</button>
+                        <button type="button" class="cycle-btn" data-cycle="yearly">Theo năm</button>
+                        <span class="cycle-save-badge">Tiết kiệm ~40% khi trả năm</span>
+                    </div>
+
+                    <!-- PRICING PLANS -->
+                    <div class="pricing-grid-u">
+                        <div class="pricing-card-u">
+                            <h3>STANDARD</h3><p class="plan-sub">Trải nghiệm miễn phí — quét sạch &amp; kiểm tra lỗ hổng trên 1 Drive.</p><div class="plan-price">0<small>đ</small></div><div class="plan-duration">Miễn phí</div>
+                            <ul class="plan-features">
+                                <li><i class="fas fa-check"></i> Tối đa 1 Drive</li><li><i class="fas fa-check"></i> Quét file mồ côi · trùng · lỗ hổng</li><li><i class="fas fa-check"></i> Báo cáo trực quan dung lượng rác</li><li><i class="fas fa-check"></i>Xử lý thủ công tối đa 100 file</li>
+                            </ul>
+                            <button type="button" class="plan-btn" disabled>Gói hiện tại</button>
+                        </div>
+                        <div class="pricing-card-u plan-popular"><div class="plan-label">★ PHỔ BIẾN NHẤT</div>
+                            <h3>ONE-WISTORIX</h3><p class="plan-sub">Không giới hạn dọn dẹp &amp; tự động bảo vệ chặt chẽ trên 1 Drive chính.</p>
+                            <div class="plan-price plan-price--monthly">59.000<small>đ</small></div><div class="plan-price plan-price--yearly" style="display:none;">429.000<small>đ</small></div>
+                            <div class="plan-duration plan-duration--monthly">/ tháng</div><div class="plan-duration plan-duration--yearly" style="display:none;">/ năm</div>
+                            <ul class="plan-features">
+                                <li><i class="fas fa-check"></i> <strong>KHÔNG GIỚI HẠN</strong> số file dọn dẹp</li><li><i class="fas fa-check"></i> Auto-Offboarding: chuyển quyền &amp; thu hồi</li><li><i class="fas fa-check"></i> Báo cáo kiểm toán định kỳ</li><li><i class="fas fa-check"></i> Direct Interface <span style="font-size:10px;color:#94A3B0;">(sắp có)</span></li><li><i class="fas fa-check"></i> AI Assistant gợi ý dọn dẹp <span style="font-size:10px;color:#94A3B0;">(sắp có)</span></li>
+                            </ul>
+                            <button type="button" class="plan-btn primary btn-upgrade-plan" data-plan="one_wistorix_v3">Nâng cấp</button>
+                        </div>
+                        <div class="pricing-card-u"><h3>Multi-Wistorix</h3><p class="plan-sub">Quản trị tập trung nhiều Drive cho đội nhóm / doanh nghiệp.</p><div class="plan-price">Theo Drive</div><div class="plan-duration" style="color:#0052cd;">Tự tính theo số kết nối</div>
+                            <ul class="plan-features">
+                                <li><i class="fas fa-check"></i> Toàn bộ tính năng One-Wistorix</li><li><i class="fas fa-check"></i> Admin Console giám sát nhiều Drive</li><li><i class="fas fa-check"></i> Quét liên tài khoản</li><li><i class="fas fa-check"></i> Cấu hình chuẩn hóa toàn đội</li>
+                            </ul>
+                            <button type="button" class="plan-btn" data-consultation-plan="multi_wistorix">Liên hệ tư vấn</button>
+                        </div>
+                    </div>
+
+                    <!-- SCAN PACKS -->
+                    <div class="scan-packs">
+                        <div class="scan-packs-header">
+                            <div class="scan-packs-header-left">
+                                <div class="scan-packs-icon"><i class="fas fa-bolt"></i></div>
+                                <div>
+                                    <div class="scan-packs-title">Mua theo lượt dọn dẹp</div>
+                                    <p class="scan-packs-desc">Không muốn đăng ký định kỳ? Mua lẻ từng lượt dọn dẹp/quét Drive — trả bao nhiêu dùng bấy nhiêu, không hết hạn.</p>
+                                </div>
+                            </div>
+                            <span class="scan-packs-pill">KHÔNG AUTO-GIA HẠN</span>
+                        </div>
+                        <div class="pack-grid" id="pack-grid"></div>
+                        <div class="pack-info-line" id="packInfoLine">Đã chọn 5 lượt · 120 giờ dọn dẹp không giới hạn tệp</div>
+                        <div class="pricing-tiers" id="pricingTiers">
+                            <span>1–4 lượt = 40.000đ/lượt</span>
+                            <span>5–9 lượt = 36.000đ/lượt</span>
+                            <span>từ 10 lượt = 32.000đ/lượt</span>
+                        </div>
+                        <div class="total-bar">
+                            <div class="total-amount">Tổng: <span id="totalPrice">180.000đ</span></div>
+                            <input type="hidden" id="quantity" name="quantity" value="5">
+                            <button type="button" id="buy-scans-btn">Mua lượt quét</button>
+                        </div>
+                    </div>
+
+                    <!-- INVOICE TABLE -->
+                    <div class="invoice-section">
+                        <div class="section-header">🧾 Lịch sử hóa đơn</div>
+                        <table class="invoice-table">
+                            <thead>
+                                <tr>
+                                    <th>Mã hóa đơn</th>
+                                    <th>Ngày</th>
+                                    <th>Gói</th>
+                                    <th>Số tiền</th>
+                                    <th>Trạng thái</th>
+                                    <th>HÀNH ĐỘNG</th>
+                                </tr>
+                            </thead>
+                            <tbody id="invoice-body">
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- VAT INFO -->
+                    <div class="vat-section">
+                        <h3>📋 Thông tin xuất hóa đơn (VAT)</h3>
+                        <div class="vat-tabs">
+                            <button type="button" class="vat-tab active">Cá nhân</button>
+                            <button type="button" class="vat-tab">Doanh nghiệp</button>
+                        </div>
+
+                        <div class="vat-form personal">
+                            <div class="row">
+                                <div class="col-6">
+                                    <label for="vat-name">Họ tên người nhận</label>
+                                    <input type="text" id="vat-name" name="vat-name" placeholder="Nguyễn Văn A">
+                                </div>
+                                <div class="col-6">
+                                    <label for="vat-email">Email nhận hóa đơn</label>
+                                    <input type="email" id="vat-email" name="vat-email" placeholder="user@gmail.com">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <label for="vat-address">Địa chỉ</label>
+                                    <input type="text" id="vat-address" name="vat-address" placeholder="Số nhà, đường, phường/xã, quận/huyện, tỉnh/thành phố">
+                                </div>
+                            </div>
+                            <button type="button" class="btn-vat">Lưu thông tin</button>
+                        </div>
+
+                        <div class="vat-form business" style="display:none;">
+                            <div class="row">
+                                <div class="col-12">
+                                    <label for="vat-company">Tên công ty</label>
+                                    <input type="text" id="vat-company" name="vat-company" placeholder="Công ty TNHH Wistorix">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-6">
+                                    <label for="vat-tax">Mã số thuế</label>
+                                    <input type="text" id="vat-tax" name="vat-tax" placeholder="0123456789">
+                                </div>
+                                <div class="col-6">
+                                    <label for="vat-biz-name">Họ tên người nhận</label>
+                                    <input type="text" id="vat-biz-name" name="vat-biz-name" placeholder="Nguyễn Văn A">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-6">
+                                    <label for="vat-biz-email">Email nhận hóa đơn</label>
+                                    <input type="email" id="vat-biz-email" name="vat-biz-email" placeholder="user@gmail.com">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <label for="vat-biz-address">Địa chỉ</label>
+                                    <input type="text" id="vat-biz-address" name="vat-biz-address" placeholder="Số nhà, đường, phường/xã, quận/huyện, tỉnh/thành phố">
+                                </div>
+                            </div>
+                            <button type="button" class="btn-vat">Lưu thông tin</button>
+                        </div>
+                    </div>
+
+                    <!-- PAYMENT METHODS -->
+                    <div class="payment-methods">
+                        <div class="pm-item"><i class="fab fa-cc-mastercard"></i></div>
+                        <div class="pm-item"><i class="fab fa-cc-visa"></i></div>
+                        <div class="pm-item"><i class="fas fa-qrcode"></i></div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+<div class="modal-overlay" id="upgrade-modal">
+    <div class="modal-upgrade">
+        <div class="modal-header">
+            <h3>Thanh toán — Nâng cấp gói</h3>
+            <button type="button" class="close-btn" id="btn-close-upgrade"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+
+            <div class="modal-stepper">
+                <div class="step active" data-step="1">
+                    <span class="num">1</span>
+                    <span class="label">Thông tin</span>
+                </div>
+                <span class="connector"></span>
+                <div class="step" data-step="2">
+                    <span class="num">2</span>
+                    <span class="label">Thanh toán</span>
+                </div>
+                <span class="connector"></span>
+                <div class="step" data-step="3">
+                    <span class="num">3</span>
+                    <span class="label">Hoàn tất</span>
+                </div>
+            </div>
+
+            <div class="step-panel active" id="upgrade-step-1">
+                <div class="order-summary" id="order-summary">
+                    <!-- populated dynamically by openUpgradeModal(plan) -->
+                </div>
+
+                <div class="step-field">
+                    <label for="discount-code">Mã giảm giá</label>
+                    <input type="text" id="discount-code" name="discount-code" placeholder="Nhập mã khuyến mãi (nếu có)">
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" id="btn-cancel-upgrade">Hủy</button>
+                    <button type="button" class="btn btn-primary" id="btn-proceed-payment">Tiếp tục →</button>
+                </div>
+            </div>
+
+            <div class="step-panel" id="upgrade-step-2">
+                <div class="pay-tabs">
+                    <button type="button" class="pay-tab active" data-pay="qr">QR / Chuyển khoản</button>
+                    <button type="button" class="pay-tab" data-pay="card">Thẻ tín dụng</button>
+                </div>
+
+                <div class="qr-area" id="pay-qr">
+                    <div class="qr-box">
+                        <canvas id="qr-canvas" width="180" height="180"></canvas>
+                    </div>
+
+                    <div class="bank-list">
+                        <span class="bank-item">Vietcombank</span>
+                        <span class="bank-item">MBBank</span>
+                        <span class="bank-item">Techcombank</span>
+                        <span class="bank-item">VietinBank</span>
+                        <span class="bank-item">ACB</span>
+                    </div>
+
+                    <div class="transfer-info">
+                        <div class="ti-row">
+                            <span class="ti-lbl">Ngân hàng</span>
+                            <span class="ti-val" id="qr-bank-name">MB Bank</span>
+                        </div>
+                        <div class="ti-row">
+                            <span class="ti-lbl">STK</span>
+                            <span class="ti-val">
+                                <span id="qr-account-number">0364173472</span>
+                                <button type="button" class="cp-btn" data-copy="0364173472">Sao chép</button>
+                            </span>
+                        </div>
+                        <div class="ti-row">
+                            <span class="ti-lbl">Chủ tài khoản</span>
+                            <span class="ti-val">Wistorix</span>
+                        </div>
+                        <div class="ti-row">
+                            <span class="ti-lbl">Số tiền</span>
+                            <span class="ti-val" id="qr-amount-label">—</span>
+                        </div>
+                        <div class="ti-row">
+                            <span class="ti-lbl">Nội dung</span>
+                            <span class="ti-val">
+                                <span id="qr-content">—</span>
+                                <button type="button" class="cp-btn" data-copy="—">Sao chép</button>
+                            </span>
+                        </div>
+                    </div>
+
+                    <p style="font-size:12px;color:#94A3B0;margin:0 0 8px;">
+                        <i class="fas fa-spinner fa-spin"></i> Đang chờ xác nhận thanh toán...
+                        <span style="display:block;margin-top:2px;font-size:11px;">Hệ thống tự động kích hoạt ngay khi nhận được chuyển khoản qua payOS — thường dưới 30 giây.</span>
+                        <span id="qr-countdown" style="display:block;margin-top:4px;font-weight:600;"></span>
+                    </p>
+
+                    <div class="poll-status info" id="qr-poll-status" style="display:none;"></div>
+
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-secondary" id="btn-back-to-step1">← Quay lại</button>
+                        <button type="button" class="btn btn-secondary" id="btn-payment-support">Liên hệ nếu cần hỗ trợ</button>
+                    </div>
+                </div>
+
+                <div id="pay-card" style="display:none;text-align:center;padding:40px 0;color:#94A3B0;">
+                    <i class="fas fa-credit-card" style="font-size:48px;display:block;margin-bottom:12px;"></i>
+                    <p>Thanh toán thẻ tín dụng sẽ sẵn sàng sau</p>
+                </div>
+            </div>
+
+            <div class="step-panel" id="upgrade-step-3">
+                <div class="success-icon">
+                    <i class="fas fa-check-circle"></i>
+                    <h3>Thanh toán thành công!</h3>
+                    <p style="font-size:13px;color:#6B7280;margin:6px 0 0;">Đã kích hoạt qua payOS · biên lai đã gửi về email của bạn.</p>
+                </div>
+
+                <table class="info-table">
+                    <tr><td>Mã giao dịch</td><td id="txn-id">—</td></tr>
+                    <tr><td>Sản phẩm</td><td id="txn-product">—</td></tr>
+                    <tr><td>Chu kỳ / Số lượng</td><td id="txn-cycle">—</td></tr>
+                    <tr><td>Phương thức</td><td id="txn-method">QR / Chuyển khoản</td></tr>
+                    <tr><td>Thời gian xác nhận</td><td id="txn-time">—</td></tr>
+                    <tr><td>Hạn sử dụng / Hiệu lực</td><td id="txn-expiry">—</td></tr>
+                    <tr><td>Số tiền</td><td id="txn-amount">—</td></tr>
+                </table>
+
+                <p style="font-size:12px;color:#94A3B0;text-align:center;margin:0 0 16px;">Bạn có thể xuất hóa đơn VAT cho giao dịch này.</p>
+
+                <div class="modal-actions" style="justify-content:center;">
+                    <button type="button" class="btn btn-secondary" id="btn-issue-vat">Xuất hóa đơn VAT</button>
+                    <button type="button" class="btn btn-primary" id="btn-back-to-billing">✔ Về Billing</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<style>
+#vat-invoice-modal .vat-modal{width:min(680px,calc(100vw - 32px));max-width:680px;padding:0;overflow:hidden;border-radius:18px}#vat-invoice-modal .modal-header{padding:20px 24px;border-bottom:1px solid #e2e8f0;align-items:flex-start}#vat-invoice-modal .vat-modal__heading{display:flex;gap:12px}#vat-invoice-modal .vat-modal__icon{width:42px;height:42px;display:grid;place-items:center;border-radius:12px;background:#eef4ff;color:#0052cd;font-size:18px}#vat-invoice-modal .vat-modal__heading p{margin:4px 0 0;color:#64748b;font-size:12px;line-height:1.5}#vat-invoice-modal .modal-stepper{justify-content:stretch;margin:0 0 22px}#vat-invoice-modal .modal-stepper .step{flex:1;flex-direction:column;gap:6px;opacity:1;text-align:center}#vat-invoice-modal .modal-stepper .step .num{width:30px;height:30px;border:1px solid #dce3ec;background:#f8fafc;color:#94a3b8}#vat-invoice-modal .modal-stepper .step.active .num{background:#0052cd;border-color:#0052cd;color:#fff}#vat-invoice-modal .modal-stepper .step.done .num{background:#ecfdf5;border-color:#10b981;color:#059669}#vat-invoice-modal .modal-stepper .step.active .label{color:#0052cd}#vat-invoice-modal .modal-stepper .connector{flex:1;max-width:96px;margin:14px 8px 0}#vat-invoice-modal .step-field label{font-size:11px;letter-spacing:.06em;font-weight:800}#vat-invoice-modal .step-field input{height:46px;width:100%;box-sizing:border-box;border:1px solid #dce3ec;border-radius:10px;background:#f8fafc;padding:0 12px}#vat-invoice-modal .step-field input.is-invalid{border-color:#e5484d}#vat-invoice-modal .vat-tabs{display:flex;width:100%;padding:4px;border-radius:11px;background:#f1f5f9}#vat-invoice-modal .vat-invoice-tab{flex:1;border:0;background:transparent;padding:10px;border-radius:8px;font:600 13px Manrope,sans-serif;color:#64748b}#vat-invoice-modal .vat-invoice-tab.active{background:#fff;color:#0052cd;box-shadow:0 1px 4px rgba(4,19,53,.12)}#vat-invoice-modal .vat-info-box{margin:16px 0;padding:12px;border:1px solid #e2e8f0;border-radius:10px;background:#f7f9fc;color:#475569;font-size:12px}#vat-invoice-modal .vat-document{border:1px solid #dce3ec;border-radius:12px;padding:22px;color:#334155}#vat-invoice-modal .vat-document h3{margin:0;text-align:center;color:#041335;font-size:17px}#vat-invoice-modal .vat-document__sub{margin:5px 0 18px;color:#64748b;text-align:center;font-size:12px}#vat-invoice-modal .vat-document__parties{display:grid;grid-template-columns:1fr 1fr;gap:18px;padding:14px 0;border-block:1px solid #e2e8f0;font-size:12px}#vat-invoice-modal .vat-document__parties p{margin:6px 0 0;line-height:1.55}#vat-invoice-modal .vat-document__table{width:100%;margin:16px 0;border-collapse:collapse;font-size:12px}#vat-invoice-modal .vat-document__table th{padding:9px 7px;background:#f7f9fc;color:#64748b;font-size:10px;text-align:left}#vat-invoice-modal .vat-document__table td{padding:10px 7px;border-bottom:1px solid #e2e8f0}#vat-invoice-modal .vat-document__totals{width:min(280px,100%);margin-left:auto;font-size:12px}#vat-invoice-modal .vat-document__totals div{display:flex;justify-content:space-between;gap:20px;padding:6px 0}#vat-invoice-modal .vat-document__totals .grand{border-top:1px solid #cbd5e1;margin-top:4px;padding-top:10px;color:#0052cd;font-size:14px}#vat-invoice-modal .vat-issue-error{margin:12px 0 0;color:#c0392b;font-size:12px}
+</style>
+<style>
+#vat-invoice-modal .vat-document__watermark{display:flex;flex-direction:column;align-items:center;gap:3px;margin:-2px 0 14px;padding:9px;border:1px solid #c9daf4;border-radius:9px;background:#f1f6ff;color:#0052cd;font-size:10px;letter-spacing:.06em;text-align:center}#vat-invoice-modal .vat-document__watermark strong{font-size:12px}
+</style>
+<div class="modal-overlay" id="vat-invoice-modal">
+    <div class="modal-upgrade vat-modal">
+        <div class="modal-header"><div class="vat-modal__heading"><span class="vat-modal__icon"><i class="fas fa-receipt"></i></span><div><h3>Xuất hóa đơn điện tử VAT</h3><p>Hóa đơn được xuất tự động cho mỗi giao dịch và gửi về email của bạn.</p></div></div><button type="button" class="close-btn" id="btn-close-vat" aria-label="Đóng"><i class="fas fa-times"></i></button></div>
+        <div class="modal-body">
+            <div class="modal-stepper"><div class="step active" data-vat-step="1"><span class="num">1</span><span class="label">Thông tin</span></div><span class="connector"></span><div class="step" data-vat-step="2"><span class="num">2</span><span class="label">Xem trước</span></div><span class="connector"></span><div class="step" data-vat-step="3"><span class="num">3</span><span class="label">Hoàn tất</span></div></div>
+            <div class="step-panel active" id="vat-step-1">
+                <div class="order-summary" id="vat-transaction-summary"></div>
+                <div class="vat-tabs"><button type="button" class="vat-invoice-tab active" data-type="personal">Cá nhân</button><button type="button" class="vat-invoice-tab" data-type="business">Doanh nghiệp</button></div>
+                <div class="step-field"><label for="vat-invoice-name">TÊN NGƯỜI MUA HÀNG *</label><input id="vat-invoice-name" name="buyerName" autocomplete="name"></div><div class="step-field"><label for="vat-invoice-address">ĐỊA CHỈ ĐĂNG KÝ *</label><input id="vat-invoice-address" name="buyerAddress" autocomplete="street-address"></div><div class="step-field"><label for="vat-invoice-email">EMAIL NHẬN HÓA ĐƠN *</label><input id="vat-invoice-email" name="buyerEmail" type="email" autocomplete="email"></div>
+                <div class="step-field vat-business-field" style="display:none;"><label for="vat-invoice-company">TÊN DOANH NGHIỆP *</label><input id="vat-invoice-company" name="companyName" autocomplete="organization"></div><div class="step-field vat-business-field" style="display:none;"><label for="vat-invoice-tax">MÃ SỐ THUẾ *</label><input id="vat-invoice-tax" name="taxCode"></div>
+                <p class="vat-info-box">Vui lòng kiểm tra kỹ thông tin trước khi xác nhận xuất hóa đơn.</p>
+                <div class="modal-actions"><button type="button" class="btn btn-secondary" id="btn-cancel-vat">Hủy</button><button type="button" class="btn btn-primary" id="btn-vat-preview">Tiếp tục (Xem trước) →</button></div>
+            </div>
+            <div class="step-panel" id="vat-step-2"><div id="vat-preview"></div><p class="vat-issue-error" id="vat-issue-error" hidden></p><div class="modal-actions"><button type="button" class="btn btn-secondary" id="btn-vat-back">← Quay lại</button><button type="button" class="btn btn-secondary" id="btn-vat-download-preview"><i class="fas fa-file-pdf"></i> Tải bản xem trước PDF</button><button type="button" class="btn btn-primary" id="btn-vat-issue">Xác nhận &amp; Phát hành →</button></div></div>
+            <div class="step-panel" id="vat-step-3"><div class="success-icon"><i class="fas fa-check-circle"></i><h3>Hóa đơn đã được phát hành!</h3><p id="vat-issued-info"></p></div><div class="modal-actions"><button type="button" class="btn btn-primary" id="btn-vat-close-complete">✓ Đóng</button></div></div>
+        </div>
+    </div>
+</div>
+
+<div id="toast-container-settings" style="position:fixed;top:20px;right:20px;z-index:99999;display:flex;flex-direction:column;gap:10px;pointer-events:none;"></div>
+
+<div class="id-modal-overlay" id="invoice-detail-modal">
+    <div class="id-modal">
+        <div class="id-header">
+            <div>
+                <h3>Chi tiết hóa đơn</h3>
+                <div class="id-sub">Mã hóa đơn: <span class="id-invoice-code"></span></div>
+            </div>
+            <button type="button" class="close-btn" id="btn-close-invoice-detail"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="id-body">
+            <table>
+                <tr><td>Mã hóa đơn</td><td class="id-invoice-code">—</td></tr>
+                <tr><td>Mã giao dịch</td><td class="id-order-code">—</td></tr>
+                <tr><td>Tên gói</td><td class="id-plan-name">—</td></tr>
+                <tr><td>Chu kỳ / Số lượng</td><td class="id-cycle">—</td></tr>
+                <tr><td>Số tiền</td><td class="id-amount">—</td></tr>
+                <tr><td>Ngày thanh toán</td><td class="id-paid-at">—</td></tr>
+                <tr><td>Phương thức</td><td class="id-method">—</td></tr>
+                <tr><td>Trạng thái</td><td class="id-status">—</td></tr>
+                <tr><td>Email nhận</td><td class="id-email">—</td></tr>
+                <tr><td>Người nhận</td><td class="id-recipient">—</td></tr>
+                <tr><td>Công ty</td><td class="id-company">—</td></tr>
+                <tr><td>Mã số thuế</td><td class="id-tax-code">—</td></tr>
+                <tr><td>Địa chỉ</td><td class="id-address">—</td></tr>
+            </table>
+        </div>
+        <div class="id-footer">
+            <button type="button" class="btn btn-secondary" id="btn-close-invoice-detail-footer">Đóng</button>
+        </div>
+    </div>
+</div>

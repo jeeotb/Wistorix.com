@@ -1,0 +1,39 @@
+{
+   "action": {
+      "default_icon": {
+         "128": "assets/icons/wistorix-icon-128.png",
+         "16": "assets/icons/wistorix-icon-16.png",
+         "48": "assets/icons/wistorix-icon-48.png"
+      },
+      "default_popup": "popup.html"
+   },
+   "background": {
+      "service_worker": "background.js",
+      "type": "module"
+   },
+   "content_security_policy": {
+      "extension_pages": "script-src 'self'; object-src 'self'"
+   },
+   "description": "Manage Google Drive files, visualize storage statistics, and clean up unused files.",
+   "host_permissions": [ "https://www.googleapis.com/*", "https://www.google-analytics.com/*", "https://accounts.google.com/*", "https://us-central1-wistorix.cloudfunctions.net/*" ],
+   "icons": {
+      "128": "assets/icons/wistorix-icon-128.png",
+      "16": "assets/icons/wistorix-icon-16.png",
+      "48": "assets/icons/wistorix-icon-48.png"
+   },
+   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA4dpSZwu26sKKnQfQGq8JvzaX8pSKdRJOl3qxYfhVDbPdYi3SIzGZIWHDCb2S906jJkeiUpAk+Ap20KXNR5AFBkXTGrlbAi7qqUvyJFQfmEpvMhPTk4+AUWoZD2zRWJ0JZIsqoLAgBB3KwxW2xAMqAZfgMXkK5xx51hcR7gOiMRFkpgmNjrK0H5qwP4YAAc+TE/2tVDoqrcFFZYuQkhWyUE1S50a18NuevP+KOTasAi/MToWwI9JNifdIMmFhHHKrzZL+aOYYu60gxmxKwzgZ7mjbSmD93QnKWfCoF9PcpLAdf0F+oG22gUptHJrR0CzQ1+Td1wGZ5yo634+FstaQ2wIDAQAB",
+   "manifest_version": 3,
+   "name": "Wistorix",
+   "oauth2": {
+      "client_id": "172477157648-n73onb707j7r1p65dqjt8g0k3kqe632d.apps.googleusercontent.com",
+      "scopes": [ "openid", "email", "profile", "https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/gmail.send", "https://www.googleapis.com/auth/drive", "https://www.googleapis.com/auth/userinfo.email" ]
+   },
+   "options_page": "dashboard.html",
+   "permissions": [ "identity", "storage", "alarms", "unlimitedStorage", "notifications" ],
+   "update_url": "https://clients2.google.com/service/update2/crx",
+   "version": "3.3.56",
+   "web_accessible_resources": [ {
+      "matches": [ "\u003Call_urls>" ],
+      "resources": [ "assets/UI/*", "assets/UI/states/*", "assets/UI/loading/*", "assets/icons/*" ]
+   } ]
+}

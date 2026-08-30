@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <!-- ══ WISTORIX CLONE — mock runtime (chỉ có ở bản clone offline) ══ -->
+    <script src="__mock/mock-data.js"></script>
+    <script src="__mock/wistorix-mock.js"></script>
+    <script src="__mock/dev-toolbar.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wistorix — My Drive</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="assets/icons/wistorix-icon-128.png">
+    <link rel="stylesheet" href="dashboard.css">
+    <style>
+        /* ── My Drive Layout ──────────────────────────────── */
+        #view-mydrive .wix-tab-panel {
+            padding: 0;
+        }
+
+        .my-drive-body {
+            display: flex;
+            flex: 1;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        /* ── Folder Sidebar ───────────────────────────────── */
+        .folder-sidebar {
+            width: 260px;
+            min-width: 260px;
+            background: #F8FAFF;
+            border-right: 1px solid #E6ECF5;
+            padding: 12px 0;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .folder-sidebar-header {
+            font-size: 11px;
+            font-weight: 700;
+            color: #6B7A99;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 8px 16px 10px;
+        }
+
+        .folder-tree {
+            flex: 1;
+            overflow-y: auto;
+            font-size: 13px;
+        }
+
+        .folder-tree ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .folder-tree .tree-row {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 6px 12px;
+            margin: 1px 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.1s;
+            user-select: none;
+        }
+
+        .folder-tree .tree-row:hover {
+            background: rgba(0, 82, 205, 0.05);
+        }
+
+        .folder-tree .tree-row.active {
+            background: rgba(0, 82, 205, 0.10);
+            font-weight: 600;
+        }
+
+        .folder-tree .tree-row.active .tree-name {
+            color: #0052CD;
+        }
+
+        .folder-tree .tree-toggle {
+            font-size: 10px;
+            width: 12px;
+            text-align: center;
+            flex-shrink: 0;
+            color: #9CA3AF;
+            cursor: pointer;
+        }
+
+        .folder-tree .tree-icon {
+            flex-shrink: 0;
+            font-size: 14px;
+            line-height: 1;
+        }
+
+        .folder-tree .tree-name {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            color: #374151;
+            font-size: 13px;
+        }
+
+        .folder-tree .tree-count {
+            margin-left: auto;
+            font-size: 11px;
+            font-weight: 600;
+            background: #FEE2E2;
+            color: #EF4444;
+            padding: 0 7px;
+            border-radius: 8px;
+            flex-shrink: 0;
+            line-height: 17px;
+        }
+
+        .folder-tree .tree-children {
+            padding-left: 16px;
+        }
+
+        .folder-tree::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .folder-tree::-webkit-scrollbar-thumb {
+            background: rgba(0,0,0,0.10);
+            border-radius: 4px;
+        }
+
+        /* ── Drive Content ────────────────────────────────── */
+        .drive-content {
+            flex: 1;
+            padding: 16px 24px;
+            overflow-y: auto;
+            min-width: 0;
+        }
+
+        .drive-content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .drive-content::-webkit-scrollbar-thumb {
+            background: rgba(0,0,0,0.10);
+            border-radius: 4px;
+        }
+
+        /* ── Drive Toolbar ──────────────────────────────── */
+        .drive-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 16px;
+            background: #fff;
+            border: 1px solid var(--border, #e2e5ea);
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+
+        .toolbar-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-back {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: 1px solid var(--border, #e2e5ea);
+            background: #fff;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-primary, #041335);
+            transition: border-color 0.15s;
+            flex-shrink: 0;
+        }
+        .btn-back:hover {
+            border-color: var(--primary, #0052CD);
+            color: var(--primary, #0052CD);
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 500;
+            font-size: 14px;
+            color: var(--text-primary, #041335);
+        }
+        .breadcrumb .home-icon {
+            font-size: 16px;
+        }
+        .breadcrumb .folder-name {
+            color: var(--text-secondary, #6b7280);
+            font-weight: 400;
+        }
+
+        .toolbar-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: #f1f5f9;
+            border-radius: 8px;
+            padding: 6px 10px;
+            gap: 6px;
+        }
+        .search-box .icon {
+            font-size: 14px;
+            line-height: 1;
+            flex-shrink: 0;
+        }
+        .search-box input {
+            border: none;
+            background: transparent;
+            outline: none;
+            width: 180px;
+            font-size: 13px;
+            font-family: 'Manrope', sans-serif;
+            color: var(--text-primary, #041335);
+        }
+        .search-box input::placeholder {
+            color: var(--text-muted, #94a3b0);
+        }
+
+        .view-toggle {
+            display: flex;
+            border: 1px solid var(--border, #e2e5ea);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .view-btn {
+            width: 36px;
+            height: 32px;
+            border: none;
+            background: white;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary, #6b7280);
+            transition: background 0.15s, color 0.15s;
+        }
+        .view-btn:hover {
+            background: #f8f9fb;
+        }
+        .view-btn.active {
+            background: #e0edff;
+            color: #1d4ed8;
+        }
+
+        /* ── File Grid ──────────────────────────────────── */
+        .file-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 12px;
+            margin-top: 4px;
+        }
+
+        .grid-card {
+            background: #fff;
+            border: 1px solid var(--border, #e2e5ea);
+            border-radius: 10px;
+            padding: 16px 12px;
+            cursor: pointer;
+            transition: box-shadow 0.18s, border-color 0.18s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 8px;
+        }
+        .grid-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.07);
+            border-color: var(--primary, #0052CD);
+        }
+
+        .grid-card__icon {
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            border-radius: 12px;
+            background: #f8f9fb;
+            flex-shrink: 0;
+        }
+
+        .grid-card__name {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary, #041335);
+            line-height: 1.3;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            width: 100%;
+        }
+
+        .grid-card__meta {
+            font-size: 11px;
+            color: var(--text-muted, #94a3b0);
+        }
+
+        /* ── Preview Panel Overrides for My Drive ────────── */
+        #view-mydrive .preview-header {
+            background: #fff;
+            color: #111827;
+            padding: 16px 20px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        #view-mydrive .preview-header-top {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        #view-mydrive .preview-header-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: #eef2ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #4f46e5;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        #view-mydrive .preview-header-text {
+            flex: 1;
+            min-width: 0;
+        }
+
+        #view-mydrive .preview-header-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        #view-mydrive .preview-header-name {
+            font-size: 12px;
+            color: #6b7280;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        #view-mydrive .preview-close {
+            position: static;
+            flex-shrink: 0;
+            margin-left: auto;
+        }
+
+        /* Hero block */
+        #view-mydrive .preview-hero {
+            background: linear-gradient(135deg, #0f172a, #1e3a8a);
+            color: white;
+            padding: 28px 20px 24px;
+            text-align: center;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #view-mydrive .preview-hero-icon {
+            width: 78px;
+            height: 78px;
+            border-radius: 16px;
+            background: rgba(255,255,255,0.12);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            margin-bottom: 14px;
+        }
+
+        #view-mydrive .preview-hero-name {
+            font-size: 17px;
+            font-weight: 700;
+            word-break: break-word;
+            text-align: center;
+            max-width: 240px;
+            line-height: 1.25;
+            margin-bottom: 12px;
+        }
+
+        #view-mydrive .preview-hero-badge {
+            display: inline-block;
+            padding: 9px 16px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.12);
+            color: rgba(255,255,255,0.78);
+            font-size: 12px;
+            font-weight: 600;
+            line-height: 1.3;
+            max-width: 230px;
+        }
+
+        /* ── Stat Cards ──────────────────────────────────── */
+        .my-drive-cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .my-drive-card {
+            background: #fff;
+            border: 1px solid #e2e5ea;
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+        }
+
+        .my-drive-card--clickable {
+            cursor: pointer;
+            transition: box-shadow 0.15s, border-color 0.15s;
+        }
+
+        .my-drive-card--clickable.my-drive-card--filtered {
+            border-color: #0052CD;
+            background: #f0f6ff;
+        }
+
+        .my-drive-card--clickable:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            border-color: #0052CD;
+        }
+
+        .my-drive-card__icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .my-drive-card__info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .my-drive-card__value {
+            font-size: 22px;
+            font-weight: 800;
+            color: #041335;
+            line-height: 1.2;
+        }
+
+        .my-drive-card__label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #374151;
+            margin-top: 2px;
+        }
+
+        .my-drive-card__sub {
+            font-size: 11px;
+            color: #9ca3af;
+            margin-top: 1px;
+        }
+        @keyframes toastIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body id="page-top">
+
+<div id="wrapper">
+
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <aside class="wix-sidebar" id="accordionSidebar">
+        <div class="sidebar__brand">
+            <div class="sidebar__brand-left">
+                <div class="sidebar__brand-icon">
+                    <img src="assets/icons/wistorix-icon-white-128.png" alt="Wistorix Logo" />
+                </div>
+                <div class="sidebar__brand-info">
+                    <span class="sidebar__brand-text">Wistorix</span>
+                    <span class="sidebar__brand-sub">Chrome Extension v2.0</span>
+                </div>
+            </div>
+            <button class="sb-toggle" id="sidebarCollapseBtn">‹</button>
+        </div>
+
+        <nav class="sidebar__nav">
+            <div class="sidebar__nav-label">MENU</div>
+            <a class="sidebar__nav-item" href="dashboard.html">
+                <span class="sidebar__nav-icon"><i class="fas fa-th-large"></i></span>
+                <span class="sidebar__nav-text">Dashboard</span>
+            </a>
+            <a class="sidebar__nav-item sidebar__nav-item--active" href="mydrive.html">
+                <span class="sidebar__nav-icon"><i class="fas fa-folder"></i></span>
+                <span class="sidebar__nav-text">My Drive</span>
+            </a>
+            <a class="sidebar__nav-item" href="email-shared.html">
+                <span class="sidebar__nav-icon"><i class="fas fa-envelope"></i></span>
+                <span class="sidebar__nav-text">Email được chia sẻ</span>
+            </a>
+            <a class="sidebar__nav-item" href="settings.html">
+                <span class="sidebar__nav-icon"><i class="fas fa-cog"></i></span>
+                <span class="sidebar__nav-text">Cài đặt</span>
+            </a>
+        </nav>
+
+        <div class="sidebar__bottom">
+            <a href="cleanup.html" class="sidebar__card" style="display:block;text-decoration:none;">
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <div class="sidebar__card-title">Lượt dọn dẹp</div>
+                    <div class="sidebar__card-sub" style="margin:0;"></div>
+                </div>
+                <div class="sidebar__progress">
+                    <div class="sidebar__progress-bar" style="width:0%;"></div>
+                </div>
+                <div class="sidebar__card-footnote"></div>
+            </a>
+            <a href="invite.html" class="sidebar__card sidebar__card--row" style="text-decoration:none;">
+                <div>
+                    <div class="sidebar__card-title">Mời bạn bè</div>
+                    <div class="sidebar__card-sub">Nhận 24 giờ dọn dẹp miễn phí</div>
+                </div>
+                <i class="fas fa-gift sidebar__card-icon"></i>
+            </a>
+            <a href="upgrade.html" class="sidebar__card sidebar__card--row" style="text-decoration:none;">
+                <div>
+                    <div class="sidebar__card-title">Nâng cấp Pro</div>
+                    <div class="sidebar__card-sub">Quét không giới hạn</div>
+                </div>
+                <i class="fas fa-bolt sidebar__card-icon"></i>
+            </a>
+            <div class="sidebar__profile" id="sidebar-profile">
+                <div class="sidebar__profile-avatar"></div>
+                <div class="sidebar__profile-info">
+                    <div class="sidebar__profile-name"></div>
+                    <div class="sidebar__profile-id"></div>
+                </div>
+                <span class="sidebar__profile-badge"></span>
+                <i class="fas fa-cog sidebar__profile-settings"></i>
+            </div>
+        </div>
+    </aside>
+
+    <div id="content-wrapper" class="wix-content-wrapper">
+        <div id="content">
+
+            <div class="wix-view" id="view-mydrive">
+
+                <header class="dash-header flex-shrink-0">
+                    <div class="dash-header__top">
+                        <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Menu">
+                            <i class="fas fa-bars"></i>
+                        </button>
+                        <div class="dash-header__left">
+                            <h1 class="dash-header__title">My Drive</h1>
+                            <p class="dash-header__sub">Duyệt và quản lý các tệp trong Google Drive của bạn</p>
+                        </div>
+
+                    </div>
+                </header>
+
+                <div class="wix-tab-panel wix-tab-panel--active">
+                    <div class="my-drive-body">
+
+                        <aside class="folder-sidebar">
+                            <div class="folder-sidebar-header">📁 CÂY THƯ MỤC</div>
+                            <div id="sidebar-tree" class="folder-tree"></div>
+                        </aside>
+
+                        <div class="drive-content">
+
+                            <!-- DRIVE TOOLBAR -->
+                            <div class="drive-toolbar">
+                                <div class="toolbar-left">
+                                    <button class="btn-back" id="btnMyDriveBack">&lsaquo;</button>
+                                    <div class="breadcrumb">
+                                        <span class="home-icon">🏠</span>
+                                        <span class="folder-name">My Drive</span>
+                                    </div>
+                                </div>
+                                <div class="toolbar-right">
+                                    <div class="search-box">
+                                        <span class="icon">🔍</span>
+                                        <input type="text" placeholder="Tìm trong thư mục..." id="searchInput">
+                                    </div>
+                                    <div class="view-toggle">
+                                        <button id="btnListView" class="view-btn active">☰</button>
+                                        <button id="btnGridView" class="view-btn">⬜</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- STAT CARDS -->
+                            <div class="my-drive-cards" id="my-drive-cards">
+                                <div class="my-drive-card">
+                                    <div class="my-drive-card__icon"><i class="fas fa-database"></i></div>
+                                    <div class="my-drive-card__info">
+                                        <div class="my-drive-card__value" id="mdc-storage">—</div>
+                                        <div class="my-drive-card__label">Dung lượng</div>
+                                        <div class="my-drive-card__sub" id="mdc-storage-sub">—</div>
+                                    </div>
+                                </div>
+                                <div class="my-drive-card my-drive-card--clickable" data-mydrive-filter="public">
+                                    <div class="my-drive-card__icon"><i class="fas fa-globe"></i></div>
+                                    <div class="my-drive-card__info">
+                                        <div class="my-drive-card__value" id="mdc-public">—</div>
+                                        <div class="my-drive-card__label">File công khai</div>
+                                        <div class="my-drive-card__sub">Bấm để xem & thu hồi</div>
+                                    </div>
+                                </div>
+                                <div class="my-drive-card my-drive-card--clickable" data-mydrive-filter="dupes">
+                                    <div class="my-drive-card__icon"><i class="fas fa-copy"></i></div>
+                                    <div class="my-drive-card__info">
+                                        <div class="my-drive-card__value" id="mdc-dupes">—</div>
+                                        <div class="my-drive-card__label">File trùng lặp</div>
+                                        <div class="my-drive-card__sub" id="mdc-dupes-sub">—</div>
+                                    </div>
+                                </div>
+                                <div class="my-drive-card my-drive-card--clickable" data-mydrive-filter="empty">
+                                    <div class="my-drive-card__icon"><i class="fas fa-file"></i></div>
+                                    <div class="my-drive-card__info">
+                                        <div class="my-drive-card__value" id="mdc-empty">—</div>
+                                        <div class="my-drive-card__label">File rỗng</div>
+                                        <div class="my-drive-card__sub">0 KB · bấm để xem & xóa</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- GRID VIEW -->
+                            <div id="fileGrid" class="file-grid" style="display:none;"></div>
+
+                            <!-- TABLE VIEW -->
+                            <div id="fileTable">
+                                <div class="wix-card col-table-full" style="margin-top:0;">
+                                    <div class="wix-card__header">
+                                        <div class="wix-card__title-group">
+                                            <h6 class="wix-card__title">Danh sách tệp tin</h6>
+                                            <span id="mydrive-list-status" class="wix-badge wix-badge--info">0 file</span>
+                                        </div>
+                                        <div class="wix-card__controls">
+                                            <label for="mydrive-file-type-filter" class="sr-only">Loại file</label>
+                                            <select id="mydrive-file-type-filter" class="wix-select" aria-label="Loại file"></select>
+                                        </div>
+                                    </div>
+                                    <div class="wix-card__body wix-card__body--table">
+                                        <div class="table-responsive" id="mydrive-table-wrapper">
+                                            <table class="wix-table" id="mydrive-table" cellspacing="0">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="th-chk"><input type="checkbox" id="mydrive-chk-all" class="wix-chk"></th>
+                                                        <th class="th-name">TÊN FILE</th>
+                                                        <th class="th-path">ĐƯỜNG DẪN</th>
+                                                        <th class="th-status">TRẠNG THÁI</th>
+                                                        <th class="th-owner">CHỦ SỞ HỮU</th>
+                                                        <th class="th-shared">CHIA SẺ</th>
+                                                        <th class="th-size" data-mydrive-sort="size">KÍCH THƯỚC <i class="fas fa-sort sort-icon"></i></th>
+                                                        <th class="th-date" data-mydrive-sort="createdTime">NGÀY TẠO <i class="fas fa-sort-down sort-icon sort-icon--active"></i></th>
+                                                        <th class="th-date" data-mydrive-sort="modifiedTime">NGÀY SỬA <i class="fas fa-sort sort-icon"></i></th>
+                                                        <th class="th-actions">HÀNH ĐỘNG</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="mydrive-tbody"></tbody>
+                                            </table>
+                                            <div id="mydrive-empty" class="wix-empty-state" style="display:none;">
+                                                <div class="wix-empty-state__text" style="padding:60px 20px;text-align:center;color:var(--text-muted);">
+                                                    <i class="fas fa-folder-open" style="font-size:48px;display:block;margin-bottom:12px;"></i>
+                                                    <strong>Chưa có dữ liệu</strong><br>
+                                                    <span style="font-size:13px;">Dữ liệu sẽ được tải tự động.</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="mydrive-pagination" class="wix-pagination" style="display:flex;justify-content:center;gap:6px;margin-top:16px;"></div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div id="mydrive-bulk-action-bar" class="bulk-bar" role="toolbar" aria-label="Bulk actions">
+    <span class="bulk-bar__count" id="mydrive-bulk-count">0 file đã chọn</span>
+    <div class="bulk-bar__actions">
+        <button id="mydrive-bulk-btn-download" class="bulk-bar__btn bulk-bar__btn--primary">
+            <i class="fas fa-download"></i> <span>Tải xuống</span>
+        </button>
+        <button id="mydrive-bulk-btn-revoke" class="bulk-bar__btn bulk-bar__btn--warning">
+            <i class="fas fa-shield-alt"></i> <span>Ngừng chia sẻ</span>
+        </button>
+        <button id="mydrive-bulk-btn-transfer" class="bulk-bar__btn bulk-bar__btn--primary">
+            <i class="fas fa-exchange-alt"></i> <span>Chuyển sở hữu</span>
+        </button>
+        <button id="mydrive-bulk-btn-delete" class="bulk-bar__btn bulk-bar__btn--danger">
+            <i class="fas fa-trash"></i> <span>Vào thùng rác</span>
+        </button>
+        <button id="mydrive-bulk-btn-deselect" class="bulk-bar__btn bulk-bar__btn--ghost">
+            <i class="fas fa-times"></i> <span>Bỏ chọn</span>
+        </button>
+    </div>
+</div>
+
+<div class="profile-dropdown" id="profileMenu">
+    <div class="profile-header">
+        <div class="avatar"></div>
+        <div class="info">
+            <div class="name"></div>
+            <div class="email"></div>
+            <div class="meta"></div>
+        </div>
+    </div>
+    <hr>
+    <div class="account-list"></div>
+    <hr>
+    <div class="menu-actions">
+        <div class="menu-item" data-profile-action="add-account">&#10133; Th&#234;m t&#224;i khoản kh&#225;c</div>
+        <div class="menu-item" data-profile-action="settings">&#9881; C&#224;i đặt t&#224;i khoản</div>
+        <div class="menu-item" data-profile-action="billing">&#128176; Thanh to&#225;n &amp; g&#243;i</div>
+        <div class="menu-item logout">&#128682; Đăng xuất</div>
+    </div>
+</div>
+<script type="module" src="mydrive.js"></script>
+<script src="sidebar-toggle.js"></script>
+
+<!-- ── File Preview Sidebar ──────────────────────────── -->
+<div id="filePreview" class="preview-sidebar">
+    <div class="preview-header">
+        <div class="preview-header-top">
+            <div class="preview-header-icon"><i class="fas fa-eye"></i></div>
+            <div class="preview-header-text">
+                <div class="preview-header-title">Xem trước tệp</div>
+                <div class="preview-header-name" id="previewFileName">—</div>
+            </div>
+            <button class="preview-close" id="previewClose">&times;</button>
+        </div>
+    </div>
+    <div class="preview-hero">
+        <div class="preview-hero-icon" id="previewHeroIcon"><i class="fas fa-file"></i></div>
+        <div class="preview-hero-name" id="previewHeroName">—</div>
+        <span class="preview-hero-badge" id="previewHeroBadge">Loại tệp này chưa hỗ trợ xem nhanh</span>
+    </div>
+    <div class="preview-body">
+        <div class="preview-info">
+            <div class="preview-info-row">
+                <span class="preview-info-label">Đường dẫn</span>
+                <span class="preview-info-value" id="previewPath">—</span>
+            </div>
+            <div class="preview-info-row">
+                <span class="preview-info-label">Trạng thái</span>
+                <span class="preview-info-value" id="previewStatus">—</span>
+            </div>
+            <div class="preview-info-row">
+                <span class="preview-info-label">Chủ sở hữu</span>
+                <span class="preview-info-value" id="previewOwner">—</span>
+            </div>
+            <div class="preview-info-row">
+                <span class="preview-info-label">Chia sẻ với</span>
+                <span class="preview-info-value" id="previewShared">—</span>
+            </div>
+            <div class="preview-info-row">
+                <span class="preview-info-label">Kích thước</span>
+                <span class="preview-info-value" id="previewSize">—</span>
+            </div>
+            <div class="preview-info-row">
+                <span class="preview-info-label">Ngày tạo</span>
+                <span class="preview-info-value" id="previewCreated">—</span>
+            </div>
+            <div class="preview-info-row">
+                <span class="preview-info-label">Ngày sửa</span>
+                <span class="preview-info-value" id="previewModified">—</span>
+            </div>
+            <div class="preview-info-row">
+                <span class="preview-info-label">Khuyến nghị</span>
+                <span class="preview-info-value" id="previewRecommendation">—</span>
+            </div>
+        </div>
+    </div>
+    <div class="preview-actions">
+        <button class="preview-btn preview-btn--primary" id="btnOpenDrive">
+            <i class="fas fa-external-link-alt"></i> Mở trên Drive
+        </button>
+        <button class="preview-btn preview-btn--danger" id="btnDeleteFile">
+            <i class="fas fa-trash"></i> Xóa tệp
+        </button>
+    </div>
+</div>
+<div id="previewOverlay" class="preview-overlay"></div>
+
+</body>
+</html>

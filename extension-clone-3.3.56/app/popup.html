@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <!-- ══ WISTORIX CLONE — mock runtime (chỉ có ở bản clone offline) ══ -->
+    <script src="__mock/mock-data.js"></script>
+    <script src="__mock/wistorix-mock.js"></script>
+    <script src="__mock/dev-toolbar.js"></script>
+    <title>Wistorix</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+
+<body>
+
+    <!-- Header -->
+    <div class="popup-header">
+        <div class="popup-header-icon">
+            <img src="assets/icons/wistorix-icon-128.png" alt="Wistorix Logo" />
+        </div>
+        <div class="popup-header-text">
+            <h1>Wistorix</h1>
+            <p>Google Drive Manager</p>
+        </div>
+    </div>
+
+    <!-- Status bar -->
+    <div class="popup-status" id="popup-status">
+        <span id="status-text">Đang kiểm tra...</span>
+    </div>
+
+    <!-- Scrollable content area -->
+    <div class="popup-content">
+
+        <!-- User bar -->
+        <div class="user-bar" id="user-bar">
+            <div class="user-avatar" id="user-avatar">?</div>
+            <div class="user-info-wrap">
+                <span class="user-email" id="user-email">Chưa đăng nhập</span>
+                <div class="user-badges-row">
+                    <span class="user-badge hidden" id="user-badge">✓ Active</span>
+                    <span class="premium-badge hidden" id="premium-badge">
+                        <i class="fas fa-crown"></i> <span id="premium-label">Premium</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── CARD 1: Dung lượng đã sử dụng ── -->
+        <div class="storage-card">
+            <div class="storage-title">💾 Dung lượng Drive</div>
+            <div id="storage-content">
+                <!-- Skeleton loading -->
+                <div class="skeleton skel-text skel-w-60"></div>
+                <div class="skeleton skel-bar"></div>
+                <div class="skeleton skel-text skel-w-30"></div>
+            </div>
+        </div>
+
+        <!-- Quick stats -->
+        <div class="quick-stats">
+
+            <!-- Mini chart -->
+            <div class="mini-chart-card">
+                <canvas id="miniChart"></canvas>
+                <div class="mini-chart-legend" id="miniChartLegend"></div>
+            </div>
+
+            <!-- ── Stats grid (5 pills: 2-col, last spans full) ── -->
+            <div class="stats-group">
+
+                <div class="stat-pill" id="stat-total">
+                    <div class="num">...</div>
+                    <div class="lbl">Tổng số files</div>
+                </div>
+
+                <div class="stat-pill danger" id="stat-issues">
+                    <div class="num">...</div>
+                    <div class="lbl">Files cần xử lý</div>
+                </div>
+
+                <div class="stat-pill warning" id="stat-stale">
+                    <div class="num">...</div>
+                    <div class="lbl">Files cũ (&gt;180 ngày)</div>
+                </div>
+
+                <!-- ── CARD 2: Files trùng lặp ── -->
+                <div class="stat-pill info" id="stat-duplicates">
+                    <div class="num">...</div>
+                    <div class="lbl">Files trùng lặp</div>
+                </div>
+
+                <!-- ── CARD 3: Files công khai (của tôi) ── -->
+                <div class="stat-pill danger span-2" id="stat-public">
+                    <div class="num">...</div>
+                    <div class="lbl">🔓 Files công khai (của tôi)</div>
+                </div>
+
+            </div>
+        </div>
+
+    </div><!-- /popup-content -->
+
+    <!-- CTA Button + Footer — fixed at bottom -->
+    <div class="popup-bottom">
+        <button class="btn-open" id="btn-open">
+            <span>📊</span> Mở Dashboard Quản Lý
+        </button>
+        <div class="popup-footer">Wistorix v2.1 · Google Drive Manager</div>
+    </div>
+
+    <!-- Onboarding overlay -->
+    <div id="onboarding-overlay" class="onboarding-overlay hidden">
+        <div class="onboarding-card">
+            <div class="onboarding-step" id="onboarding-step-label">Bước 1/5</div>
+            <h2 id="onboarding-title">Chào mừng đến với Wistorix</h2>
+            <p id="onboarding-description">
+                Wistorix giúp bạn quét Google Drive, phát hiện rủi ro và tối ưu dung lượng nhanh chóng.
+            </p>
+            <!-- Permissions list — chỉ hiển thị ở bước 2 -->
+            <div id="onboarding-permissions" class="onboarding-permissions" style="display:none;">
+                <div class="ob-perm-item">
+                    <div class="ob-perm-icon">📂</div>
+                    <div class="ob-perm-text">
+                        <div class="ob-perm-title">Đọc danh sách file</div>
+                        <div class="ob-perm-desc">Xem tên, kích thước, ngày chỉnh sửa. Không thay đổi nội dung file của bạn.</div>
+                    </div>
+                </div>
+                <div class="ob-perm-item">
+                    <div class="ob-perm-icon">🗑️</div>
+                    <div class="ob-perm-text">
+                        <div class="ob-perm-title">Quản lý file</div>
+                        <div class="ob-perm-desc">Chuyển file vào thùng rác và thu hồi quyền chia sẻ — chỉ khi bạn ra lệnh.</div>
+                    </div>
+                </div>
+                <div class="ob-perm-item">
+                    <div class="ob-perm-icon">👤</div>
+                    <div class="ob-perm-text">
+                        <div class="ob-perm-title">Thông tin tài khoản</div>
+                        <div class="ob-perm-desc">Biết bạn đang đăng nhập bằng email nào để phân biệt file của bạn và file được chia sẻ.</div>
+                    </div>
+                </div>
+                <div class="ob-perm-item">
+                    <div class="ob-perm-icon">💾</div>
+                    <div class="ob-perm-text">
+                        <div class="ob-perm-title">Lưu trữ trên trình duyệt</div>
+                        <div class="ob-perm-desc">Lưu cài đặt và cache quét vào máy tính của bạn. Dữ liệu không rời khỏi thiết bị.</div>
+                    </div>
+                </div>
+                <div class="ob-perm-item">
+                    <div class="ob-perm-icon">🔔</div>
+                    <div class="ob-perm-text">
+                        <div class="ob-perm-title">Thông báo</div>
+                        <div class="ob-perm-desc">Gửi cảnh báo khi phát hiện file có rủi ro bảo mật hoặc chiếm dụng nhiều dung lượng.</div>
+                    </div>
+                </div>
+            </div>
+            <div class="onboarding-actions">
+                <button id="onboarding-prev" class="onboarding-btn secondary" disabled>Quay lại</button>
+                <button id="onboarding-next" class="onboarding-btn primary">Tiếp tục</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="libs/chart.umd.min.js"></script>
+    <script src="popup.js" type="module"></script>
+</body>
+
+</html>

@@ -39,39 +39,6 @@
     </path>
   </g>
 
-  <!-- corner glass chips, subtle, away from headline -->
-  <g>
-    <g opacity="0.85">
-      <rect x="86" y="150" width="150" height="46" rx="12" fill="url(#card)" stroke="#3373D7" stroke-opacity="0.4"/>
-      <circle cx="112" cy="173" r="10" fill="#058EF4" fill-opacity="0.8"/>
-      <rect x="132" y="162" width="66" height="8" rx="4" fill="#99B7EB" fill-opacity="0.7"/>
-      <rect x="132" y="176" width="44" height="7" rx="3.5" fill="#668FE0" fill-opacity="0.5"/>
-      <animateTransform attributeName="transform" type="translate" values="0,0;0,-10;0,0" dur="7s" repeatCount="indefinite"/>
-    </g>
-    <g opacity="0.85">
-      <rect x="1020" y="180" width="150" height="46" rx="12" fill="url(#card)" stroke="#3373D7" stroke-opacity="0.4"/>
-      <circle cx="1046" cy="203" r="10" fill="#99B7EB" fill-opacity="0.8"/>
-      <rect x="1066" y="192" width="66" height="8" rx="4" fill="#99B7EB" fill-opacity="0.7"/>
-      <rect x="1066" y="206" width="44" height="7" rx="3.5" fill="#668FE0" fill-opacity="0.5"/>
-      <animateTransform attributeName="transform" type="translate" values="0,0;0,12;0,0" dur="8s" repeatCount="indefinite"/>
-    </g>
-    <g opacity="0.8">
-      <rect x="150" y="560" width="150" height="46" rx="12" fill="url(#card)" stroke="#3373D7" stroke-opacity="0.4"/>
-      <path d="M176 574 l9 3.5 v7 c0 6 -4 9.5 -9 12 c-5 -2.5 -9 -6 -9 -12 v-7 z" fill="#058EF4" fill-opacity="0.9"/>
-      <rect x="196" y="572" width="66" height="8" rx="4" fill="#99B7EB" fill-opacity="0.7"/>
-      <rect x="196" y="586" width="44" height="7" rx="3.5" fill="#668FE0" fill-opacity="0.5"/>
-      <animateTransform attributeName="transform" type="translate" values="0,0;0,10;0,0" dur="6.5s" repeatCount="indefinite"/>
-    </g>
-    <g opacity="0.8">
-      <rect x="980" y="540" width="150" height="46" rx="12" fill="url(#card)" stroke="#3373D7" stroke-opacity="0.4"/>
-      <circle cx="1006" cy="563" r="10" fill="none" stroke="#058EF4" stroke-width="3"/>
-      <path d="M1002 563 l3 3 l6 -7" stroke="#F0F4FC" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-      <rect x="1026" y="552" width="66" height="8" rx="4" fill="#99B7EB" fill-opacity="0.7"/>
-      <rect x="1026" y="566" width="44" height="7" rx="3.5" fill="#668FE0" fill-opacity="0.5"/>
-      <animateTransform attributeName="transform" type="translate" values="0,0;0,-12;0,0" dur="7.5s" repeatCount="indefinite"/>
-    </g>
-  </g>
-
   <!-- satellite dots -->
   <g>
     <circle cx="628" cy="140" r="5" fill="#058EF4"/>

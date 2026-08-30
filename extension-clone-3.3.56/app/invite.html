@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <!-- ══ WISTORIX CLONE — mock runtime (chỉ có ở bản clone offline) ══ -->
+    <script src="__mock/mock-data.js"></script>
+    <script src="__mock/wistorix-mock.js"></script>
+    <script src="__mock/dev-toolbar.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wistorix — Mời bạn bè</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="invite.css">
+</head>
+<body id="page-top" data-page="invite">
+<div id="wrapper">
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+    <aside class="wix-sidebar" id="accordionSidebar">
+        <div class="sidebar__brand">
+            <div class="sidebar__brand-left">
+                <div class="sidebar__brand-icon"><img src="assets/icons/wistorix-icon-white-128.png" alt="Wistorix Logo" /></div>
+                <div class="sidebar__brand-info">
+                    <span class="sidebar__brand-text">Wistorix</span>
+                    <span class="sidebar__brand-sub">Chrome Extension v2.0</span>
+                </div>
+            </div>
+            <button class="sb-toggle" id="sidebarCollapseBtn">‹</button>
+        </div>
+        <nav class="sidebar__nav">
+            <div class="sidebar__nav-label">MENU</div>
+            <a class="sidebar__nav-item" href="dashboard.html"><span class="sidebar__nav-icon"><i class="fas fa-th-large"></i></span><span class="sidebar__nav-text">Dashboard</span></a>
+            <a class="sidebar__nav-item" href="mydrive.html"><span class="sidebar__nav-icon"><i class="fas fa-folder"></i></span><span class="sidebar__nav-text">My Drive</span></a>
+            <a class="sidebar__nav-item" href="email-shared.html"><span class="sidebar__nav-icon"><i class="fas fa-envelope"></i></span><span class="sidebar__nav-text">Email được chia sẻ</span></a>
+            <a class="sidebar__nav-item" href="settings.html"><span class="sidebar__nav-icon"><i class="fas fa-cog"></i></span><span class="sidebar__nav-text">Cài đặt</span></a>
+        </nav>
+        <div class="sidebar__bottom">
+            <a href="cleanup.html" class="sidebar__card" style="display:block;text-decoration:none;">
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <div class="sidebar__card-title">Lượt dọn dẹp</div>
+                    <div class="sidebar__card-sub" style="margin:0;"></div>
+                </div>
+                <div class="sidebar__progress"><div class="sidebar__progress-bar" style="width:0%;"></div></div>
+                <div class="sidebar__card-footnote"></div>
+            </a>
+            <a href="invite.html" class="sidebar__card sidebar__card--row" style="text-decoration:none;">
+                <div>
+                    <div class="sidebar__card-title">Mời bạn bè</div>
+                    <div class="sidebar__card-sub">Nhận 24 giờ dọn dẹp miễn phí</div>
+                </div>
+                <i class="fas fa-gift sidebar__card-icon"></i>
+            </a>
+            <a href="upgrade.html" class="sidebar__card sidebar__card--row" style="text-decoration:none;">
+                <div>
+                    <div class="sidebar__card-title">Nâng cấp Pro</div>
+                    <div class="sidebar__card-sub">Quét không giới hạn</div>
+                </div>
+                <i class="fas fa-bolt sidebar__card-icon"></i>
+            </a>
+            <div class="sidebar__profile">
+                <div class="sidebar__profile-avatar"></div>
+                <div class="sidebar__profile-info">
+                    <div class="sidebar__profile-name"></div>
+                    <div class="sidebar__profile-id"></div>
+                </div>
+                <span class="sidebar__profile-badge"></span>
+                <i class="fas fa-cog sidebar__profile-settings"></i>
+            </div>
+        </div>
+    </aside>
+    <div id="content-wrapper" class="wix-content-wrapper">
+        <div id="content">
+            <div class="wix-view" id="view-invite">
+                <header class="dash-header flex-shrink-0">
+                    <div class="dash-header__top">
+                        <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Menu"><i class="fas fa-bars"></i></button>
+                        <div class="dash-header__left">
+                            <h1 class="dash-header__title">Mời bạn bè</h1>
+                            <p class="dash-header__sub">Giới thiệu bạn bè và nhận lượt dọn dẹp miễn phí</p>
+                        </div>
+                    </div>
+                </header>
+                <div class="wix-tab-panel wix-tab-panel--active" style="padding-top:20px;">
+                    <div class="invite-container">
+                        <div id="invite-hero"></div>
+                        <div class="stats-grid" id="invite-stats"></div>
+                        <div id="invite-progress"></div>
+                        <div class="steps-grid" id="invite-steps"></div>
+                        <div class="invite-list">
+                            <div class="list-header" id="invite-people-header"></div>
+                            <div id="invite-people"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="profile-dropdown" id="profileMenu">
+    <div class="profile-header">
+        <div class="avatar"></div>
+        <div class="info">
+            <div class="name"></div>
+            <div class="email"></div>
+            <div class="meta"></div>
+        </div>
+    </div>
+    <hr>
+    <div class="account-list"></div>
+    <hr>
+    <div class="menu-actions">
+        <div class="menu-item" data-profile-action="add-account">&#10133; Th&#234;m t&#224;i khoản kh&#225;c</div>
+        <div class="menu-item" data-profile-action="settings">&#9881; C&#224;i đặt t&#224;i khoản</div>
+        <div class="menu-item" data-profile-action="billing">&#128176; Thanh to&#225;n &amp; g&#243;i</div>
+        <div class="menu-item logout">&#128682; Đăng xuất</div>
+    </div>
+</div>
+<script type="module" src="modules/profile-bootstrap.js"></script>
+<script src="sidebar-toggle.js"></script>
+<script type="module" src="invite.js"></script>
+</body>
+</html>
