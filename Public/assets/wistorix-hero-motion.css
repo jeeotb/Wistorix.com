@@ -26,7 +26,7 @@ body{overflow-x:clip}
 @keyframes wx-d2{to{transform:translate(-6vw,-4vh) scale(.95)}}
 @keyframes wx-d3{to{transform:translate(4vw,-6vh) scale(1.12)}}
 .wx-dots{position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,.13) 1px,transparent 1.4px);background-size:26px 26px;-webkit-mask-image:radial-gradient(ellipse 72% 62% at 50% 42%,#000 26%,transparent 76%);mask-image:radial-gradient(ellipse 72% 62% at 50% 42%,#000 26%,transparent 76%)}
-#wx-pc{position:absolute;inset:0;width:100%;height:100%;z-index:1}
+#wx-pc{position:absolute;inset:0;width:100%;height:100%;z-index:1;transform:translateZ(0);will-change:transform} /* tách canvas thành lớp GPU riêng, Safari khỏi vẽ lại cả hero mỗi khung */
 
 /* Bố cục 2 cột: H1 + CTA bên trái · logo WS 3D hạt bên phải */
 .wx-cols{display:grid;grid-template-columns:1.14fr .86fr;gap:3vw;align-items:center;width:min(1280px,92vw);margin:0 auto}
