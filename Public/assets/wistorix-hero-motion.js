@@ -11,7 +11,12 @@
     var host=cv&&cv.parentElement;
     if(!cv||!stage||!host)return;
     var ctx=cv.getContext('2d');
-    var DPR=Math.min(window.devicePixelRatio||1,2);
+    var DPR=Math.min(window.devicePixelRatio||1,1.5);
+    /* Mật độ hạt tự thích nghi: stride=1 vẽ đủ 3.200 hạt · 2 = một nửa · 3 = một phần ba.
+       Máy ít nhân/ít RAM hoặc màn hẹp khởi đầu ở mức 2; đo fps 60 khung đầu, nếu chậm thì giảm tiếp. */
+    var hc=navigator.hardwareConcurrency||4, dm=navigator.deviceMemory||8;
+    var stride=(hc<=4||dm<=4||window.innerWidth<860)?2:1;
+    var ftAcc=0,ftCnt=0,ftLast=0,ftWarm=0,ftSlow=0;
     var N=SHAPES[0].p.length>>1,W=0,H=0,box=null;
     var THICK=14;
     var cur=0,curShape=SHAPES[0];
@@ -236,8 +241,18 @@
       var cxm=box.x+box.w/2, cym=box.y+box.h/2;
       var F=900*DPR, TH=THICK*DPR;
 
+      /* đo thời gian khung hình, tự hạ mật độ hạt nếu máy đuối (>24ms/khung ≈ dưới 40fps) */
+      var nowT=performance.now();
+      if(ftLast){
+        if(ftWarm<120)ftWarm++;                      /* bỏ qua ~2s đầu: khung hình lúc load luôn giật */
+        else{ftAcc+=nowT-ftLast;ftCnt++;
+          if(ftCnt>=60){
+            if(ftAcc/ftCnt>26){if(++ftSlow>=2&&stride<3){stride++;ftSlow=0;}}else ftSlow=0;
+            ftAcc=0;ftCnt=0;}}
+      }
+      ftLast=nowT;
       var i,p;
-      for(i=0;i<N;i++){p=pts[i];
+      for(i=0;i<N;i+=stride){p=pts[i];
         p.x+=p.vx*(1-blend);p.y+=p.vy*(1-blend);
         if(p.x<0||p.x>W)p.vx*=-1;if(p.y<0||p.y>H)p.vy*=-1;
         if(blend>.01){
@@ -260,9 +275,9 @@
 
       ctx.globalAlpha=.58+.42*blend;
       var deep=blend>.3;
-      var baseR=(0.74+.32*blend)*DPR;
+      var baseR=(0.74+.32*blend)*DPR*(stride===1?1:stride===2?1.25:1.45);
       var bl=Math.round(blend*11);
-      for(i=0;i<N;i++){p=pts[i];
+      for(i=0;i<N;i+=stride){p=pts[i];
         var shl=deep?(p.z>TH*.5?2:(p.z>-TH*.5?1:0)):1;
         var rad=baseR*(deep?p.sc:1);
         ctx.drawImage(sprite(p.ci,shl,bl),p.x-rad,p.y-rad,rad*2,rad*2);
@@ -282,4 +297,3 @@
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);
   else init();
 })();
-

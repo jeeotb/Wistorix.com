@@ -1,7 +1,11 @@
 /* Wistorix hero motion · hạt xếp thành wordmark + nền aurora
    Gắn kèm: assets/wistorix-hero-motion.js · dùng trong index.html */
 
-/* Thanh nav dùng chung: xem assets/wistorix-nav.css + wistorix-nav.js */
+/* Navbar luôn hiển thị khi cuộn: chuyển từ absolute sang fixed, thêm nền mờ cho dễ đọc.
+   Thu gọn: hạ chiều cao logo và padding để thanh nav mỏng như bản gốc */
+.navbar{position:fixed;top:0;left:0;right:0;background-color:rgba(4,15,42,.93);padding-top:0;padding-bottom:0}
+.navbar .padding-global.is-navbar{padding:.5rem 0;width:min(1280px,92vw);margin:0 auto}
+.navbar .navbar_logo,.navbar img.navbar_logo{height:2.5rem;max-height:2.5rem;width:auto}
 
 /* Sticky của .wx-pin cần trục dọc visible, nhưng vẫn phải chặn tràn NGANG (marquee logo rộng hàng nghìn px
    từng làm Chrome mobile phóng to viewport) → clip riêng trục ngang, trục dọc visible để sticky chạy */
@@ -13,10 +17,11 @@ body{overflow-x:clip}
 /* Phủ tối nền để hạt trắng của logo WS nổi hơn: một lớp tối đều + một vùng tối sâu hơn ngay sau logo (cột phải) */
 .wx-aurora::before{content:"";position:absolute;inset:0;background:rgba(2,8,26,.42)}
 .wx-aurora::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse 46% 56% at 72% 46%,rgba(1,4,16,.55),transparent 72%)}
-.wx-blob{position:absolute;width:52vw;height:52vw;border-radius:50%;filter:blur(90px);opacity:.32;mix-blend-mode:screen}
-.wx-blob.is-1{background:radial-gradient(circle,#2f52f0,transparent 62%);top:-18%;left:-10%;animation:wx-d1 17s ease-in-out infinite alternate}
-.wx-blob.is-2{background:radial-gradient(circle,#7c3aed,transparent 62%);bottom:-24%;right:-8%;animation:wx-d2 21s ease-in-out infinite alternate}
-.wx-blob.is-3{background:radial-gradient(circle,#0ea5b7,transparent 62%);bottom:-6%;left:30%;width:32vw;height:32vw;animation:wx-d3 14s ease-in-out infinite alternate}
+/* Aurora KHÔNG dùng filter blur (rất nặng với GPU cũ): độ mềm lấy từ chính radial-gradient tan dần ra rìa */
+.wx-blob{position:absolute;width:56vw;height:56vw;border-radius:50%;opacity:.55;will-change:transform;pointer-events:none}
+.wx-blob.is-1{background:radial-gradient(circle,rgba(47,82,240,.55) 0%,rgba(47,82,240,.22) 30%,rgba(47,82,240,0) 68%);top:-18%;left:-10%;animation:wx-d1 17s ease-in-out infinite alternate}
+.wx-blob.is-2{background:radial-gradient(circle,rgba(124,58,237,.5) 0%,rgba(124,58,237,.2) 30%,rgba(124,58,237,0) 68%);bottom:-24%;right:-8%;animation:wx-d2 21s ease-in-out infinite alternate}
+.wx-blob.is-3{background:radial-gradient(circle,rgba(14,165,183,.5) 0%,rgba(14,165,183,.2) 30%,rgba(14,165,183,0) 68%);bottom:-6%;left:30%;width:36vw;height:36vw;animation:wx-d3 14s ease-in-out infinite alternate}
 @keyframes wx-d1{to{transform:translate(7vw,5vh) scale(1.08)}}
 @keyframes wx-d2{to{transform:translate(-6vw,-4vh) scale(.95)}}
 @keyframes wx-d3{to{transform:translate(4vw,-6vh) scale(1.12)}}
@@ -65,6 +70,12 @@ body{overflow-x:clip}
   /* hero tràn viền: bỏ margin + bo góc của template */
   .wx-pin .section_hero{margin:0;border-radius:0;top:0;min-height:100svh}
   .hero_wrap{padding-top:5.25rem;padding-bottom:2.5rem}
+  /* navbar gọn: logo nhỏ, burger viền mảnh trong suốt */
+  .navbar .padding-global.is-navbar{width:100%;padding:.4rem .9rem}
+  .navbar .navbar_logo,.navbar img.navbar_logo{height:1.9rem;max-height:1.9rem}
+  .navbar .menu-button{background-color:transparent}
+  .navbar .nav-button_component{background-color:transparent;border:1px solid rgba(255,255,255,.3);border-radius:.6rem}
+  .navbar .nav-button_line{background-color:#fff}
   /* cấp chữ: sub và trust nhỏ, ngắt dòng cân bằng không rơi chữ mồ côi */
   .wx-cols .max-width-medium{max-width:21rem;margin-left:auto;margin-right:auto}
   .wx-cols .max-width-medium .text-base{font-size:.88rem;line-height:1.55;text-wrap:balance}

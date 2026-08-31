@@ -34,9 +34,7 @@
   <g fill="none">
     <circle cx="628" cy="470" r="330" stroke="#3373D7" stroke-opacity="0.28" stroke-width="1.5"/>
     <circle cx="628" cy="470" r="430" stroke="#3373D7" stroke-opacity="0.16" stroke-width="1.5" stroke-dasharray="2 10"/>
-    <path d="M 628 140 A 330 330 0 0 1 940 350" stroke="#058EF4" stroke-opacity="0.7" stroke-width="2.5" stroke-linecap="round">
-      <animateTransform attributeName="transform" type="rotate" from="0 628 470" to="360 628 470" dur="30s" repeatCount="indefinite"/>
-    </path>
+    <path d="M 628 140 A 330 330 0 0 1 940 350" stroke="#058EF4" stroke-opacity="0.7" stroke-width="2.5" stroke-linecap="round"/>
   </g>
 
   <!-- satellite dots -->
