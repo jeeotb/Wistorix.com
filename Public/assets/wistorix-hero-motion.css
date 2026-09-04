@@ -1,23 +1,26 @@
-/* Wistorix hero motion · hạt xếp thành wordmark + nền aurora
-   Gắn kèm: assets/wistorix-hero-motion.js · dùng trong index.html */
+/* Wistorix hero · màn trình diễn quỹ đạo theo thanh cuộn
+   Gắn kèm: assets/wistorix-hero-motion.js · dùng trong index.html
+   Nguyên tắc: KHÔNG dùng rotateX/filter blur (nặng GPU cũ). Chuyển động chỉ gồm
+   scale · opacity · xoay quanh trục Z → mượt trên cả máy yếu lẫn màn retina. */
 
-/* Navbar luôn hiển thị khi cuộn: chuyển từ absolute sang fixed, thêm nền mờ cho dễ đọc.
-   Thu gọn: hạ chiều cao logo và padding để thanh nav mỏng như bản gốc */
-.navbar{position:fixed;top:0;left:0;right:0;background-color:rgba(4,15,42,.93);padding-top:0;padding-bottom:0}
-.navbar .padding-global.is-navbar{padding:.5rem 0;width:min(1280px,92vw);margin:0 auto}
-.navbar .navbar_logo,.navbar img.navbar_logo{height:2.5rem;max-height:2.5rem;width:auto}
+:root{--wx-cyan:#2AD2FF;--wx-lime:#D6FD70;--wx-ease:cubic-bezier(.16,1,.3,1)}
 
-/* Sticky của .wx-pin cần trục dọc visible, nhưng vẫn phải chặn tràn NGANG (marquee logo rộng hàng nghìn px
-   từng làm Chrome mobile phóng to viewport) → clip riêng trục ngang, trục dọc visible để sticky chạy */
+/* ===== Navbar =====
+   File này KHÔNG còn định kiểu thanh nav. Toàn bộ header do assets/wistorix-nav.css lo,
+   dùng chung cho mọi trang: nền trắng, sticky, vuốt xuống ẩn vuốt lên hiện.
+   Trước đây chỗ này ghi đè thành nền navy position:fixed, gây hai lệch so với trang phụ:
+   logo to hơn, và ở mobile vạch hamburger bị tô trắng nên tàng hình trên nền trắng. */
+
+/* Sticky cần trục dọc visible, nhưng vẫn phải chặn tràn NGANG (dải marquee rộng hàng nghìn px
+   từng làm Chrome mobile phóng to viewport) */
 .page-wrapper{overflow-x:clip;overflow-y:visible}
 body{overflow-x:clip}
 
-/* Lớp nền động, phủ toàn hero, nằm trên ảnh nền SVG và dưới nội dung (.vertical-center có z-index:2) */
+/* ===== Nền động của hero ===== */
 .wx-aurora{position:absolute;inset:0;overflow:hidden;pointer-events:none}
-/* Phủ tối nền để hạt trắng của logo WS nổi hơn: một lớp tối đều + một vùng tối sâu hơn ngay sau logo (cột phải) */
 .wx-aurora::before{content:"";position:absolute;inset:0;background:rgba(2,8,26,.42)}
 .wx-aurora::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse 46% 56% at 72% 46%,rgba(1,4,16,.55),transparent 72%)}
-/* Aurora KHÔNG dùng filter blur (rất nặng với GPU cũ): độ mềm lấy từ chính radial-gradient tan dần ra rìa */
+/* Không dùng filter:blur · độ mềm lấy từ chính radial-gradient tan dần ra rìa */
 .wx-blob{position:absolute;width:56vw;height:56vw;border-radius:50%;opacity:.55;will-change:transform;pointer-events:none}
 .wx-blob.is-1{background:radial-gradient(circle,rgba(47,82,240,.55) 0%,rgba(47,82,240,.22) 30%,rgba(47,82,240,0) 68%);top:-18%;left:-10%;animation:wx-d1 17s ease-in-out infinite alternate}
 .wx-blob.is-2{background:radial-gradient(circle,rgba(124,58,237,.5) 0%,rgba(124,58,237,.2) 30%,rgba(124,58,237,0) 68%);bottom:-24%;right:-8%;animation:wx-d2 21s ease-in-out infinite alternate}
@@ -26,103 +29,164 @@ body{overflow-x:clip}
 @keyframes wx-d2{to{transform:translate(-6vw,-4vh) scale(.95)}}
 @keyframes wx-d3{to{transform:translate(4vw,-6vh) scale(1.12)}}
 .wx-dots{position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,.13) 1px,transparent 1.4px);background-size:26px 26px;-webkit-mask-image:radial-gradient(ellipse 72% 62% at 50% 42%,#000 26%,transparent 76%);mask-image:radial-gradient(ellipse 72% 62% at 50% 42%,#000 26%,transparent 76%)}
-#wx-pc{position:absolute;inset:0;width:100%;height:100%;z-index:1;transform:translateZ(0);will-change:transform} /* tách canvas thành lớp GPU riêng, Safari khỏi vẽ lại cả hero mỗi khung */
 
-/* Bố cục 2 cột: H1 + CTA bên trái · logo WS 3D hạt bên phải */
-.wx-cols{display:grid;grid-template-columns:1.14fr .86fr;gap:3vw;align-items:center;width:min(1280px,92vw);margin:0 auto}
+/* ===== Bố cục 2 cột ===== */
+.wx-cols{display:grid;grid-template-columns:1.06fr .94fr;gap:3vw;align-items:center;width:min(1280px,92vw);margin:0 auto}
 .wx-cols .padding-global.is-hero{width:100%;padding-left:0;padding-right:0}
 .wx-cols .vertical-center{align-items:flex-start;text-align:left}
 .wx-cols .text-align-center{text-align:left}
 .wx-cols .button_wrapper.is-hero{justify-content:flex-start}
-/* H1: giữ ngắt dòng cố định 2 dòng ("Bảo mật, kiểm soát và" ⏎ "dọn dẹp dữ liệu trên Google Drive") */
 .wx-cols h1{font-size:clamp(2.1rem,3vw,3.1rem);line-height:1.2;letter-spacing:-.01em;white-space:nowrap}
 .wx-cols h1 br{display:block}
+.wx-cols h1 span.opacity-73{opacity:1;color:#fff}
 @media(max-width:1100px){.wx-cols h1{white-space:normal}}
-@media(max-width:600px){.wx-cols h1{font-size:1.95rem;line-height:1.28}}
 
-/* Nút "Xem demo": đổi từ đen mờ sang cyan sáng cho nổi trên nền navy */
-.wx-cols .button.w-variant-3876fb3c-f589-169e-8f41-073b5a3f3902{background-color:#2AD2FF;color:#04263B}
+/* Nút "Xem demo" cyan · footer đồng bộ tông navy */
+.wx-cols .button.w-variant-3876fb3c-f589-169e-8f41-073b5a3f3902{background-color:var(--wx-cyan);color:#04263B}
 .wx-cols .button.w-variant-3876fb3c-f589-169e-8f41-073b5a3f3902:hover{background-color:#5FDFFF}
-
-/* Footer đồng bộ tông navy với hero banner */
 .footer_wrap{background:linear-gradient(135deg,#021E6B,#041335 60%,#041335)}
 
-/* Dòng trust nằm ngay dưới cụm CTA (nguyên tắc proximity), chữ nhỏ và dịu hơn CTA */
-.wx-cols .rating{padding-top:1.25rem;padding-bottom:0;justify-content:flex-start;align-items:flex-start;text-align:left}
-.wx-cols .rating .text-color-on-primary{font-size:.875rem;opacity:.72}
-@media(max-width:860px){.wx-cols .rating{justify-content:center;align-items:center;text-align:center}}
+/* ===== H1 cố định · không hiệu ứng chữ, keyword luôn sáng lime ===== */
+.wx-cols h1 img.wx-gd{height:.85em;width:auto;display:inline-block;vertical-align:-.06em;margin:0 .06em}
+.wx-cols h1 .wx-k{color:var(--wx-lime);text-shadow:0 0 26px rgba(214,253,112,.45)}
 
-/* Hộp đích: hạt xếp thành bộ não 3D (tỉ lệ 1.147), dịch nhẹ sang trái cho đỡ sát lề phải */
-.wx-stage{position:relative;width:100%;max-width:520px;margin:0 auto;transform:translateX(-5%);pointer-events:none}
-.wx-stage::before{content:"";display:block;padding-top:87.2%}
+/* ===== Sân khấu: quỹ đạo · khung VUÔNG để mọi vòng tròn đều tuyệt đối ===== */
+.wx-stage{position:relative;width:100%;max-width:560px;aspect-ratio:1;margin:0 auto;pointer-events:none}
+.wx-orbits{position:absolute;inset:0;display:grid;place-items:center;opacity:0;transform:scale(.55);
+  transition:opacity .9s var(--wx-ease),transform 1.5s var(--wx-ease);will-change:transform,opacity}
+.wx-ring{position:absolute;border-radius:50%;border:1px solid rgba(120,170,255,.22)}
+.wx-r1{width:34%;aspect-ratio:1}.wx-r2{width:58%;aspect-ratio:1}.wx-r3{width:82%;aspect-ratio:1}
+.wx-arc{position:absolute;border-radius:50%;border:2px solid transparent;animation:wx-spin 7s linear infinite}
+.wx-a1{width:58%;aspect-ratio:1;border-top-color:var(--wx-cyan);border-right-color:rgba(42,210,255,.25)}
+.wx-a2{width:82%;aspect-ratio:1;border-bottom-color:rgba(120,170,255,.55);animation-duration:11s;animation-direction:reverse}
+@keyframes wx-spin{to{transform:rotate(360deg)}}
+.wx-dotr{position:absolute;border-radius:50%;animation:wx-spin 16s linear infinite}
+.wx-dotr i{position:absolute;top:-4px;left:calc(50% - 4px);width:8px;height:8px;border-radius:50%;background:var(--wx-cyan);box-shadow:0 0 12px rgba(42,210,255,.9)}
+.wx-d1{width:58%;aspect-ratio:1;animation-duration:13s}
+.wx-d2{width:82%;aspect-ratio:1;animation-duration:19s;animation-direction:reverse}
+.wx-d2 i{background:#8fb0ff;box-shadow:0 0 10px rgba(143,176,255,.8)}
+/* vành icon xoay quanh trục Z, icon xoay ngược nên luôn đứng thẳng */
+.wx-ringicons{position:absolute;width:82%;aspect-ratio:1;animation:wx-spin 30s linear infinite}
+.wx-slot{position:absolute;width:0;height:0}
+.wx-slot .wx-un{position:absolute;left:0;top:0;animation:wx-spin 30s linear infinite reverse}
+.wx-p1{left:6.7%;top:25%}.wx-p2{left:93.3%;top:25%}.wx-p3{left:50%;top:100%}
+.wx-app{position:absolute;left:-46px;top:-46px;width:92px;height:92px;border-radius:22px;background:#fff;
+  box-shadow:0 18px 40px rgba(4,10,30,.45);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;
+  color:#0A1B4A;font-size:.68rem;font-weight:700;opacity:0;transform:scale(.6);
+  transition:opacity .6s var(--wx-ease),transform .9s var(--wx-ease);will-change:transform,opacity}
+.wx-app svg{width:30px;height:30px}
+/* tâm: đĩa TRẮNG + logo WS màu + viền gradient xoay */
+.wx-core{position:absolute;left:50%;top:50%;width:132px;height:132px;border-radius:50%;
+  transform:translate(-50%,-50%) scale(1);display:grid;place-items:center;
+  box-shadow:0 0 0 10px rgba(42,210,255,.07),0 18px 60px rgba(0,0,0,.45);
+  transition:transform 1.5s var(--wx-ease),opacity .8s var(--wx-ease),box-shadow 1s ease;will-change:transform,opacity}
+.wx-core::before{content:"";position:absolute;inset:-6px;border-radius:50%;
+  background:conic-gradient(from 0deg,#2AD2FF,#4169f0,#7c5bff,#2AD2FF);animation:wx-spin 6s linear infinite}
+.wx-disc{position:relative;z-index:1;width:100%;height:100%;border-radius:50%;background:#fff;
+  display:grid;place-items:center;box-shadow:inset 0 -6px 18px rgba(11,32,90,.08)}
+.wx-disc img{width:64%}
 
-/* H1 trắng tinh: bỏ lớp mờ opacity-73 của template trong hero */
-.wx-cols h1 span.opacity-73{opacity:1;color:#fff}
+/* logo dạng chấm nối mạng · chỉ hiện ở nhịp mở đầu rồi tan vào logo đặc */
+.wx-dotlogo{position:absolute;left:50%;top:50%;width:78%;max-width:440px;
+  transform:translate(-50%,-50%) scale(.94);opacity:0;pointer-events:none;
+  transition:opacity .75s var(--wx-ease),transform 1.3s var(--wx-ease)}
 
-/* ==== MOBILE: hero tràn viền, hierarchy gọn: H1 > sub > CTA > trust > hình hạt ==== */
+/* ===== Slide tính năng ===== */
+.wx-feat{position:absolute;inset:0;opacity:0;pointer-events:none;transition:opacity .6s}
+.wx-feat.is-on{opacity:1}
+.wx-head{position:absolute;left:2%;top:0;display:flex;gap:15px;align-items:center;transform-origin:left top}
+.wx-feat.is-on .wx-head{animation:wx-launch 1.25s var(--wx-ease) both}
+@keyframes wx-launch{from{transform:translate(190px,195px) scale(2.4);opacity:0}60%{opacity:1}to{transform:translate(0,0) scale(1);opacity:1}}
+.wx-head .wx-ic{width:68px;height:68px;border-radius:19px;background:#fff;display:grid;place-items:center;box-shadow:0 18px 40px rgba(4,10,30,.45);flex:none}
+.wx-head .wx-ic svg{width:32px;height:32px}
+.wx-head small{display:block;color:#9fb0d9;font-size:.84rem;margin-bottom:3px}
+.wx-head b{font-size:1.22rem;line-height:1.25;display:block;color:#fff}
+.wx-laptop{position:absolute;left:7%;right:7%;top:27%;opacity:0;transform:translateY(46px) scale(.97);
+  transition:opacity .8s .55s var(--wx-ease),transform 1.2s .55s var(--wx-ease)}
+.wx-feat.is-on .wx-laptop{opacity:1;transform:none}
+.wx-lid{border-radius:14px 14px 4px 4px;background:#0d1730;padding:9px 9px 0;box-shadow:0 34px 80px rgba(0,0,0,.55)}
+.wx-lid img{display:block;width:100%;border-radius:6px 6px 0 0;aspect-ratio:16/10;object-fit:cover;object-position:top}
+.wx-base{height:13px;margin:0 -3.4%;border-radius:0 0 14px 14px;background:linear-gradient(#2a3552,#161f38)}
+.wx-chip{position:absolute;padding:10px 13px;border-radius:13px;background:#fff;color:#0A1B4A;font-size:.73rem;
+  box-shadow:0 16px 34px rgba(4,10,30,.4);opacity:0;transform:translateY(14px);
+  transition:opacity .6s var(--wx-ease),transform .8s var(--wx-ease)}
+.wx-feat.is-on .wx-chip{opacity:1;transform:none}
+.wx-feat.is-on .wx-c1{transition-delay:1.05s}.wx-feat.is-on .wx-c2{transition-delay:1.3s}
+.wx-chip b{display:block;font-size:.82rem;margin-bottom:1px}
+.wx-chip .g{color:#0a8f4e}.wx-chip .r{color:#d23f3f}
+
+/* ===== Trạng thái theo chặng cuộn ===== */
+/* nhịp 1 · chấm: chỉ có mạng chấm, logo đặc chưa hiện */
+.wx-stage[data-s="dots"] .wx-dotlogo{opacity:1;transform:translate(-50%,-50%) scale(1)}
+.wx-stage[data-s="dots"] .wx-core{opacity:0;transform:translate(-50%,-50%) scale(1.15)}
+/* nhịp 2 · logo: chấm tan đi, logo đặc cận cảnh hiện lên */
+.wx-stage[data-s="logo"] .wx-core{transform:translate(-50%,-50%) scale(1.5)}
+.wx-stage[data-s="orbit"] .wx-orbits,.wx-stage[data-s="end"] .wx-orbits{opacity:1;transform:scale(1)}
+.wx-stage[data-s="orbit"] .wx-app,.wx-stage[data-s="end"] .wx-app{opacity:1;transform:scale(1)}
+.wx-stage[data-s="orbit"] .wx-w1{transition-delay:.15s}
+.wx-stage[data-s="orbit"] .wx-w2{transition-delay:.3s}
+.wx-stage[data-s="orbit"] .wx-w3{transition-delay:.45s}
+.wx-stage[data-s^="f"] .wx-orbits{opacity:0;transform:scale(1.45)}
+.wx-stage[data-s^="f"] .wx-core{opacity:0;transform:translate(-50%,-50%) scale(.5)}
+.wx-stage[data-s="end"] .wx-core{transform:translate(-50%,-50%) scale(1.05);box-shadow:0 0 0 16px rgba(214,253,112,.10),0 18px 70px rgba(42,210,255,.5)}
+
+/* ===== Dải chạy ngang thay logo partner ===== */
+.wx-trust-loop{grid-column-gap:1.6rem;grid-row-gap:.7rem;padding-right:0}
+/* Dải tin cậy ĐỨNG YÊN, không chạy ngang.
+   .loop gốc của template là width:max-content và bị Webflow IX3 kéo transform,
+   nên phải ghi đè bằng !important thì mới thắng được style inline do IX3 ghi vào.
+   visibility:visible cũng cần, vì template ẩn .loop_logos cho tới khi IX3 khởi động,
+   mà giờ dải này không còn phụ thuộc IX3 nữa. */
+.section_loop .loop.wx-trust-static{width:100%;justify-content:center;transform:none!important;animation:none!important}
+.section_loop .loop_logos{visibility:visible!important;flex-wrap:wrap;justify-content:center;flex:0 1 auto;max-width:100%;transform:none!important;animation:none!important}
+.wx-trust-item{white-space:nowrap;font-size:1.05rem;font-weight:500;color:#0A1F52;letter-spacing:.01em}
+.wx-trust-dot{flex:none;width:9px;height:9px;border-radius:50%;background:var(--wx-lime);box-shadow:0 0 0 3px rgba(214,253,112,.28)}
+
+/* ===== Hero cao đúng một màn hình · khối bên phải tự chạy vòng lặp ===== */
+.wx-pin{height:auto}
+.wx-pin .section_hero{position:relative;top:auto;min-height:calc(100svh - 1.5rem)}
+.wx-after{position:relative;z-index:2;background-color:#fff}
+.hero_wrap{padding-bottom:4rem}
+
+/* ===== MOBILE ===== */
 @media(max-width:860px){
-  .wx-cols{grid-template-columns:1fr;gap:1.75rem}
+  .wx-cols{grid-template-columns:1fr;gap:1.5rem}
   .wx-cols .vertical-center{align-items:center;text-align:center}
   .wx-cols .text-align-center{text-align:center}
-  .wx-cols .button_wrapper.is-hero{justify-content:center;gap:.6rem}
-  /* hạt căn giữa thật sự (bỏ dịch trái của desktop) */
-  .wx-stage{max-width:min(340px,76vw);transform:none;margin:0 auto}
-  /* hero tràn viền: bỏ margin + bo góc của template */
-  .wx-pin .section_hero{margin:0;border-radius:0;top:0;min-height:100svh}
-  .hero_wrap{padding-top:5.25rem;padding-bottom:2.5rem}
-  /* navbar gọn: logo nhỏ, burger viền mảnh trong suốt */
-  .navbar .padding-global.is-navbar{width:100%;padding:.4rem .9rem}
-  .navbar .navbar_logo,.navbar img.navbar_logo{height:1.9rem;max-height:1.9rem}
-  .navbar .menu-button{background-color:transparent}
-  .navbar .nav-button_component{background-color:transparent;border:1px solid rgba(255,255,255,.3);border-radius:.6rem}
-  .navbar .nav-button_line{background-color:#fff}
-  /* cấp chữ: sub và trust nhỏ, ngắt dòng cân bằng không rơi chữ mồ côi */
+  .wx-cols .button_wrapper.is-hero{justify-content:center;gap:.6rem;flex-wrap:nowrap;flex-direction:row}
+  .wx-cols h1{font-size:1.72rem;line-height:1.3;min-height:5.4em}
   .wx-cols .max-width-medium{max-width:21rem;margin-left:auto;margin-right:auto}
   .wx-cols .max-width-medium .text-base{font-size:.88rem;line-height:1.55;text-wrap:balance}
-  .wx-cols .rating .text-color-on-primary{font-size:.75rem;max-width:21rem;margin:0 auto;text-wrap:balance}
-  /* CTA nhỏ đúng cấp phụ, đứng chung một hàng */
-  .wx-cols .button_wrapper.is-hero{flex-wrap:nowrap;flex-direction:row}
   .wx-cols .button{min-height:2.3rem;padding:.4rem 1.1rem;font-size:.78rem}
   .wx-cols .button-arrow{padding:.28rem;grid-column-gap:.45rem}
   .wx-cols .button-arrow .text_button{font-size:.78rem}
   .wx-cols .button-arrow .button_container-arrow{width:2rem;height:2rem}
-  /* nén khoảng trống dọc giữa các khối */
-  .wx-cols .spacer-medium{height:.75rem}
-  .wx-cols .spacer-huge{height:1.4rem}
-  .wx-cols .rating{padding-top:.9rem}
-}
-
-/* Ghim hero khi cuộn: trang chỉ trôi tiếp sau khi chữ Wistorix xếp xong.
-   .wx-pin cao 210svh · section_hero dính ở đỉnh suốt quãng đó · hạt tụ theo tiến độ cuộn qua .wx-pin */
-.wx-pin{height:460svh}
-.wx-pin .section_hero{position:sticky;top:.75rem;min-height:calc(100svh - 1.5rem)}
-/* Nội dung sau hero trườn lên đè qua hero đang ghim (curtain reveal):
-   hero đứng yên tuyệt đối, phần dưới kéo margin âm 100svh và nổi lên trên với nền đặc */
-.wx-after{position:relative;z-index:2;margin-top:-70svh;background-color:#fff}
-
-/* Keyword trong H1 theo hồi: hồi nào thì đúng từ đó sáng cyan, TOÀN BỘ phần chữ còn lại mờ xuống
-   (kể cả "và", "trên Google Drive"). Kéo xem hết 3 hình (hồi 4) thì cả câu cùng bừng sáng một lúc
-   rồi nội dung bên dưới mới đẩy lên. */
-/* Gõ máy đánh chữ: ký tự chưa gõ thì ẩn, ký tự cuối có con trỏ nhấp nháy */
-.wx-cols h1 .wx-c.off{display:none}
-/* Logo Google Drive nằm trong dòng chữ, cũng "gõ" ra như một ký tự */
-.wx-cols h1 img.wx-gd{height:.85em;width:auto;display:inline-block;vertical-align:-.06em;margin:0 .06em}
-.wx-cols h1 .wx-cur{position:relative}
-.wx-cols h1 .wx-cur::after{content:"";display:inline-block;width:3px;height:.85em;background:#7FE3FF;margin-left:4px;vertical-align:-.06em;animation:wx-blink 1s steps(1) infinite}
-@keyframes wx-blink{50%{opacity:0}}
-
-/* Keyword đã gõ tới thì giữ màu cyan LUÔN, không đổi về trắng nữa (tích lũy theo hồi) */
-.wx-cols h1 .wx-k{transition:color .45s,text-shadow .45s}
-.wx-cols h1[data-wxp="1"] .wx-k1,.wx-cols h1[data-wxp="2"] .wx-k1,.wx-cols h1[data-wxp="3"] .wx-k1,.wx-cols h1[data-wxp="4"] .wx-k1,
-.wx-cols h1[data-wxp="2"] .wx-k2,.wx-cols h1[data-wxp="3"] .wx-k2,.wx-cols h1[data-wxp="4"] .wx-k2,
-.wx-cols h1[data-wxp="3"] .wx-k3,.wx-cols h1[data-wxp="4"] .wx-k3{color:#D6FD70;text-shadow:0 0 26px rgba(214,253,112,.45)}
-.hero_wrap{padding-bottom:5rem}
-@media (prefers-reduced-motion:reduce){
-  .wx-pin{height:auto}
-  .wx-pin .section_hero{position:relative;top:auto}
-  .wx-after{margin-top:0}
+  .wx-cols .spacer-medium{height:.7rem}
+  .wx-cols .spacer-huge{height:1.2rem}
+  /* hero tràn viền */
+  .wx-pin .section_hero{margin:0;border-radius:0;top:0;min-height:calc(100svh - 3.4rem)}
+  .hero_wrap{padding-top:1.4rem;padding-bottom:1.5rem}
+  /* sân khấu thu nhỏ */
+  .wx-stage{max-width:min(340px,80vw)}
+  .wx-app{left:-31px;top:-31px;width:62px;height:62px;border-radius:15px;font-size:.55rem;gap:3px}
+  .wx-app svg{width:21px;height:21px}
+  .wx-core{width:92px;height:92px}
+  .wx-head{left:0}
+  .wx-head .wx-ic{width:46px;height:46px;border-radius:13px}
+  .wx-head .wx-ic svg{width:21px;height:21px}
+  .wx-head b{font-size:.86rem}.wx-head small{font-size:.7rem}
+  @keyframes wx-launch{from{transform:translate(110px,120px) scale(2.1);opacity:0}60%{opacity:1}to{transform:none;opacity:1}}
+  .wx-laptop{left:2%;right:2%;top:30%}
+  .wx-chip{font-size:.62rem;padding:7px 9px}
+  .wx-chip b{font-size:.68rem}
+  /* mobile: xếp dọc 3 dòng, bỏ chấm ngăn vì xuống dòng thì chấm rơi ra mép */
+  .section_loop .loop_logos{flex-direction:column;row-gap:.4rem}
+  .wx-trust-dot{display:none}
+  .wx-trust-item{font-size:.92rem}
 }
 
 @media (prefers-reduced-motion:reduce){
-  .wx-blob{animation:none}
+  .wx-blob,.wx-arc,.wx-dotr,.wx-ringicons,.wx-slot .wx-un,.wx-core::before{animation:none}
+  .wx-orbits{opacity:1;transform:none}
+  .wx-app{opacity:1;transform:none}
 }

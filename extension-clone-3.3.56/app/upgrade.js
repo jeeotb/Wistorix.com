@@ -17,7 +17,7 @@ const PRODUCTS = {
   },
   scan_pack: {
     id: 'scan_pack',
-    name: 'Gói lượt quét',
+    name: 'Lượt dọn dẹp',
     type: 'one_time'
   }
 };
@@ -138,7 +138,7 @@ function mapPurchaseToCreatePaymentPayload(state) {
   return {
     email,
     product,
-    productName: product === 'scan_pack' ? 'Gói lượt quét' : (PRODUCTS[product]?.name || product),
+    productName: product === 'scan_pack' ? 'Lượt dọn dẹp' : (PRODUCTS[product]?.name || product),
     billingCycle: billingCycle || 'monthly',
     quantity: qty,
     unitPrice,
@@ -156,8 +156,9 @@ function renderOrderSummary(product, cycle, quantity) {
     const vat = Math.round(total * 0.08);
     const grandTotal = total + vat;
     document.getElementById('order-summary').innerHTML = `
-      <div class="row"><span class="lbl">Sản phẩm</span><span class="val">Gói lượt quét</span></div>
-      <div class="row"><span class="lbl">Chu kỳ / Số lượng</span><span class="val">${quantity} lượt</span></div>
+      <div class="row"><span class="lbl">Sản phẩm</span><span class="val">Lượt dọn dẹp</span></div>
+      <div class="row"><span class="lbl">Số lượng</span><span class="val">${quantity} lượt · mỗi lượt 24 giờ</span></div>
+      <div class="row"><span class="lbl">Tổng thời gian</span><span class="val">${quantity * 24} giờ dọn không giới hạn số tệp</span></div>
       <div class="row"><span class="lbl">Đơn giá</span><span class="val">${unitPrice.toLocaleString('vi-VN')}đ / lượt</span></div>
       <div class="row"><span class="lbl">Tạm tính</span><span class="val">${total.toLocaleString('vi-VN')}đ</span></div>
       <div class="row"><span class="lbl">VAT (8%)</span><span class="val">${vat.toLocaleString('vi-VN')}đ</span></div>
@@ -554,7 +555,7 @@ function _buildTransactionFromPayment(status) {
   let planName, cycleLabel, quantity;
   if (isScanPack) {
     const qty = _currentQuantity || 5;
-    planName = `Mua ${qty} lượt quét`;
+    planName = `Mua ${qty} lượt dọn dẹp`;
     cycleLabel = `${qty} lượt`;
     quantity = qty;
   } else {
@@ -810,121 +811,6 @@ function _initTabNav() {
 let selectedPack = 5;
 let customCount = 5;
 
-function renderPacks() {
-  const grid = document.getElementById('pack-grid');
-  if (!grid) return;
-  const existing = document.querySelector('.pack-item.active');
-  const activeVal = existing ? parseInt(existing.dataset.count) || customCount : null;
-
-  const packData = [
-    { count: 1, label: '', cls: '', saveLabel: '', savePct: 0, unitPrice: 40000 },
-    { count: 5, label: 'PHỔ BIẾN', cls: 'popular', saveLabel: 'Tiết kiệm 10%', savePct: 10, unitPrice: 36000 },
-    { count: 10, label: 'TIẾT KIỆM NHẤT', cls: 'best', saveLabel: 'Tiết kiệm 20%', savePct: 20, unitPrice: 32000 },
-  ];
-  const c = activeVal || customCount;
-
-  let html = '';
-  packData.forEach(p => {
-    const isActive = activeVal === p.count;
-    const total = calculatePrice(p.count);
-    const discountText = p.saveLabel ? `<div class="pack-save-badge">${p.saveLabel}</div>` : '';
-    const checkMark = isActive ? '<div class="pack-check"><i class="fas fa-check-circle"></i></div>' : '';
-    const popularBadge = p.label ? `<div class="pack-label ${p.cls}">${p.label}</div>` : '';
-    html += `
-      <div class="pack-item ${isActive ? 'active' : ''}" data-count="${p.count}" data-price="${total}">
-        ${popularBadge}
-        <div class="pack-count">${p.count} <small>lượt</small></div>
-        <div class="pack-price">${total.toLocaleString('vi-VN')}đ</div>
-        <div class="pack-unit-price">${p.unitPrice.toLocaleString('vi-VN')}đ / lượt</div>
-        ${discountText}
-        ${checkMark}
-      </div>
-    `;
-  });
-
-  const isCustomActive = c !== null && !packData.some(p => p.count === c);
-  const customTotal = calculatePrice(c);
-  const customUnitPrice = getUnitPrice(c);
-  html += `
-    <div class="pack-item pack-custom ${isCustomActive ? 'active' : ''}" data-count="custom">
-      <div class="pack-custom-title">Chọn số lượt tùy ý</div>
-      <div class="pack-custom-controls">
-        <button class="pack-dec" data-delta="-1">−</button>
-        <input type="number" class="pack-custom-input" id="pack-custom-input" value="${c}" min="1" max="99">
-        <button class="pack-inc" data-delta="1">+</button>
-      </div>
-      <div class="pack-unit-price">${customUnitPrice.toLocaleString('vi-VN')}đ / lượt</div>
-    </div>
-  `;
-
-  grid.innerHTML = html;
-
-  document.querySelectorAll('.pack-item:not(.pack-custom)').forEach(el => {
-    el.addEventListener('click', () => {
-      const count = parseInt(el.dataset.count);
-      document.querySelectorAll('.pack-item').forEach(x => x.classList.remove('active'));
-      el.classList.add('active');
-      document.getElementById('pack-custom-input').value = count;
-      updateTotal(count);
-    });
-  });
-
-  const customInput = document.getElementById('pack-custom-input');
-  if (customInput) {
-    customInput.addEventListener('change', () => {
-      let v = parseInt(customInput.value) || 1;
-      if (v < 1) v = 1;
-      if (v > 99) v = 99;
-      customInput.value = v;
-      document.querySelectorAll('.pack-item').forEach(x => x.classList.remove('active'));
-      customInput.closest('.pack-item').classList.add('active');
-      updateTotal(v);
-    });
-    customInput.addEventListener('input', () => {
-      const v = parseInt(customInput.value) || 0;
-      if (v > 0) {
-        document.querySelectorAll('.pack-item').forEach(x => x.classList.remove('active'));
-        customInput.closest('.pack-item').classList.add('active');
-        updateTotal(v);
-      }
-    });
-  }
-
-  if (!existing) {
-    const popular = document.querySelector('.pack-item[data-count="5"]');
-    if (popular) {
-      popular.classList.add('active');
-      updateTotal(5);
-    }
-  }
-  const qtyInput = document.getElementById('quantity');
-  if (qtyInput && !qtyInput.value) qtyInput.value = 5;
-}
-
-function getUnitPrice(quantity) {
-  if (quantity >= 1 && quantity <= 4) return 40000;
-  if (quantity >= 5 && quantity <= 9) return 36000;
-  if (quantity >= 10) return 32000;
-  return 40000;
-}
-
-function updateTotal(count) {
-  const total = calculatePrice(count);
-  const unitPrice = getUnitPrice(count);
-  const btn = document.getElementById('buy-scans-btn');
-  if (btn) btn.textContent = `Mua ${count} lượt quét — ${total.toLocaleString('vi-VN')}đ`;
-  const qtyInput = document.getElementById('quantity');
-  if (qtyInput) qtyInput.value = count;
-  const totalPriceEl = document.getElementById('totalPrice');
-  if (totalPriceEl) totalPriceEl.textContent = total.toLocaleString('vi-VN') + 'đ';
-  const infoLine = document.getElementById('packInfoLine');
-  if (infoLine) infoLine.textContent = `Đã chọn ${count} lượt · ${count * 24} giờ dọn dẹp không giới hạn tệp`;
-  const customUnitPrices = document.querySelectorAll('.pack-custom .pack-unit-price');
-  customUnitPrices.forEach(el => {
-    el.textContent = unitPrice.toLocaleString('vi-VN') + 'đ / lượt';
-  });
-}
-
 function _loadTransactions() {
   return new Promise(resolve => {
     import('./modules/account-manager.js').then(({ readScopedOrLegacy }) => readScopedOrLegacy('ws_transactions'))
@@ -1073,6 +959,247 @@ async function openUpgradeModal(plan) {
   renderOrderSummary(_currentProduct, _currentCycle, 1);
   showStep(1);
 }
+/* ── Add-on: Drive kết nối thêm ───────────────────────────────
+   Multi-Wistorix gồm sẵn 5 Drive. Drive thứ 6 trở đi mua ở đây,
+   69.000đ mỗi Drive mỗi NĂM (nguồn: Public/assets/wistorix-pricing.js).
+   Chưa có bậc chiết khấu theo số lượng, nên tổng = số Drive × 69.000đ. */
+const DRIVE_UNIT     = 69000;
+const DRIVE_INCLUDED = 5;
+let driveCustom = 3;
+
+function renderDrivePacks() {
+  const grid = document.getElementById('drive-grid');
+  if (!grid) return;
+  const active = grid.querySelector('.pack-item.active');
+  const activeVal = active ? (parseInt(active.dataset.count) || driveCustom) : 1;
+
+  const data = [
+    { count: 1,  label: '',              cls: '',      note: 'Tổng 6 Drive' },
+    { count: 5,  label: 'PHỔ BIẾN',      cls: 'addon', note: 'Tổng 10 Drive' },
+    { count: 10, label: 'CHO DOANH NGHIỆP', cls: 'addon', note: 'Tổng 15 Drive' },
+  ];
+
+  let html = '';
+  data.forEach(d => {
+    const on = activeVal === d.count;
+    html += `
+      <div class="pack-item ${on ? 'active' : ''}" data-count="${d.count}">
+        ${d.label ? `<div class="pack-label ${d.cls}">${d.label}</div>` : ''}
+        <div class="pack-count">${d.count} <small>Drive</small></div>
+        <div class="pack-price">${(d.count * DRIVE_UNIT).toLocaleString('vi-VN')}đ</div>
+        <div class="pack-unit-price">69.000đ / Drive mỗi năm</div>
+        <div class="pack-note">${d.note}</div>
+        ${on ? '<div class="pack-check"><i class="fas fa-check-circle"></i></div>' : ''}
+      </div>`;
+  });
+
+  const isCustom = !data.some(d => d.count === activeVal);
+  html += `
+    <div class="pack-item pack-custom ${isCustom ? 'active' : ''}" data-count="custom">
+      <div class="pack-custom-title">Chọn số Drive tùy ý</div>
+      <div class="pack-custom-controls">
+        <button class="drive-dec" data-delta="-1">−</button>
+        <input type="number" class="pack-custom-input" id="drive-custom-input" value="${isCustom ? activeVal : driveCustom}" min="1" max="99">
+        <button class="drive-inc" data-delta="1">+</button>
+      </div>
+      <div class="pack-unit-price">69.000đ / Drive mỗi năm</div>
+    </div>`;
+
+  grid.innerHTML = html;
+
+  grid.querySelectorAll('.pack-item:not(.pack-custom)').forEach(el => {
+    el.addEventListener('click', () => {
+      const n = parseInt(el.dataset.count);
+      grid.querySelectorAll('.pack-item').forEach(x => x.classList.remove('active'));
+      el.classList.add('active');
+      const inp = document.getElementById('drive-custom-input');
+      if (inp) inp.value = n;
+      updateDriveTotal(n);
+    });
+  });
+
+  const inp = document.getElementById('drive-custom-input');
+  if (inp) {
+    const sync = () => {
+      let v = parseInt(inp.value) || 1;
+      if (v < 1) v = 1;
+      if (v > 99) v = 99;
+      inp.value = v;
+      driveCustom = v;
+      grid.querySelectorAll('.pack-item').forEach(x => x.classList.remove('active'));
+      inp.closest('.pack-item').classList.add('active');
+      updateDriveTotal(v);
+    };
+    inp.addEventListener('change', sync);
+    inp.addEventListener('input', sync);
+  }
+
+  if (!active) updateDriveTotal(activeVal);
+}
+
+function updateDriveTotal(n) {
+  const money = (n * DRIVE_UNIT).toLocaleString('vi-VN') + 'đ';
+  const el = document.getElementById('driveTotal');
+  if (el) el.textContent = money;
+  const qty = document.getElementById('drive-quantity');
+  if (qty) qty.value = n;
+  const btn = document.getElementById('buy-drives-btn');
+  if (btn) btn.textContent = `Thêm ${n} Drive · ${money}`;
+}
+
+function changeDriveCustom(delta) {
+  const inp = document.getElementById('drive-custom-input');
+  if (!inp) return;
+  let v = (parseInt(inp.value) || 1) + delta;
+  if (v < 1) v = 1;
+  if (v > 99) v = 99;
+  inp.value = v;
+  driveCustom = v;
+  const grid = document.getElementById('drive-grid');
+  if (grid) grid.querySelectorAll('.pack-item').forEach(x => x.classList.remove('active'));
+  inp.closest('.pack-item').classList.add('active');
+  updateDriveTotal(v);
+}
+window.changeDriveCustom = changeDriveCustom;
+
+function renderPacks() {
+  const grid = document.getElementById('pack-grid');
+  if (!grid) return;
+  const existing = document.querySelector('.pack-item.active');
+  const activeVal = existing ? parseInt(existing.dataset.count) || customCount : null;
+
+  const packData = [
+    { count: 1, label: '', cls: '', saveLabel: '', savePct: 0, unitPrice: 40000 },
+    { count: 5, label: 'PHỔ BIẾN', cls: 'popular', saveLabel: 'Tiết kiệm 10%', savePct: 10, unitPrice: 36000 },
+    { count: 10, label: 'TIẾT KIỆM NHẤT', cls: 'best', saveLabel: 'Tiết kiệm 20%', savePct: 20, unitPrice: 32000 },
+  ];
+  const c = activeVal || customCount;
+
+  let html = '';
+  packData.forEach(p => {
+    const isActive = activeVal === p.count;
+    const total = calculatePrice(p.count);
+    const discountText = p.saveLabel ? `<div class="pack-save-badge">${p.saveLabel}</div>` : '';
+    const checkMark = isActive ? '<div class="pack-check"><i class="fas fa-check-circle"></i></div>' : '';
+    const popularBadge = p.label ? `<div class="pack-label ${p.cls}">${p.label}</div>` : '';
+    html += `
+      <div class="pack-item ${isActive ? 'active' : ''}" data-count="${p.count}" data-price="${total}">
+        ${popularBadge}
+        <div class="pack-count">${p.count} <small>lượt</small></div>
+        <div class="pack-price">${total.toLocaleString('vi-VN')}đ</div>
+        <div class="pack-unit-price">${p.unitPrice.toLocaleString('vi-VN')}đ / lượt</div>
+        ${discountText}
+        ${checkMark}
+      </div>
+    `;
+  });
+
+  const isCustomActive = c !== null && !packData.some(p => p.count === c);
+  const customTotal = calculatePrice(c);
+  const customUnitPrice = getUnitPrice(c);
+  html += `
+    <div class="pack-item pack-custom ${isCustomActive ? 'active' : ''}" data-count="custom">
+      <div class="pack-custom-title">Chọn số lượt tùy ý</div>
+      <div class="pack-custom-controls">
+        <button class="pack-dec" data-delta="-1">−</button>
+        <input type="number" class="pack-custom-input" id="pack-custom-input" value="${c}" min="1" max="99">
+        <button class="pack-inc" data-delta="1">+</button>
+      </div>
+      <div class="pack-unit-price">${customUnitPrice.toLocaleString('vi-VN')}đ / lượt</div>
+    </div>
+  `;
+
+  grid.innerHTML = html;
+
+  document.querySelectorAll('.pack-item:not(.pack-custom)').forEach(el => {
+    el.addEventListener('click', () => {
+      const count = parseInt(el.dataset.count);
+      document.querySelectorAll('.pack-item').forEach(x => x.classList.remove('active'));
+      el.classList.add('active');
+      document.getElementById('pack-custom-input').value = count;
+      updateTotal(count);
+    });
+  });
+
+  const customInput = document.getElementById('pack-custom-input');
+  if (customInput) {
+    customInput.addEventListener('change', () => {
+      let v = parseInt(customInput.value) || 1;
+      if (v < 1) v = 1;
+      if (v > 99) v = 99;
+      customInput.value = v;
+      document.querySelectorAll('.pack-item').forEach(x => x.classList.remove('active'));
+      customInput.closest('.pack-item').classList.add('active');
+      updateTotal(v);
+    });
+    customInput.addEventListener('input', () => {
+      const v = parseInt(customInput.value) || 0;
+      if (v > 0) {
+        document.querySelectorAll('.pack-item').forEach(x => x.classList.remove('active'));
+        customInput.closest('.pack-item').classList.add('active');
+        updateTotal(v);
+      }
+    });
+  }
+
+  if (!existing) {
+    const popular = document.querySelector('.pack-item[data-count="5"]');
+    if (popular) {
+      popular.classList.add('active');
+      updateTotal(5);
+    }
+  }
+  const qtyInput = document.getElementById('quantity');
+  if (qtyInput && !qtyInput.value) qtyInput.value = 5;
+}
+
+function getUnitPrice(quantity) {
+  if (quantity >= 1 && quantity <= 4) return 40000;
+  if (quantity >= 5 && quantity <= 9) return 36000;
+  if (quantity >= 10) return 32000;
+  return 40000;
+}
+
+function updateTotal(count) {
+  const total = calculatePrice(count);
+  const unitPrice = getUnitPrice(count);
+  const btn = document.getElementById('buy-scans-btn');
+  if (btn) btn.textContent = `Mua ${count} lượt dọn dẹp · ${total.toLocaleString('vi-VN')}đ`;
+  const qtyInput = document.getElementById('quantity');
+  if (qtyInput) qtyInput.value = count;
+  const totalPriceEl = document.getElementById('totalPrice');
+  if (totalPriceEl) totalPriceEl.textContent = total.toLocaleString('vi-VN') + 'đ';
+  const infoLine = document.getElementById('packInfoLine');
+  if (infoLine) infoLine.textContent = `Đã chọn ${count} lượt · ${count * 24} giờ dọn dẹp không giới hạn số tệp`;
+  const customUnitPrices = document.querySelectorAll('.pack-custom .pack-unit-price');
+  customUnitPrices.forEach(el => {
+    el.textContent = unitPrice.toLocaleString('vi-VN') + 'đ / lượt';
+  });
+}
+
+function calculatePrice(quantity) {
+  let pricePerUnit = 40000;
+  if (quantity >= 5 && quantity <= 9) {
+    pricePerUnit = 36000;
+  }
+  if (quantity >= 10) {
+    pricePerUnit = 32000;
+  }
+  return quantity * pricePerUnit;
+}
+
+function changeCustom(delta) {
+  const input = document.getElementById('pack-custom-input');
+  if (!input) return;
+  let v = parseInt(input.value) || 1;
+  v += delta;
+  if (v < 1) v = 1;
+  if (v > 99) v = 99;
+  input.value = v;
+  document.querySelectorAll('.pack-item').forEach(x => x.classList.remove('active'));
+  input.closest('.pack-item').classList.add('active');
+  updateTotal(v);
+}
 
 async function openScanPackModal(quantity) {
   const account = await getActiveUserAccount();
@@ -1092,6 +1219,8 @@ async function openScanPackModal(quantity) {
   renderOrderSummary('scan_pack', null, quantity);
   showStep(1);
 }
+
+window.changeCustom = changeCustom;
 
 window.openUpgradeModal = openUpgradeModal;
 
@@ -1116,32 +1245,6 @@ function copyText(text) {
   }).catch(function() {});
 }
 window.copyText = copyText;
-
-function changeCustom(delta) {
-  const input = document.getElementById('pack-custom-input');
-  if (!input) return;
-  let v = parseInt(input.value) || 1;
-  v += delta;
-  if (v < 1) v = 1;
-  if (v > 99) v = 99;
-  input.value = v;
-  document.querySelectorAll('.pack-item').forEach(x => x.classList.remove('active'));
-  input.closest('.pack-item').classList.add('active');
-  updateTotal(v);
-}
-window.changeCustom = changeCustom;
-
-function calculatePrice(quantity) {
-  let pricePerUnit = 40000;
-  if (quantity >= 5 && quantity <= 9) {
-    pricePerUnit = 36000;
-  }
-  if (quantity >= 10) {
-    pricePerUnit = 32000;
-  }
-  return quantity * pricePerUnit;
-}
-
 async function updateCurrentPlanCredits() {
   try {
     const credits = await computeCredits();
@@ -1198,6 +1301,7 @@ export async function mount() {
   initProfile().catch(error => console.warn('[upgrade] profile refresh failed', { code: error?.code || 'UNKNOWN' }));
   _initTabNav();
   renderPacks();
+  renderDrivePacks();
   initVatTabs();
   renderCurrentPlan();
 
@@ -1232,6 +1336,17 @@ export async function mount() {
   document.getElementById('buy-scans-btn')?.addEventListener('click', () => {
     const qty = parseInt(document.getElementById('quantity')?.value) || 5;
     openScanPackModal(qty);
+  });
+
+  document.addEventListener('click', (e) => {
+    const dec = e.target.closest('.pack-dec[data-delta]');
+    if (dec) { changeCustom(parseInt(dec.dataset.delta)); return; }
+    const inc = e.target.closest('.pack-inc[data-delta]');
+    if (inc) { changeCustom(parseInt(inc.dataset.delta)); return; }
+    const ddec = e.target.closest('.drive-dec[data-delta]');
+    if (ddec) { changeDriveCustom(parseInt(ddec.dataset.delta)); return; }
+    const dinc = e.target.closest('.drive-inc[data-delta]');
+    if (dinc) { changeDriveCustom(parseInt(dinc.dataset.delta)); return; }
   });
 
   document.querySelectorAll('.pay-tab').forEach(tab => {
@@ -1273,19 +1388,6 @@ export async function mount() {
 
   document.querySelectorAll('.cp-btn[data-copy]').forEach(btn => {
     btn.addEventListener('click', () => copyText(btn.dataset.copy));
-  });
-
-  document.addEventListener('click', (e) => {
-    const decBtn = e.target.closest('.pack-dec[data-delta]');
-    if (decBtn) {
-      changeCustom(parseInt(decBtn.dataset.delta));
-      return;
-    }
-    const incBtn = e.target.closest('.pack-inc[data-delta]');
-    if (incBtn) {
-      changeCustom(parseInt(incBtn.dataset.delta));
-      return;
-    }
   });
 
   document.getElementById('invoice-body')?.addEventListener('click', e => {

@@ -1,0 +1,240 @@
+/* ==========================================================================
+   Wistorix · Module tính năng (khu "Cách hoạt động")
+   Dùng ở: Public/index.html, Public/services.html
+   Mỗi tính năng là một hàng riêng, ảnh giao diện thật một bên, nội dung một bên.
+   Không đụng vào class của Webflow, mọi thứ nằm trong tiền tố .wxm
+   ========================================================================== */
+
+.wxm{
+  --wxm-primary:#0052CD;
+  --wxm-navy:#041335;
+  --wxm-sky:#058EF4;
+  --wxm-green:#0A8F4E;
+  --wxm-ink:#0A1F52;
+  --wxm-muted:#5C6577;
+  --wxm-line:#E3E7EE;
+  --wxm-surface:#F6F8FB;
+  --wxm-gap:7.5rem;
+
+  display:flex;
+  flex-direction:column;
+  gap:var(--wxm-gap);
+}
+
+/* ---------- Hàng module ---------------------------------------------- */
+.wxm-row{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);
+  gap:4.5rem;
+  align-items:center;
+}
+.wxm-row.is-flip .wxm-media{order:-1}
+
+/* ---------- Cột nội dung --------------------------------------------- */
+.wxm-copy{max-width:31rem}
+
+.wxm-step{
+  display:inline-flex;
+  align-items:center;
+  gap:.625rem;
+  margin-bottom:1.25rem;
+}
+.wxm-step-num{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:2.25rem;
+  height:2.25rem;
+  border-radius:999px;
+  background:var(--wxm-primary);
+  color:#fff;
+  font-size:.875rem;
+  font-weight:700;
+  letter-spacing:.02em;
+  font-variant-numeric:tabular-nums;
+}
+.wxm-step-label{
+  font-size:.75rem;
+  font-weight:600;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--wxm-primary);
+}
+
+.wxm-title{
+  margin:0;
+  font-size:2.125rem;
+  line-height:1.22;
+  letter-spacing:-.02em;
+  font-weight:600;
+  color:var(--wxm-navy);
+}
+.wxm-desc{
+  margin:1rem 0 0;
+  font-size:1.0625rem;
+  line-height:1.65;
+  color:var(--wxm-muted);
+}
+
+.wxm-list{
+  list-style:none;
+  margin:1.75rem 0 0;
+  padding:0;
+  display:flex;
+  flex-direction:column;
+  gap:.875rem;
+}
+.wxm-list li{
+  position:relative;
+  padding-left:2rem;
+  font-size:1rem;
+  line-height:1.55;
+  color:var(--wxm-ink);
+}
+.wxm-list li::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:.125rem;
+  width:1.25rem;
+  height:1.25rem;
+  border-radius:999px;
+  background:rgba(10,143,78,.12);
+}
+.wxm-list li::after{
+  content:"";
+  position:absolute;
+  left:.4375rem;
+  top:.4375rem;
+  width:.375rem;
+  height:.1875rem;
+  border-left:2px solid var(--wxm-green);
+  border-bottom:2px solid var(--wxm-green);
+  transform:rotate(-45deg);
+}
+
+.wxm-cta{
+  display:inline-flex;
+  align-items:center;
+  gap:.5rem;
+  margin-top:2rem;
+  font-size:1rem;
+  font-weight:600;
+  color:var(--wxm-primary);
+  letter-spacing:-.01em;
+  text-decoration:none;
+  border-bottom:1px solid transparent;
+  padding-bottom:.125rem;
+  transition:border-color .18s ease,gap .18s ease;
+}
+.wxm-cta:hover{border-bottom-color:var(--wxm-primary);gap:.75rem}
+.wxm-cta svg{width:1rem;height:1rem;flex:0 0 auto}
+
+/* ---------- Cột ảnh giao diện ---------------------------------------- */
+.wxm-media{position:relative}
+
+.wxm-frame{
+  position:relative;
+  border-radius:1.125rem;
+  border:1px solid var(--wxm-line);
+  background:#fff;
+  overflow:hidden;
+  box-shadow:0 2px 4px rgba(4,19,53,.04),0 32px 64px -32px rgba(4,19,53,.32);
+}
+.wxm-bar{
+  display:flex;
+  align-items:center;
+  gap:.5rem;
+  padding:.6875rem 1rem;
+  background:var(--wxm-surface);
+  border-bottom:1px solid var(--wxm-line);
+}
+.wxm-dot{width:.5rem;height:.5rem;border-radius:999px;background:#D2D8E2}
+.wxm-bar-label{
+  margin-left:.5rem;
+  font-size:.75rem;
+  letter-spacing:.02em;
+  color:#7A8296;
+}
+.wxm-frame img{
+  display:block;
+  position:static;
+  width:100%;
+  height:auto;
+  max-width:100%;
+  object-fit:fill;
+  inset:auto;
+}
+
+.wxm-chip{
+  position:absolute;
+  left:-1.25rem;
+  bottom:-1.25rem;
+  z-index:2;
+  display:flex;
+  flex-direction:column;
+  gap:.125rem;
+  padding:.875rem 1.125rem;
+  border-radius:.875rem;
+  background:var(--wxm-navy);
+  color:#fff;
+  box-shadow:0 18px 36px -16px rgba(4,19,53,.55);
+  max-width:15rem;
+}
+.wxm-chip b{
+  font-size:1rem;
+  font-weight:700;
+  letter-spacing:-.01em;
+}
+.wxm-chip span{
+  font-size:.8125rem;
+  line-height:1.4;
+  color:rgba(255,255,255,.66);
+}
+.wxm-row.is-flip .wxm-chip{left:auto;right:-1.25rem}
+
+/* ---------- Hiện dần khi cuộn (chỉ bật khi JS chạy) ------------------- */
+html.wxm-js .wxm-row{opacity:0;transform:translateY(1.5rem)}
+html.wxm-js .wxm-row.is-in{
+  opacity:1;
+  transform:none;
+  transition:opacity .7s ease,transform .7s cubic-bezier(.22,.61,.36,1);
+}
+
+@media (prefers-reduced-motion:reduce){
+  html.wxm-js .wxm-row{opacity:1;transform:none}
+  .wxm-cta{transition:none}
+}
+
+/* ---------- Tablet ---------------------------------------------------- */
+@media screen and (max-width:991px){
+  .wxm{--wxm-gap:5rem}
+  .wxm-row{grid-template-columns:1fr;gap:2.5rem}
+  .wxm-row.is-flip .wxm-media{order:0}
+  .wxm-copy{max-width:38rem}
+  .wxm-title{font-size:1.875rem}
+  .wxm-chip{left:1rem;bottom:-1rem;max-width:none;flex-direction:row;align-items:baseline;gap:.5rem}
+  .wxm-row.is-flip .wxm-chip{left:1rem;right:auto}
+}
+
+/* ---------- Mobile ---------------------------------------------------- */
+@media screen and (max-width:767px){
+  .wxm{--wxm-gap:4rem}
+  .wxm-title{font-size:1.625rem}
+  .wxm-desc{font-size:1rem}
+  .wxm-list li{font-size:.9375rem}
+  .wxm-bar{padding:.5rem .75rem}
+  .wxm-chip{padding:.75rem .875rem;border-radius:.75rem}
+  .wxm-chip b{font-size:.9375rem}
+  .wxm-chip span{font-size:.75rem}
+}
+
+@media screen and (max-width:479px){
+  .wxm-chip{
+    position:static;
+    margin-top:1rem;
+    box-shadow:none;
+    flex-direction:column;
+    gap:.125rem;
+  }
+}

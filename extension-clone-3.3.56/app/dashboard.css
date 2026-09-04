@@ -6184,3 +6184,164 @@
   background: transparent !important;
   border-color: transparent !important;
 }
+
+
+/* ---------- DẢI PHẠM VI CHỌN (chọn ngoài trang hiện tại) ---------- */
+.bulk-scope {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  margin: 0 0 10px;
+  padding: 9px 14px;
+  border-radius: 8px;
+  background: #F5F8FF;
+  border: 1px solid #DCE7FF;
+  font-size: 13px;
+  color: #334155;
+}
+.bulk-scope__t b { color: #0F172A; font-weight: 700; }
+.bulk-scope__a {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  font: 700 13px inherit;
+  color: #2563EB;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.bulk-scope__a:hover { color: #1D4ED8; }
+.bulk-bar__scope {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.16);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+
+/* ---------- CHỪA CHỖ CHO THANH NỔI DƯỚI CÙNG ----------
+   Thanh hành động hàng loạt neo ở đáy màn hình, che mất dòng phân trang
+   của bảng file. Khi thanh hiện ra, JS đặt --wix-bulk-reserve bằng đúng
+   phần nó lấn lên, thân thẻ nới đệm dưới, phân trang bị đẩy lên trên.
+   --wix-demo-reserve là phần của lớp demo trên bản clone, bản thật luôn 0. */
+:root {
+  --wix-bulk-reserve: 0px;
+  --wix-demo-reserve: 0px;
+}
+/* .col-table-full > .wix-card__body đặt padding 0 với độ ưu tiên cao hơn,
+   nên phải viết selector đủ nặng thì luật này mới thắng */
+.wix-card__body--table.wix-card__body,
+.col-table-full > .wix-card__body--table {
+  padding-bottom: max(var(--wix-bulk-reserve), var(--wix-demo-reserve));
+  transition: padding-bottom 0.25s ease;
+}
+.wix-pagination {
+  margin-bottom: max(var(--wix-bulk-reserve), var(--wix-demo-reserve));
+  transition: margin-bottom 0.25s ease;
+}
+
+
+/* ---------- CON CÚ WISTORIX · NÚT NỔI CHO THANH THAO TÁC ----------
+   Thanh thao tác hàng loạt thu gọn về con cú. Bấm con cú thì thanh
+   trượt ra cạnh nó. Con cú kéo thả tự do, nhớ vị trí, để người dùng
+   đặt ở chỗ không che giao diện. ---------------------------------- */
+.bulk-owl {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  width: 54px;
+  height: 54px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  cursor: grab;
+  z-index: 9001;
+  display: none;
+  place-items: center;
+  touch-action: none;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.2s ease;
+}
+.bulk-owl.is-on { display: grid; }
+.bulk-owl:hover { transform: scale(1.08); }
+.bulk-owl.is-drag { cursor: grabbing; transform: scale(1.1); }
+.bulk-owl img {
+  width: 54px;
+  height: 54px;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+  grid-area: 1 / 1;
+  filter: drop-shadow(0 6px 14px rgba(2, 8, 23, 0.3));
+  transition: opacity 0.18s ease, transform 0.22s cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+.bulk-owl__live { opacity: 0; transform: scale(0.82); }
+
+/* Đang mở thanh: đổi sang con cú bung bảng hologram. Ảnh này rộng hơn
+   nên bỏ nền tròn, nếu không hai cánh bên sẽ bị bo góc cắt mất. */
+.bulk-owl.is-open {
+  width: 66px;
+  height: 66px;
+}
+.bulk-owl.is-open .bulk-owl__idle { opacity: 0; transform: scale(1.14); }
+.bulk-owl.is-open .bulk-owl__live {
+  opacity: 1;
+  transform: scale(1);
+  width: 66px;
+  height: 66px;
+  filter: drop-shadow(0 8px 20px rgba(37, 99, 235, 0.35));
+}
+.bulk-owl.is-open .bulk-owl__n {
+  top: -2px;
+  right: 2px;
+}
+.bulk-owl__n {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 21px;
+  height: 21px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: #2563EB;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 21px;
+  text-align: center;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 6px rgba(2, 8, 23, 0.28);
+  font-variant-numeric: tabular-nums;
+}
+.bulk-owl.is-open .bulk-owl__n { background: #16a34a; }
+
+/* thanh thao tác giờ neo theo con cú, JS đặt toạ độ */
+.bulk-bar.is-docked {
+  bottom: auto;
+  left: 0;
+  top: 0;
+  transform: none;
+  transition: opacity 0.2s ease, transform 0.24s cubic-bezier(0.34, 1.3, 0.64, 1);
+}
+.bulk-bar.is-docked.is-folded {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(16px) scale(0.96);
+}
+.bulk-bar__fold {
+  border: 0;
+  background: rgba(255, 255, 255, 0.08);
+  color: #cbd5e1;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+.bulk-bar__fold:hover { background: rgba(255, 255, 255, 0.18); color: #fff; }

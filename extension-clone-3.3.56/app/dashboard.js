@@ -573,7 +573,7 @@ const I18n = {
             'security.good':           'An toàn',
             'security.improve':        'Cần cải thiện',
             'security.excellent':      'Tuyệt vời',
-            'security.desc':           '{n} vấn đề đang kéo điểm xuống. Xử lý hết để đạt tối đa 100 — quét lần cuối {time}.',
+            'security.desc':           '{n} vấn đề đang kéo điểm xuống. Xử lý hết để đạt tối đa 100 · quét lần cuối {time}.',
             'security.descClean':      'Tất cả vấn đề đã được xử lý. Drive của bạn an toàn!',
             'security.how':            'Cách tính điểm này →',
 
@@ -2049,6 +2049,7 @@ const UIController = window.UIController = {
     _inheritedPermissionSourceCache: new Map(),
     _folderSortMode:    'alpha',
     _selectedFileIds:   new Set(),
+    _allMatching:       false,   // đang chọn tất cả file khớp bộ lọc, không chỉ trang này
     _lastStorageUsed:   null,
     _lastStorageTotal:  0,
     _activeStatusFilter:'all',
@@ -2358,10 +2359,86 @@ const UIController = window.UIController = {
         if (cleanPill) cleanPill.addEventListener('click', () => cleanPill.classList.toggle('demo-pill--active'));
     },
 
+    // ── Chọn hàng loạt vượt ngoài một trang ────────────────
+    // Ô tick đầu bảng chỉ chọn trang đang xem. Khi trang đã tick hết mà còn
+    // trang khác, hiện một dải mời chọn TẤT CẢ file khớp bộ lọc, giống Gmail
+    // và Google Drive. Không tự động chọn hết, người dùng phải bấm thêm một lần.
+    _scopeBar() {
+        let el = document.getElementById('bulk-scope');
+        if (!el) {
+            const wrap = document.getElementById('table-wrapper');
+            if (!wrap || !wrap.parentNode) return null;
+            el = document.createElement('div');
+            el.id = 'bulk-scope';
+            el.className = 'bulk-scope';
+            el.hidden = true;
+            wrap.parentNode.insertBefore(el, wrap);
+        }
+        return el;
+    },
+
+    _renderScopeBar() {
+        const el = this._scopeBar();
+        if (!el) return;
+        const total = this._pagination.totalFiles.length;
+        const rows  = [...document.querySelectorAll('#issues-tbody .row-chk')];
+        const onPage = rows.filter(c => c.checked).length;
+
+        // không còn trang nào khác thì không cần dải này
+        if (total <= rows.length || onPage === 0) { el.hidden = true; return; }
+
+        if (this._allMatching) {
+            el.hidden = false;
+            el.innerHTML = '<span class="bulk-scope__t">Đang chọn <b>' + fmt(total)
+                + '</b> file khớp bộ lọc, gồm cả các trang sau.</span>'
+                + '<button type="button" class="bulk-scope__a" data-scope="page">Chỉ chọn trang này</button>';
+        } else {
+            el.hidden = false;
+            el.innerHTML = '<span class="bulk-scope__t">Đã chọn <b>' + fmt(onPage)
+                + '</b> file trên trang này.</span>'
+                + '<button type="button" class="bulk-scope__a" data-scope="all">Chọn tất cả '
+                + fmt(total) + ' file khớp bộ lọc</button>';
+        }
+
+        el.querySelector('[data-scope]').onclick = (ev) => {
+            if (ev.currentTarget.dataset.scope === 'all') this.selectAllMatching();
+            else this.selectPageOnly();
+        };
+    },
+
+    selectAllMatching() {
+        this._allMatching = true;
+        this._pagination.totalFiles.forEach(f => this._selectedFileIds.add(f.id));
+        document.querySelectorAll('#issues-tbody .row-chk').forEach(c => c.checked = true);
+        const chkAll = document.getElementById('chk-all');
+        if (chkAll) chkAll.checked = true;
+        this._renderScopeBar();
+        BulkActionBar.update();
+    },
+
+    selectPageOnly() {
+        this._allMatching = false;
+        const onPage = new Set([...document.querySelectorAll('#issues-tbody .row-chk')].map(c => c.dataset.fileId));
+        this._selectedFileIds.forEach(id => { if (!onPage.has(id)) this._selectedFileIds.delete(id); });
+        this._renderScopeBar();
+        BulkActionBar.update();
+    },
+
+    clearSelection() {
+        this._allMatching = false;
+        this._selectedFileIds.clear();
+        document.querySelectorAll('#issues-tbody .row-chk').forEach(c => c.checked = false);
+        const chkAll = document.getElementById('chk-all');
+        if (chkAll) chkAll.checked = false;
+        const el = document.getElementById('bulk-scope');
+        if (el) el.hidden = true;
+    },
+
     _bindSelectAll() {
         const chkAll = document.getElementById('chk-all');
         if (!chkAll) return;
         chkAll.addEventListener('change', () => {
+            this._allMatching = false;
             const checkboxes = document.querySelectorAll('#issues-tbody .row-chk');
             checkboxes.forEach(c => {
                 c.checked = chkAll.checked;
@@ -2370,6 +2447,8 @@ const UIController = window.UIController = {
                 if (chkAll.checked) this._selectedFileIds.add(fileId);
                 else                this._selectedFileIds.delete(fileId);
             });
+            if (!chkAll.checked) this._selectedFileIds.clear();
+            this._renderScopeBar();
             BulkActionBar.update();
         });
         document.addEventListener('change', (e) => {
@@ -2377,10 +2456,14 @@ const UIController = window.UIController = {
             const fileId = e.target.dataset.fileId;
             if (fileId) {
                 if (e.target.checked) this._selectedFileIds.add(fileId);
-                else                  this._selectedFileIds.delete(fileId);
+                else {
+                    this._selectedFileIds.delete(fileId);
+                    this._allMatching = false;   // bỏ một dòng thì không còn là "tất cả"
+                }
             }
             const all = [...document.querySelectorAll('#issues-tbody .row-chk')];
             chkAll.checked = all.length > 0 && all.every(c => c.checked);
+            this._renderScopeBar();
             BulkActionBar.update();
         });
     },
@@ -3373,6 +3456,7 @@ const UIController = window.UIController = {
             const all = [...tableBody.querySelectorAll('.row-chk')];
             chkAll.checked = all.length > 0 && all.every(c => c.checked);
         }
+        this._renderScopeBar();
         BulkActionBar.update();
 
         // Bind action buttons
@@ -4867,6 +4951,12 @@ const BulkActionBar = (() => {
         _initialized = true;
     }
 
+    // Thanh này neo ở đáy màn hình nên che mất phân trang của bảng file.
+    // Đo phần nó lấn lên rồi báo cho CSS, bảng tự nới đệm dưới.
+    function _reserve() {
+        if (window.BulkDock) window.BulkDock.reserve();
+    }
+
     function update() {
         if (!_bar) _cache();
         if (!_bar) return;
@@ -4874,17 +4964,16 @@ const BulkActionBar = (() => {
         if (count === 0) { _bar.classList.remove('is-visible'); return; }
         _bar.classList.add('is-visible');
         if (_countEl) {
+            const scope = UIController._allMatching
+                ? '<span class="bulk-bar__scope">tất cả file khớp bộ lọc</span>' : '';
             _countEl.innerHTML = `<strong>${fmt(count)}</strong> ${
                 I18n.t('bulk.selected').replace('{n}', fmt(count)).replace(/^\d+\s/, '')
-            }`;
+            }${scope}`;
         }
     }
 
     function _handleDeselect() {
-        UIController._selectedFileIds.clear();
-        document.querySelectorAll('#issues-tbody .row-chk').forEach(c => c.checked = false);
-        const chkAll = document.getElementById('chk-all');
-        if (chkAll) chkAll.checked = false;
+        UIController.clearSelection();
         update();
     }
 
@@ -5249,3 +5338,200 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (wrapper) wrapper.style.display = 'none';
     }
 });
+
+/* ================================================================
+   BULK DOCK · con cú Wistorix
+   Con cú luôn nổi trên mọi màn hình, kéo thả tự do, nhớ vị trí.
+   Nó nhận bất kỳ thanh .bulk-bar nào đang hiện (dashboard, My Drive,
+   trang khác sau này) rồi neo thanh đó vào cạnh mình, nên không phải
+   nối tay từng trang. Chọn file là thanh tự bung ra, bấm con cú thì
+   thu về, bấm lần nữa lại bung.
+   ================================================================ */
+window.BulkDock = (function () {
+    'use strict';
+
+    const POS_KEY  = '__wistorix_owl_pos__';
+    const OPEN_KEY = '__wistorix_owl_open__';
+    const SIZE = 54, GAP = 12;
+
+    let owl = null, badge = null, bar = null, open = true, pos = null;
+    try { pos  = JSON.parse(localStorage.getItem(POS_KEY)); } catch (_) {}
+    try { open = localStorage.getItem(OPEN_KEY) !== '0'; } catch (_) {}
+
+    // con cú nở ra 66px khi mở thanh, nên đo kích thước thật thay vì hằng số
+    const size = () => (owl && owl.offsetWidth) || SIZE;
+    const clamp = (p) => ({
+        left: Math.max(8, Math.min(p.left, innerWidth  - size() - 8)),
+        top:  Math.max(8, Math.min(p.top,  innerHeight - size() - 8)),
+    });
+
+    function placeOwl() {
+        if (!owl) return;
+        if (!pos) {
+            owl.style.left = 'auto'; owl.style.top = 'auto';
+            owl.style.right = '24px'; owl.style.bottom = '24px';
+            return;
+        }
+        const c = clamp(pos);
+        owl.style.right = 'auto'; owl.style.bottom = 'auto';
+        owl.style.left = c.left + 'px';
+        owl.style.top  = c.top + 'px';
+    }
+
+    /* Thanh mở sang trái con cú nếu đủ chỗ, không thì sang phải,
+       không nữa thì lên trên. Luôn kẹp trong màn hình. */
+    function placeBar() {
+        if (!bar || !owl) return;
+        const o = owl.getBoundingClientRect();
+        const bw = bar.offsetWidth || 640, bh = bar.offsetHeight || 52;
+        const W = innerWidth, H = innerHeight;
+
+        let left, sameRow = true;
+        if (o.left - GAP - bw >= 8)           left = o.left - GAP - bw;
+        else if (o.right + GAP + bw <= W - 8) left = o.right + GAP;
+        else { left = Math.max(8, Math.min((W - bw) / 2, W - bw - 8)); sameRow = false; }
+
+        let top = sameRow ? o.top + (o.height - bh) / 2
+                          : (o.top - GAP - bh >= 8 ? o.top - GAP - bh : o.bottom + GAP);
+        top = Math.max(8, Math.min(top, H - bh - 8));
+
+        bar.style.left = Math.round(left) + 'px';
+        bar.style.top  = Math.round(top) + 'px';
+
+        const fold = bar.querySelector('.bulk-bar__fold i');
+        if (fold) fold.className = 'fas ' + (left < o.left ? 'fa-chevron-right' : 'fa-chevron-left');
+    }
+
+    function reserve() {
+        // chỉ chừa chỗ khi con cú, hoặc thanh đang mở, nằm sát đáy màn hình
+        let intrude = 0;
+        [owl, (open ? bar : null)].forEach(el => {
+            if (!el) return;
+            const cs = getComputedStyle(el);
+            if (cs.display === 'none' || cs.visibility === 'hidden') return;
+            const r = el.getBoundingClientRect();
+            if (r.height < 2 || innerHeight - r.bottom > 40) return;
+            intrude = Math.max(intrude, innerHeight - r.top);
+        });
+        document.documentElement.style.setProperty(
+            '--wix-bulk-reserve', (intrude ? Math.round(intrude) + 16 : 0) + 'px');
+    }
+
+    function setOpen(on) {
+        open = on;
+        try { localStorage.setItem(OPEN_KEY, on ? '1' : '0'); } catch (_) {}
+        if (owl) { owl.classList.toggle('is-open', on && !!bar); owl.setAttribute('aria-expanded', String(on)); }
+        if (bar) bar.classList.toggle('is-folded', !on);
+        // ảnh đổi kích thước nên phải kẹp lại vị trí rồi mới đặt thanh
+        requestAnimationFrame(() => {
+            if (pos) { pos = clamp(pos); placeOwl(); }
+            if (on) placeBar();
+            reserve();
+        });
+    }
+
+    function build() {
+        if (document.getElementById('bulk-owl')) { owl = document.getElementById('bulk-owl'); }
+        else {
+            owl = document.createElement('button');
+            owl.type = 'button';
+            owl.id = 'bulk-owl';
+            owl.className = 'bulk-owl';
+            owl.setAttribute('aria-label', 'Wistorix · thao tác hàng loạt');
+            owl.innerHTML =
+                '<img class="bulk-owl__idle" src="assets/icons/wistorix-owl.png" alt="" draggable="false">'
+              + '<img class="bulk-owl__live" src="assets/icons/wistorix-owl-active.png" alt="" draggable="false">'
+              + '<span class="bulk-owl__n" id="bulk-owl-count"></span>';
+            document.body.appendChild(owl);
+        }
+        owl.classList.add('is-on');           // luôn hiện, không đợi chọn file
+        badge = owl.querySelector('.bulk-owl__n');
+        placeOwl();
+
+        owl.addEventListener('pointerdown', (ev) => {
+            ev.preventDefault();
+            const r = owl.getBoundingClientRect();
+            const dx = ev.clientX - r.left, dy = ev.clientY - r.top;
+            let moved = false;
+            owl.setPointerCapture(ev.pointerId);
+            const move = (e) => {
+                if (!moved && Math.abs(e.clientX - ev.clientX) + Math.abs(e.clientY - ev.clientY) < 4) return;
+                moved = true;
+                owl.classList.add('is-drag');
+                pos = clamp({ left: e.clientX - dx, top: e.clientY - dy });
+                placeOwl();
+                if (open) placeBar();
+                reserve();
+            };
+            const up = () => {
+                owl.removeEventListener('pointermove', move);
+                owl.removeEventListener('pointerup', up);
+                owl.classList.remove('is-drag');
+                if (moved) { try { localStorage.setItem(POS_KEY, JSON.stringify(pos)); } catch (_) {} }
+                else if (bar) setOpen(!open);
+                else if (window.Toast) Toast.info('Chọn tệp trong bảng để mở thanh thao tác hàng loạt.');
+            };
+            owl.addEventListener('pointermove', move);
+            owl.addEventListener('pointerup', up);
+        });
+
+        addEventListener('resize', () => { placeOwl(); if (open) placeBar(); reserve(); });
+    }
+
+    /* Bám theo thanh đang hiện, dù nó thuộc trang nào */
+    /* Router giữ lại DOM của trang cũ nên thanh của My Drive vẫn còn
+       trong tài liệu sau khi rời trang. Thanh là position:fixed nên
+       offsetParent luôn null, phải đo hộp bao mới biết nó có thật sự
+       đang hiện hay không. */
+    const onScreen = (el) => {
+        if (!el) return false;
+        const r = el.getBoundingClientRect();
+        return r.width > 1 && r.height > 1;
+    };
+
+    function scan() {
+        const found = [...document.querySelectorAll('.bulk-bar.is-visible')].find(onScreen) || null;
+        if (found !== bar) {
+            if (bar) { bar.classList.remove('is-docked', 'is-folded'); bar.style.left = bar.style.top = ''; }
+            bar = found;
+            if (bar) {
+                bar.classList.add('is-docked');
+                if (!bar.querySelector('.bulk-bar__fold')) {
+                    const f = document.createElement('button');
+                    f.type = 'button';
+                    f.className = 'bulk-bar__fold';
+                    f.title = 'Thu gọn về Wistorix';
+                    f.innerHTML = '<i class="fas fa-chevron-right"></i>';
+                    f.addEventListener('click', () => setOpen(false));
+                    (bar.querySelector('.bulk-bar__actions') || bar).appendChild(f);
+                }
+                open = true;                    // chọn tệp là bung ra ngay
+                try { localStorage.setItem(OPEN_KEY, '1'); } catch (_) {}
+                setTimeout(() => { setOpen(true); }, 40);
+            } else {
+                if (owl) owl.classList.remove('is-open');
+                reserve();
+            }
+        }
+        if (badge) {
+            const n = (window.UIController && UIController._selectedFileIds)
+                ? UIController._selectedFileIds.size : 0;
+            const m = bar ? (bar.textContent.match(/([\d.,]+)\s*file/) || [])[1] : null;
+            const val = bar ? (m ? m : String(n)) : '';
+            badge.textContent = val;
+            badge.style.display = val ? '' : 'none';
+        }
+        if (bar && open) placeBar();
+    }
+
+    function start() {
+        build();
+        scan();
+        setInterval(scan, 300);
+    }
+
+    if (document.readyState === 'loading') addEventListener('DOMContentLoaded', start);
+    else start();
+
+    return { reserve, placeBar, setOpen, scan };
+})();

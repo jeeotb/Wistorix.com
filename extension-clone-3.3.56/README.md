@@ -81,6 +81,17 @@ và phụ đề thẻ nâng cấp đã sửa lại thành "Dọn dẹp không gi
 
 Mọi thao tác trong demo là mô phỏng, không đụng tới dữ liệu mẫu và không gọi mạng.
 
+### Lớp điểm chạm bổ sung, đang tắt
+
+File `app/__mock/cta-demo-extra.js` còn nằm trong thư mục nhưng không được nạp.
+Nó chứa bản thử của ba điểm chạm mới (thu hồi toàn bộ quyền theo người, chặn Drive
+thứ hai, thao tác lẻ khi hết hạn mức) ở dạng popup. Đã tắt theo yêu cầu, để bản clone
+chạy tự nhiên. Muốn xem lại thì thêm dòng này vào `<head>` của `dashboard.html`:
+
+```html
+<script src="__mock/cta-demo-extra.js"></script>
+```
+
 ### Tắt demo
 
 Ba cách, từ nhẹ tới dứt điểm:

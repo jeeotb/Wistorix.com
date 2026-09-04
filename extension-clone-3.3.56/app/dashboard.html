@@ -7,6 +7,8 @@
     <script src="__mock/wistorix-mock.js"></script>
     <script src="__mock/dev-toolbar.js"></script>
     <script src="__mock/cta-demo.js"></script>
+    <script src="__mock/tour.js"></script>
+    <script src="__mock/onboarding.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wistorix</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
@@ -858,6 +860,11 @@
 </div>
 
 <!-- ══ BULK ACTION BAR ════════════════════════════════════════ -->
+<button type="button" id="bulk-owl" class="bulk-owl" aria-label="Mở thanh thao tác" aria-expanded="true">
+    <img class="bulk-owl__idle" src="assets/icons/wistorix-owl.png" alt="" draggable="false">
+    <img class="bulk-owl__live" src="assets/icons/wistorix-owl-active.png" alt="" draggable="false">
+    <span class="bulk-owl__n" id="bulk-owl-count">0</span>
+</button>
 <div id="bulk-action-bar" class="bulk-bar" role="toolbar" aria-label="Bulk actions">
     <span class="bulk-bar__count" id="bulk-count">0 file đã chọn</span>
     <div class="bulk-bar__actions">

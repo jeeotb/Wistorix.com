@@ -77,7 +77,8 @@
 
         const bar = document.createElement('div');
         bar.id = 'wixmock-bar';
-        bar.dataset.collapsed = localStorage.getItem(HIDDEN_KEY) === '1' ? 'true' : 'false';
+        // mặc định thu gọn, để bảng nổi không che phân trang của bảng file
+        bar.dataset.collapsed = localStorage.getItem(HIDDEN_KEY) === '0' ? 'false' : 'true';
 
         const head = document.createElement('div');
         head.className = 'wixmock-head';

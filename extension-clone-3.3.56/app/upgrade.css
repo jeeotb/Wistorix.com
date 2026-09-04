@@ -296,173 +296,7 @@
 .preset-option.active {
     border: 2px solid #0487F1;
     background: #f5f9ff;
-}
-
-/* ---------- SCAN PACKS ---------- */
-.scan-packs {
-  background: white;
-  border-radius: 10px;
-  border: 1px solid #e6ecf5;
-  padding: 20px;
-}
-
-.scan-packs h3 {
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--navy);
-  margin: 0 0 14px;
-}
-
-.pack-grid {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.pack-item {
-  flex: 1;
-  min-width: 120px;
-  padding: 16px 14px;
-  border-radius: 10px;
-  border: 1px solid #e6ecf5;
-  background: white;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  position: relative;
-}
-
-.pack-item:hover {
-  border-color: #0487F1;
-}
-
-.pack-item.active {
-  border: 2px solid #0487F1;
-  background: #f5f9ff;
-}
-
-.pack-item .pack-label {
-  position: absolute;
-  top: -8px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 9px;
-  font-weight: 700;
-  padding: 2px 8px;
-  border-radius: 999px;
-  white-space: nowrap;
-}
-
-.pack-item .pack-label.popular {
-  background: #0487F1;
-  color: white;
-}
-
-.pack-item .pack-label.best {
-  background: #f59e0b;
-  color: white;
-}
-
-.pack-item .pack-count {
-  font-size: 20px;
-  font-weight: 800;
-  color: var(--navy);
-}
-
-.pack-item .pack-count small {
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--text-muted);
-}
-
-.pack-item .pack-price {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--navy);
-  margin-top: 4px;
-}
-
-.pack-item .pack-price small {
-  font-size: 11px;
-  font-weight: 400;
-  color: var(--text-muted);
-}
-
-.pack-item.pack-custom {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  cursor: default;
-}
-
-.pack-item.pack-custom button {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  border: 1px solid #dce3f0;
-  background: white;
-  font-size: 16px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-secondary);
-}
-
-.pack-item.pack-custom button:hover {
-  border-color: #0487F1;
-  color: #0487F1;
-}
-
-.pack-item.pack-custom input {
-  width: 44px;
-  text-align: center;
-  border: 1px solid #dce3f0;
-  border-radius: 6px;
-  padding: 6px 4px;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--navy);
-}
-
-/* Total bar */
-.total-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 16px;
-  padding-top: 16px;
-  border-top: 1px solid #e6ecf5;
-}
-
-.total-bar .total-amount {
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--navy);
-}
-
-.total-bar .total-amount span {
-  font-size: 20px;
-  color: #0487F1;
-}
-
-.total-bar button {
-  background: #0487F1;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  padding: 10px 22px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.total-bar button:hover {
-  background: #0373d0;
-}
-
-/* ---------- INVOICE TABLE ---------- */
+}/* ---------- INVOICE TABLE ---------- */
 .invoice-section {
   background: white;
   border-radius: 10px;
@@ -700,6 +534,239 @@
   border-radius: 999px;
   white-space: nowrap;
   margin-left: 4px;
+}/* ---------- SCAN PACKS: REPLACE OLD PRESET-ROW ---------- */
+.preset-row { display: none; }
+
+/* ---------- VAT ISSUANCE MODAL ---------- */
+#vat-invoice-modal .vat-modal { width:min(680px,calc(100vw - 32px)); max-width:680px; max-height:calc(100vh - 32px); max-height:calc(100dvh - 32px); padding:0; overflow:hidden; border-radius:18px; display:flex; flex-direction:column; }
+#vat-invoice-modal .modal-header { flex:0 0 auto; padding:20px 24px; border-bottom:1px solid #e2e8f0; align-items:flex-start; }
+#vat-invoice-modal .modal-body { flex:1 1 auto; min-height:0; overflow-y:auto; }
+#vat-invoice-modal .vat-modal__heading { display:flex; gap:12px; align-items:flex-start; }
+#vat-invoice-modal .vat-modal__icon { width:42px; height:42px; display:grid; place-items:center; border-radius:12px; background:#eef4ff; color:#0052cd; font-size:18px; }
+#vat-invoice-modal .vat-modal__heading p { margin:4px 0 0; color:#64748b; font-size:12px; line-height:1.5; }
+#vat-invoice-modal .modal-stepper { justify-content:stretch; margin:0 0 22px; }
+#vat-invoice-modal .modal-stepper .step { flex:1; flex-direction:column; gap:6px; opacity:1; text-align:center; }
+#vat-invoice-modal .modal-stepper .step .num { width:30px; height:30px; border:1px solid #dce3ec; background:#f8fafc; color:#94a3b8; }
+#vat-invoice-modal .modal-stepper .step.active .num { background:#0052cd; border-color:#0052cd; color:#fff; }
+#vat-invoice-modal .modal-stepper .step.done .num { background:#ecfdf5; border-color:#10b981; color:#059669; }
+#vat-invoice-modal .modal-stepper .step.active .label { color:#0052cd; }
+#vat-invoice-modal .modal-stepper .connector { flex:1; max-width:96px; margin:14px 8px 0; }
+#vat-invoice-modal .step-field label { font-size:11px; letter-spacing:.06em; font-weight:800; }
+#vat-invoice-modal .step-field input { height:46px; width:100%; box-sizing:border-box; border:1px solid #dce3ec; border-radius:10px; background:#f8fafc; padding:0 12px; }
+#vat-invoice-modal .step-field input:focus { outline:2px solid rgba(0,82,205,.18); border-color:#0052cd; }
+#vat-invoice-modal .step-field input.is-invalid { border-color:#e5484d; }
+#vat-invoice-modal .vat-tabs { display:flex; width:100%; padding:4px; border-radius:11px; background:#f1f5f9; }
+#vat-invoice-modal .vat-invoice-tab { flex:1; border:0; background:transparent; padding:10px; border-radius:8px; font:600 13px Manrope,sans-serif; color:#64748b; }
+#vat-invoice-modal .vat-invoice-tab.active { background:#fff; color:#0052cd; box-shadow:0 1px 4px rgba(4,19,53,.12); }
+#vat-invoice-modal .vat-info-box { margin:16px 0; padding:12px; border:1px solid #e2e8f0; border-radius:10px; background:#f7f9fc; color:#475569; font-size:12px; }
+#vat-invoice-modal .vat-document { border:1px solid #dce3ec; border-radius:12px; padding:22px; color:#334155; }
+#vat-invoice-modal .vat-document__watermark { display:flex; flex-direction:column; align-items:center; gap:3px; margin:-2px 0 14px; padding:9px; border:1px solid #c9daf4; border-radius:9px; background:#f1f6ff; color:#0052cd; font-size:10px; letter-spacing:.06em; text-align:center; }
+#vat-invoice-modal .vat-document__watermark strong { font-size:12px; }
+#vat-invoice-modal .vat-document h3 { margin:0; text-align:center; color:#041335; font-size:17px; }
+#vat-invoice-modal .vat-document__sub { margin:5px 0 18px; color:#64748b; text-align:center; font-size:12px; }
+#vat-invoice-modal .vat-document__parties { display:grid; grid-template-columns:1fr 1fr; gap:18px; padding:14px 0; border-block:1px solid #e2e8f0; font-size:12px; }
+#vat-invoice-modal .vat-document__parties b { font-size:10px; letter-spacing:.06em; color:#64748b; }
+#vat-invoice-modal .vat-document__parties p { margin:6px 0 0; line-height:1.55; }
+#vat-invoice-modal .vat-document__table { width:100%; margin:16px 0; border-collapse:collapse; font-size:12px; }
+#vat-invoice-modal .vat-document__table th { padding:9px 7px; background:#f7f9fc; color:#64748b; font-size:10px; text-align:left; }
+#vat-invoice-modal .vat-document__table td { padding:10px 7px; border-bottom:1px solid #e2e8f0; }
+#vat-invoice-modal .vat-document__totals { width:min(280px,100%); margin-left:auto; font-size:12px; }
+#vat-invoice-modal .vat-document__totals div { display:flex; justify-content:space-between; gap:20px; padding:6px 0; }
+#vat-invoice-modal .vat-document__totals .grand { border-top:1px solid #cbd5e1; margin-top:4px; padding-top:10px; color:#0052cd; font-size:14px; }
+#vat-invoice-modal .vat-issue-error { margin:12px 0 0; color:#c0392b; font-size:12px; }
+@media (max-width:560px) { #vat-invoice-modal .vat-document { padding:14px; } #vat-invoice-modal .vat-document__parties { grid-template-columns:1fr; gap:12px; } #vat-invoice-modal .vat-document__table { font-size:10px; } #vat-invoice-modal .vat-document__table th,#vat-invoice-modal .vat-document__table td { padding:7px 4px; } }
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width: 1200px) {
+  .pricing-grid-u {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .pricing-grid-u {
+    grid-template-columns: 1fr;
+  }
+  .current-plan {
+    flex-direction: column;
+    text-align: center;
+  }
+  .current-plan .plan-progress {
+    justify-content: center;
+  }
+  .current-plan .plan-right {
+    text-align: center;
+  }  .invoice-table {
+    font-size: 11px;
+  }}
+
+
+
+/* ── Mua theo lượt dọn dẹp · lấy lại từ bản 3.3.57 ─────── */
+
+
+/* ---------- SCAN PACKS ---------- */
+.scan-packs {
+  background: white;
+  border-radius: 10px;
+  border: 1px solid #e6ecf5;
+  padding: 20px;
+}
+
+.scan-packs h3 {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--navy);
+  margin: 0 0 14px;
+}
+
+.pack-grid {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.pack-item {
+  flex: 1;
+  min-width: 120px;
+  padding: 16px 14px;
+  border-radius: 10px;
+  border: 1px solid #e6ecf5;
+  background: white;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  position: relative;
+}
+
+.pack-item:hover {
+  border-color: #0487F1;
+}
+
+.pack-item.active {
+  border: 2px solid #0487F1;
+  background: #f5f9ff;
+}
+
+.pack-item .pack-label {
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.pack-item .pack-label.popular {
+  background: #0487F1;
+  color: white;
+}
+
+.pack-item .pack-label.best {
+  background: #f59e0b;
+  color: white;
+}
+
+.pack-item .pack-count {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--navy);
+}
+
+.pack-item .pack-count small {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.pack-item .pack-price {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--navy);
+  margin-top: 4px;
+}
+
+.pack-item .pack-price small {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+.pack-item.pack-custom {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: default;
+}
+
+.pack-item.pack-custom button {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid #dce3f0;
+  background: white;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+}
+
+.pack-item.pack-custom button:hover {
+  border-color: #0487F1;
+  color: #0487F1;
+}
+
+.pack-item.pack-custom input {
+  width: 44px;
+  text-align: center;
+  border: 1px solid #dce3f0;
+  border-radius: 6px;
+  padding: 6px 4px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--navy);
+}
+
+/* Total bar */
+.total-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #e6ecf5;
+}
+
+.total-bar .total-amount {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--navy);
+}
+
+.total-bar .total-amount span {
+  font-size: 20px;
+  color: #0487F1;
+}
+
+.total-bar button {
+  background: #0487F1;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 22px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.total-bar button:hover {
+  background: #0373d0;
 }
 
 /* ---------- SCAN PACKS HEADER ---------- */
@@ -840,80 +907,52 @@
   white-space: nowrap;
 }
 
-/* ---------- SCAN PACKS: REPLACE OLD PRESET-ROW ---------- */
-.preset-row { display: none; }
-
-/* ---------- VAT ISSUANCE MODAL ---------- */
-#vat-invoice-modal .vat-modal { width:min(680px,calc(100vw - 32px)); max-width:680px; max-height:calc(100vh - 32px); max-height:calc(100dvh - 32px); padding:0; overflow:hidden; border-radius:18px; display:flex; flex-direction:column; }
-#vat-invoice-modal .modal-header { flex:0 0 auto; padding:20px 24px; border-bottom:1px solid #e2e8f0; align-items:flex-start; }
-#vat-invoice-modal .modal-body { flex:1 1 auto; min-height:0; overflow-y:auto; }
-#vat-invoice-modal .vat-modal__heading { display:flex; gap:12px; align-items:flex-start; }
-#vat-invoice-modal .vat-modal__icon { width:42px; height:42px; display:grid; place-items:center; border-radius:12px; background:#eef4ff; color:#0052cd; font-size:18px; }
-#vat-invoice-modal .vat-modal__heading p { margin:4px 0 0; color:#64748b; font-size:12px; line-height:1.5; }
-#vat-invoice-modal .modal-stepper { justify-content:stretch; margin:0 0 22px; }
-#vat-invoice-modal .modal-stepper .step { flex:1; flex-direction:column; gap:6px; opacity:1; text-align:center; }
-#vat-invoice-modal .modal-stepper .step .num { width:30px; height:30px; border:1px solid #dce3ec; background:#f8fafc; color:#94a3b8; }
-#vat-invoice-modal .modal-stepper .step.active .num { background:#0052cd; border-color:#0052cd; color:#fff; }
-#vat-invoice-modal .modal-stepper .step.done .num { background:#ecfdf5; border-color:#10b981; color:#059669; }
-#vat-invoice-modal .modal-stepper .step.active .label { color:#0052cd; }
-#vat-invoice-modal .modal-stepper .connector { flex:1; max-width:96px; margin:14px 8px 0; }
-#vat-invoice-modal .step-field label { font-size:11px; letter-spacing:.06em; font-weight:800; }
-#vat-invoice-modal .step-field input { height:46px; width:100%; box-sizing:border-box; border:1px solid #dce3ec; border-radius:10px; background:#f8fafc; padding:0 12px; }
-#vat-invoice-modal .step-field input:focus { outline:2px solid rgba(0,82,205,.18); border-color:#0052cd; }
-#vat-invoice-modal .step-field input.is-invalid { border-color:#e5484d; }
-#vat-invoice-modal .vat-tabs { display:flex; width:100%; padding:4px; border-radius:11px; background:#f1f5f9; }
-#vat-invoice-modal .vat-invoice-tab { flex:1; border:0; background:transparent; padding:10px; border-radius:8px; font:600 13px Manrope,sans-serif; color:#64748b; }
-#vat-invoice-modal .vat-invoice-tab.active { background:#fff; color:#0052cd; box-shadow:0 1px 4px rgba(4,19,53,.12); }
-#vat-invoice-modal .vat-info-box { margin:16px 0; padding:12px; border:1px solid #e2e8f0; border-radius:10px; background:#f7f9fc; color:#475569; font-size:12px; }
-#vat-invoice-modal .vat-document { border:1px solid #dce3ec; border-radius:12px; padding:22px; color:#334155; }
-#vat-invoice-modal .vat-document__watermark { display:flex; flex-direction:column; align-items:center; gap:3px; margin:-2px 0 14px; padding:9px; border:1px solid #c9daf4; border-radius:9px; background:#f1f6ff; color:#0052cd; font-size:10px; letter-spacing:.06em; text-align:center; }
-#vat-invoice-modal .vat-document__watermark strong { font-size:12px; }
-#vat-invoice-modal .vat-document h3 { margin:0; text-align:center; color:#041335; font-size:17px; }
-#vat-invoice-modal .vat-document__sub { margin:5px 0 18px; color:#64748b; text-align:center; font-size:12px; }
-#vat-invoice-modal .vat-document__parties { display:grid; grid-template-columns:1fr 1fr; gap:18px; padding:14px 0; border-block:1px solid #e2e8f0; font-size:12px; }
-#vat-invoice-modal .vat-document__parties b { font-size:10px; letter-spacing:.06em; color:#64748b; }
-#vat-invoice-modal .vat-document__parties p { margin:6px 0 0; line-height:1.55; }
-#vat-invoice-modal .vat-document__table { width:100%; margin:16px 0; border-collapse:collapse; font-size:12px; }
-#vat-invoice-modal .vat-document__table th { padding:9px 7px; background:#f7f9fc; color:#64748b; font-size:10px; text-align:left; }
-#vat-invoice-modal .vat-document__table td { padding:10px 7px; border-bottom:1px solid #e2e8f0; }
-#vat-invoice-modal .vat-document__totals { width:min(280px,100%); margin-left:auto; font-size:12px; }
-#vat-invoice-modal .vat-document__totals div { display:flex; justify-content:space-between; gap:20px; padding:6px 0; }
-#vat-invoice-modal .vat-document__totals .grand { border-top:1px solid #cbd5e1; margin-top:4px; padding-top:10px; color:#0052cd; font-size:14px; }
-#vat-invoice-modal .vat-issue-error { margin:12px 0 0; color:#c0392b; font-size:12px; }
-@media (max-width:560px) { #vat-invoice-modal .vat-document { padding:14px; } #vat-invoice-modal .vat-document__parties { grid-template-columns:1fr; gap:12px; } #vat-invoice-modal .vat-document__table { font-size:10px; } #vat-invoice-modal .vat-document__table th,#vat-invoice-modal .vat-document__table td { padding:7px 4px; } }
-
-/* ---------- RESPONSIVE ---------- */
-@media (max-width: 1200px) {
-  .pricing-grid-u {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
 @media (max-width: 768px) {
-  .pricing-grid-u {
-    grid-template-columns: 1fr;
-  }
-  .current-plan {
-    flex-direction: column;
-    text-align: center;
-  }
-  .current-plan .plan-progress {
-    justify-content: center;
-  }
-  .current-plan .plan-right {
-    text-align: center;
-  }
   .pack-grid {
     flex-direction: column;
   }
   .pack-item {
     min-width: auto;
   }
-  .invoice-table {
-    font-size: 11px;
-  }
   .total-bar {
     flex-direction: column;
     gap: 12px;
-  }
+  }}
+
+.scan-packs-note {
+    margin: 8px 0 0; max-width: 62ch;
+    font-size: 12.5px; line-height: 1.55; color: #64748B;
+    border-left: 2px solid #DBEAFE; padding-left: 10px;
 }
+.scan-packs-note b { color: #1D4ED8; font-weight: 700; }
+
+
+.plan-yearly-note {
+    display: block; margin-top: 4px;
+    font-size: 12px; font-weight: 600; color: #05684B;
+}
+
+
+
+/* ---------- ADD-ON · DRIVE KẾT NỐI THÊM ---------- */
+.drive-addon { margin-top: 16px; }
+.scan-packs-icon--addon { background: #ecfdf5; color: #059669; }
+.drive-addon .pack-item .pack-note {
+  font-size: 10.5px;
+  color: var(--text-muted);
+  margin-top: 4px;
+  line-height: 1.35;
+}
+.drive-addon .pack-item.active { border-color: #059669; background: #f2fdf8; }
+.drive-addon .pack-item:hover { border-color: #059669; }
+.drive-addon .pack-check { color: #059669; }
+.drive-addon .pack-label.addon { background: #059669; color: #fff; }
+.drive-addon .pack-custom-controls button:hover { border-color: #059669; color: #059669; }
+.drive-addon .total-bar .total-amount span { color: #059669; }
+.drive-addon .total-bar .total-cycle {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+.drive-addon .total-bar button { background: #059669; }
+.drive-addon .total-bar button:hover { background: #047857; }
